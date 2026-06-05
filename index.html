@@ -10,16 +10,31 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Calidad Bertone">
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="96" fill="%231e3a8a"/%3E%3Ctext x="256" y="238" font-family="Arial, Helvetica, sans-serif" font-size="88" font-weight="900" text-anchor="middle" fill="white"%3EB%3C/text%3E%3Ctext x="256" y="330" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="900" text-anchor="middle" fill="white"%3EBERTONE%3C/text%3E%3C/svg%3E'>
     
     <!-- Enlace al Manifest incrustado vía Data URI para evitar archivos separados -->
     <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Sistema%20de%20Calidad%20BERTONE%22%2C%22short_name%22%3A%22Calidad%20Bertone%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%231e3a8a%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22https%3A%2F%2Fcdn-icons-png.flaticon.com%2F512%2F5605%2F5605063.png%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fpng%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
 
-    <!-- Tailwind CSS -->
+    <!-- Tailwind CSS (warning de CDN suprimido - no afecta el funcionamiento) -->
+    <script>!function(){const w=console.warn;console.warn=function(...a){if(a[0]&&String(a[0]).includes('cdn.tailwindcss.com'))return;w.apply(console,a)};}();</script>
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Html5-QrCode Library (QR Scanner) -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <!-- Tesseract.js OCR - lee texto de etiquetas en el dispositivo -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-app-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-auth-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-firestore-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-storage-compat.min.js"></script>
+    <!-- Fallback CDN por si gstatic no carga en alguna red -->
+    <script>
+    window.__firebaseLoadCheck = function() {
+        return typeof firebase !== 'undefined' && firebase.app && firebase.auth && firebase.firestore && firebase.storage;
+    };
+    </script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     
     <style>
         @media print {
@@ -40,22 +55,8 @@
             border-radius: 3px;
         }
     </style>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
-
-    <!-- PANTALLA DE CARGA / PROCESAMIENTO INTELIGENTE -->
-    <div id="loader-overlay" class="fixed inset-0 bg-slate-900/80 z-[100] flex flex-col items-center justify-center hidden">
-        <div class="bg-white rounded-2xl p-6 shadow-2xl flex flex-col items-center gap-4 max-w-xs text-center border border-slate-200">
-            <div class="relative w-16 h-16">
-                <div class="absolute inset-0 border-4 border-slate-200 rounded-full"></div>
-                <div class="absolute inset-0 border-4 border-blue-900 rounded-full border-t-transparent animate-spin"></div>
-            </div>
-            <p class="font-bold text-slate-800 text-sm uppercase tracking-wider">AI Procesando Cucarda...</p>
-            <p class="text-xs text-slate-500">Eliminando logotipo y ecualizando contraste dinámico para escanear el código QR.</p>
-        </div>
-    </div>
 
     <!-- MENÚ DE CONFIGURACIÓN DE MARCA (Editable en cualquier momento) -->
     <div id="settings-panel" class="bg-slate-800 text-white p-4 hidden no-print transition-all duration-300">
@@ -66,7 +67,7 @@
                 </h3>
                 <button onclick="toggleSettings()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                 <div>
                     <label class="block text-xs text-slate-400 font-semibold mb-1">Nombre de la Empresa</label>
                     <input type="text" id="cfg-empresa" oninput="actualizarMarca()" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
@@ -83,34 +84,67 @@
                     <label class="block text-xs text-slate-400 font-semibold mb-1">Subtítulo del Formulario</label>
                     <input type="text" id="cfg-subtitulo-form" oninput="actualizarMarca()" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
                 </div>
-            </div>
-            
-            <!-- SECCIÓN DE VINCULO A LA NUBE Y QR GENERADO EN TIEMPO REAL -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 border-t border-slate-700 pt-4 mb-4">
-                <div class="md:col-span-2">
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-xs text-slate-400 font-semibold">Código de Enlace para Celulares (Sincronización de Base de Datos)</label>
-                        <button type="button" onclick="copiarConfiguracionNube()" class="bg-blue-600 hover:bg-blue-500 text-white text-[10px] font-bold px-2 py-1 rounded transition">
-                            <i class="fas fa-copy"></i> Copiar Código Manual
+                <div class="sm:col-span-2 md:col-span-4 border border-slate-600 rounded-xl p-3 bg-slate-900/50">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-bold text-white flex items-center gap-2"><i class="fas fa-cloud text-blue-400"></i> Sincronización en la Nube (Firebase)</span>
+                        <button onclick="toggleGuiaFirebase()" type="button" class="text-blue-400 text-xs underline hover:text-blue-300">¿Cómo configurar?</button>
+                    </div>
+                    <div id="guia-firebase" class="hidden mb-3 bg-blue-950/60 rounded-lg p-3 text-xs text-slate-300 space-y-1">
+                        <!-- AVISO FILE:// -->
+                        <div id="alerta-file-protocol" class="hidden mb-3 bg-red-900 border border-red-400 rounded-lg p-3">
+                            <p class="text-red-200 font-bold mb-1">🚨 Abrís el archivo como file:// — la nube NO puede funcionar así.</p>
+                            <p class="text-red-100 mb-2">Firebase necesita una URL <strong>https://</strong>. Solución gratis en 5 min con GitHub Pages:</p>
+                            <ol class="text-red-100 space-y-1 list-decimal list-inside">
+                                <li>Entrá a <a href="https://github.com" target="_blank" class="text-blue-300 underline font-bold">github.com</a> → crear cuenta gratis</li>
+                                <li>Nuevo repositorio público → nombre: <strong>bertone-app</strong></li>
+                                <li>Subir este archivo renombrado como <strong>index.html</strong></li>
+                                <li>Settings → Pages → Branch: main → Save</li>
+                                <li>URL: <strong>https://tuusuario.github.io/bertone-app</strong> → compartir con todos 📱</li>
+                            </ol>
+                        </div>
+                        <p class="font-bold text-blue-300 mb-2">📋 Pasos para activar la nube (gratis):</p>
+                        <p>1. Ir a <a href="https://console.firebase.google.com" target="_blank" class="text-blue-400 underline">console.firebase.google.com</a></p>
+                        <p>2. Crear proyecto → Continuar → Deshabilitar Analytics → Crear</p>
+                        <p>3. En "Authentication" → Iniciar → pestaña "Sign-in method" → habilitar <strong>Anónimo</strong></p>
+                        <p>4. En "Firestore Database" → Crear base de datos → Modo prueba → Listo</p>
+                        <p>4b. En "Storage" → Comenzar → Modo prueba → Listo (para guardar fotos)</p>
+                        <p>5. En "Authentication" → Sign-in method → <strong>Anónimo → Habilitar</strong>.</p>
+                        <div class="mt-3 bg-yellow-900 border border-yellow-500 rounded-lg p-3">
+                            <p class="text-yellow-300 font-bold mb-1">⚠️ Si solo funciona en UN dispositivo:</p>
+                            <p class="text-yellow-200 text-xs mb-2">Las reglas en "modo prueba" vencen a los 30 días. Copiá estas reglas permanentes:</p>
+                            <p class="font-bold text-white text-xs mb-1">Firestore → Reglas:</p>
+                            <pre class="bg-slate-900 text-green-300 text-xs rounded p-2 mb-2 overflow-x-auto">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}</pre>
+                            <p class="font-bold text-white text-xs mb-1">Storage → Reglas:</p>
+                            <pre class="bg-slate-900 text-green-300 text-xs rounded p-2 overflow-x-auto">rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}</pre>
+                        </div>
+                        <p>5. Ir a ⚙️ Configuración del proyecto → "Tu app" → Registrar app web → Copiar config</p>
+                        <p>6. Pegar la config JSON aquí abajo y guardar</p>
+                        <p class="text-yellow-300 mt-1">💡 Para compartir con otros celulares: guardá la config y usá el botón "Compartir Config"</p>
+                    </div>
+                    <textarea id="cfg-db-config" rows="3" placeholder='Pegar aqui la configuracion JSON de Firebase:
+{"apiKey":"AIza...","authDomain":"mi-proyecto.firebaseapp.com","projectId":"mi-proyecto",...}' class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500 placeholder-slate-500"></textarea>
+                    <div class="flex gap-2 mt-2">
+                        <button type="button" onclick="compartirConfigCloud()" class="bg-blue-700 hover:bg-blue-600 text-xs text-white font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition">
+                            <i class="fas fa-share-alt"></i> Compartir Config
                         </button>
+                        <span class="text-[10px] text-slate-400 self-center">Genera un QR para que otros celulares se conecten a la misma base</span>
                     </div>
-                    <textarea id="cfg-db-config" readonly class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-[11px] text-slate-300 focus:outline-none focus:border-blue-500 font-mono h-24 outline-none resize-none"></textarea>
-                    <p class="text-[10px] text-slate-400 mt-1 italic">
-                        * Consejo: Sincronizar mediante el código QR de la derecha es el método más rápido, ya que no requiere tipear ni copiar texto.
-                    </p>
-                </div>
-                <!-- PANEL QR PARA VINCULAR DISPOSITIVOS -->
-                <div id="pwa-sync-qr-section" class="bg-white p-3 rounded-xl flex flex-col items-center justify-center shadow-inner border border-slate-300 max-w-[190px] mx-auto w-full text-center">
-                    <p class="text-[9px] text-slate-800 font-black mb-1 flex items-center gap-1 uppercase">
-                        <i class="fas fa-mobile-alt text-blue-900"></i> Vincular Celular
-                    </p>
-                    <div class="bg-slate-50 p-1 border border-slate-200 rounded-lg flex items-center justify-center w-[120px] h-[120px]">
-                        <img id="db-sync-qr-img" src="" alt="QR de Sincronización" class="w-full h-full object-contain">
-                    </div>
-                    <p class="text-[8px] text-slate-500 mt-1 italic leading-tight">Escanea este QR desde el escáner de la app de tu móvil.</p>
                 </div>
             </div>
-
             <div class="mt-4 pt-4 border-t border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <label class="block text-xs text-slate-400 font-semibold mb-1">Subir Logotipo Personalizado (Reemplaza el texto corporativo)</label>
@@ -143,12 +177,7 @@
                     <img id="brand-img-logo" src="" alt="Logo" class="hidden max-h-11 object-contain">
                 </div>
                 <div>
-                    <div class="flex items-center gap-2">
-                        <h1 id="brand-form-title" class="text-lg font-bold">SISTEMA DE CALIDAD</h1>
-                        <span id="cloud-status-badge" class="bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1">
-                            <i class="fas fa-spinner animate-spin"></i> Conectando...
-                        </span>
-                    </div>
+                    <h1 id="brand-form-title" class="text-lg font-bold">SISTEMA DE CALIDAD</h1>
                     <p id="brand-form-subtitle" class="text-xs text-blue-200">Checklist de Cumplimiento de Paneles</p>
                 </div>
             </div>
@@ -160,18 +189,24 @@
                 <button onclick="toggleSettings()" class="bg-blue-800 hover:bg-blue-700 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition" title="Editar marcas, textos y logos">
                     <i class="fas fa-edit"></i> Editar App
                 </button>
+                <button onclick="resetearChecklistLocal()" class="bg-orange-700 hover:bg-orange-600 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition" title="Restablecer items del checklist">
+                    <i class="fas fa-list-check"></i> Restablecer Items
+                </button>
                 <button onclick="window.print()" class="bg-blue-700 hover:bg-blue-600 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition">
                     <i class="fas fa-print"></i> Imprimir / PDF
                 </button>
                 <button onclick="exportarExcel()" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition">
                     <i class="fas fa-file-excel"></i> Exportar Todo a Excel
                 </button>
-                <button onclick="document.getElementById('importar-csv-file').click()" class="bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition" title="Consolidar datos de otros operadores de forma manual si es necesario">
-                    <i class="fas fa-file-import"></i> Importar CSV
-                </button>
-                <input type="file" id="importar-csv-file" accept=".csv" class="hidden" onchange="importarCSV(event)">
+                <label class="cursor-pointer bg-amber-600 hover:bg-amber-500 active:bg-amber-700 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition select-none" title="Consolidar datos de otros operadores">
+                    <i class="fas fa-file-import"></i> Importar / Combinar
+                    <input type="file" id="importar-csv-file" accept=".csv" class="hidden" onchange="importarCSV(event)">
+                </label>
                 <button onclick="toggleHistorial()" class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition">
                     <i class="fas fa-history"></i> <span id="btn-historial-txt">Historial ([0])</span>
+                </button>
+                <button onclick="abrirConfigNube()" id="cloud-status-badge" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-2 border border-blue-700 transition cursor-pointer" title="Configurar sincronización en la nube">
+                    <i class="fas fa-cloud"></i> <span id="cloud-badge-txt">☁️ Configurar Nube</span>
                 </button>
             </div>
         </div>
@@ -190,16 +225,16 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
                 <div>
                     <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-                        <i class="fas fa-database text-blue-900"></i> Base de Datos Unificada en la Nube
+                        <i class="fas fa-database text-blue-900"></i> Base de Datos Acumulativa
                     </h2>
-                    <p class="text-xs text-slate-500 mt-1">Todos los registros de cualquier dispositivo de la empresa se sincronizan aquí para un único Excel general.</p>
+                    <p class="text-xs text-slate-500 mt-1">Todos los registros guardados aquí se exportarán juntos en una única planilla de Excel.</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="exportarExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-2 rounded-lg font-bold transition">
                         <i class="fas fa-download"></i> Descargar Todo el Excel
                     </button>
                     <button onclick="limpiarHistorialCompleto()" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs px-3 py-2 rounded-lg font-medium border border-red-200 transition">
-                        Borrar Local
+                        Borrar Todo
                     </button>
                 </div>
             </div>
@@ -209,7 +244,7 @@
                         <tr class="bg-slate-100 text-slate-700 uppercase tracking-wider text-xs">
                             <th class="p-3 border-b">Fecha</th>
                             <th class="p-3 border-b">Código</th>
-                            <th class="p-3 border-b">Descripción (Modelo)</th>
+                            <th class="p-3 border-b">Panel (Modelo)</th>
                             <th class="p-3 border-b">Cucarda/Serie</th>
                             <th class="p-3 border-b">Mesa</th>
                             <th class="p-3 border-b">Operarios / Firma</th>
@@ -249,17 +284,16 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-2 border-b border-slate-200">
                 <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">Datos de Identificación del Panel</h3>
                 
-                <div class="flex flex-wrap gap-2 w-full sm:w-auto no-print">
-                    <!-- Botón Unificado de Escaneo QR con Cámara Activa -->
+                <div class="flex gap-2 flex-wrap w-full sm:w-auto no-print">
+                    <!-- Botón Escaneo QR -->
                     <button type="button" onclick="abrirScanner()" class="flex-1 sm:flex-none bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-sm">
-                        <i class="fas fa-qrcode text-sm"></i> Escanear con Cámara / QR Enlace
+                        <i class="fas fa-qrcode text-sm"></i> Escanear QR
                     </button>
-                    <!-- Botón de Fallback/PC: Subir archivo directo o capturar con cámara nativa del sistema -->
-                    <button type="button" onclick="document.getElementById('qr-file-fallback').click()" class="flex-1 sm:flex-none bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition" title="Ideal para computadoras sin cámara activa o si se bloquean los permisos">
-                        <i class="fas fa-upload text-sm"></i> Subir Imagen/Foto de Cucarda
+                    <!-- Botón Foto IA para leer cucarda -->
+                    <button type="button" onclick="abrirCamaraIA()" class="flex-1 sm:flex-none bg-violet-700 hover:bg-violet-600 active:bg-violet-800 text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fas fa-brain text-sm"></i> Foto IA Cucarda
                     </button>
-                    <!-- Input de archivo unificado sin capture forzado para que funcione tanto en PC como en móviles sin bloqueos -->
-                    <input type="file" id="qr-file-fallback" accept="image/*" class="hidden" onchange="escanearDesdeArchivo(event)">
+                    <!-- El input qr-file-fallback ahora vive dentro del modal QR como label nativo -->
                 </div>
             </div>
 
@@ -274,8 +308,8 @@
                     <input type="text" id="codigo" required placeholder="Ej. 08-007-08544" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Descripción Panel (Letras Grandes)</label>
-                    <input type="text" id="descripcion_panel" required placeholder="Ej. PPV018B" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Nombre Panel (Letras Grandes)</label>
+                    <input type="text" id="nombre_panel" required placeholder="Ej. PPV018B" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold uppercase text-slate-500 mb-1">N° Serie / Cucarda</label>
@@ -293,7 +327,30 @@
 
             <!-- TABLA DE CONTROLES -->
             <div class="mb-8">
-                <h3 class="text-lg font-bold text-slate-800 mb-4 pb-2 border-b-2 border-slate-200">Ítems de Control de Calidad</h3>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-2 border-b-2 border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800">Ítems de Control de Calidad</h3>
+                    <button type="button" onclick="toggleItemManager()" class="no-print bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition">
+                        <i class="fas fa-list-check"></i> Modificar Ítems
+                    </button>
+                </div>
+
+                <div id="item-manager" class="hidden no-print mb-5 border border-blue-100 rounded-xl bg-blue-50/60 p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-[180px_1fr_auto] gap-3 items-end">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Categoría</label>
+                            <input type="text" id="new-item-category" list="category-list" placeholder="Ej. Armadura" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            <datalist id="category-list"></datalist>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Descripción del ítem</label>
+                            <input type="text" id="new-item-desc" placeholder="Nuevo control de calidad..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button type="button" onclick="agregarItemManual()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold py-2.5 px-4 rounded-lg">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-2">Para quitar un ítem, usá el icono de basura que aparece al lado de cada control.</p>
+                </div>
                 
                 <div class="space-y-6" id="items-container">
                     <!-- Las categorías e ítems se inyectan dinámicamente aquí -->
@@ -305,11 +362,16 @@
                 <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
                     <label class="block text-sm font-bold text-slate-700 uppercase">Observaciones Generales e Imágenes</label>
                     
-                    <!-- Botón para añadir fotos / usar cámara -->
-                    <button type="button" onclick="document.getElementById('input-fotos').click()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition no-print">
-                        <i class="fas fa-camera"></i> Adjuntar Foto / Cámara
-                    </button>
-                    <input type="file" id="input-fotos" accept="image/*" multiple capture="environment" class="hidden" onchange="procesarFotosAdjuntas(event)">
+                    <!-- Botones de foto: Cámara en vivo y Galería -->
+                    <div class="flex gap-2 no-print">
+                        <button type="button" onclick="abrirCamara()" class="bg-blue-900 text-white text-xs font-bold py-2 px-3 rounded-lg flex items-center gap-2 transition active:bg-blue-700">
+                            <i class="fas fa-camera"></i> Cámara
+                        </button>
+                        <label class="cursor-pointer bg-slate-600 text-white text-xs font-bold py-2 px-3 rounded-lg flex items-center gap-2 transition select-none active:bg-slate-400">
+                            <i class="fas fa-images"></i> Galería
+                            <input type="file" id="input-fotos-galeria" accept="image/*" multiple class="hidden" onchange="procesarFotosAdjuntas(event)">
+                        </label>
+                    </div>
                 </div>
                 
                 <textarea id="observaciones" rows="3" placeholder="Escriba aquí aclaraciones, desvíos detectados o acciones correctivas tomadas..." class="w-full bg-white border border-slate-300 rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition mb-4"></textarea>
@@ -323,47 +385,21 @@
                 </div>
             </div>
 
-            <!-- REGISTRO DE FIRMA -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                <div class="border border-slate-300 rounded-xl p-4 bg-slate-50 flex flex-col justify-between">
-                    <div>
-                        <label class="block text-xs font-bold uppercase text-slate-500 mb-2">Firma del Responsable</label>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nombre y Apellido del Firmante (Obligatorio)</label>
-                                <input type="text" id="nombre_firmante" required placeholder="Escriba su Nombre y Apellido completo" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition">
-                            </div>
-                            <div class="no-print">
-                                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Firma Digitalizada / Trazo (Opcional)</label>
-                                    <!-- <div class="relative bg-white border border-slate-300 rounded-lg overflow-hidden h-[100px]">
- -->
-                                    <!-- <canvas id="firma-canvas" class="w-full h-full cursor-crosshair"></canvas>
- -->
-                                    <!-- </div>
- -->
-                                    <!-- <button type="button" onclick="limpiarFirma()" class="mt-1 text-[11px] text-red-500 hover:text-red-700 font-semibold flex items-center gap-1">
- -->
-                                    <!-- <i class="fas fa-eraser"></i> Limpiar Trazo
- -->
-                                    <!-- </button>
- -->
-                                    <!-- </div>
- -->
-                        </div>
-                    </div>
+            <!-- DATOS RESPONSABLE Y GUARDADO -->
+            <div class="mb-8 border border-slate-300 rounded-xl p-6 bg-slate-50">
+                <label class="block text-xs font-bold uppercase text-slate-500 mb-3">Responsable</label>
+                <div class="mb-4">
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nombre y Apellido del Responsable (Obligatorio)</label>
+                    <input type="text" id="nombre_firmante" required placeholder="Escriba su Nombre y Apellido completo" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition">
                 </div>
-                
-                <div class="flex flex-col justify-center bg-slate-50 border border-slate-300 rounded-xl p-6">
-                    <h4 class="text-sm font-bold text-slate-700 mb-2 uppercase text-center md:text-left">Validación y Almacenamiento</h4>
-                    <p class="text-xs text-slate-500 mb-4 text-center md:text-left">Al guardar, los datos del panel, respuestas, fotos y firma quedarán consolidados permanentemente en la base de datos de este dispositivo.</p>
-                    <div class="flex flex-col sm:flex-row gap-2 no-print">
-                        <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg text-sm tracking-wide shadow transition flex items-center justify-center gap-2">
-                            <i class="fas fa-save"></i> Guardar Planilla
-                        </button>
-                        <button type="button" onclick="resetearFormulario()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 px-4 rounded-lg text-sm transition">
-                            Limpiar Todo
-                        </button>
-                    </div>
+                <p class="text-xs text-slate-500 mb-4">Al guardar, los datos del panel, respuestas y fotos quedarán consolidados en la base de datos.</p>
+                <div class="flex flex-col sm:flex-row gap-2 no-print">
+                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg text-sm tracking-wide shadow transition flex items-center justify-center gap-2">
+                        <i class="fas fa-save"></i> Guardar Planilla
+                    </button>
+                    <button type="button" onclick="resetearFormulario()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 px-4 rounded-lg text-sm transition">
+                        Limpiar Todo
+                    </button>
                 </div>
             </div>
 
@@ -388,8 +424,11 @@
             </div>
 
             <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-slate-600">
-                <p class="font-bold text-blue-900 mb-1">Cucarda Bertone / ViBert o QR de Enlace:</p>
-                <p>Enfoca la cucarda física o el código QR de configuración de la PC.</p>
+                <p class="font-bold text-blue-900 mb-1">Formatos de QR soportados:</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li><strong>Texto Separado por barras:</strong> <code class="bg-blue-100 px-1 rounded font-mono">CÓDIGO | NOMBRE PANEL | SERIE</code></li>
+                    <li><strong>JSON estructurado:</strong> <code class="bg-blue-100 px-1 rounded font-mono">{"codigo":"...", "nombre":"...", "serie":"..."}</code></li>
+                </ul>
             </div>
 
             <!-- Contenedor del scanner de cámara -->
@@ -397,11 +436,13 @@
                 <div id="reader" class="w-full h-full"></div>
             </div>
 
+            <!-- Botón fallback: label nativo, funciona sin JS .click() en iOS/Android -->
             <div class="text-center">
-                <p class="text-xs text-slate-500 mb-2">¿Problemas de permisos o cámara bloqueada en PC?</p>
-                <button type="button" onclick="cerrarScanner(); document.getElementById('qr-file-fallback').click();" class="text-xs text-blue-700 hover:text-blue-900 font-bold underline">
-                    <i class="fas fa-image"></i> Cargar imagen o foto guardada de la cucarda
-                </button>
+                <p class="text-xs text-slate-500 mb-2">Problemas con la camara activa?</p>
+                <label class="cursor-pointer text-xs text-blue-700 font-bold underline inline-flex items-center gap-1">
+                    <i class="fas fa-image"></i> Subir foto del QR desde el celular
+                    <input type="file" id="qr-file-fallback" accept="image/*" capture="environment" class="hidden" onchange="cerrarScanner(); escanearDesdeArchivo(event)">
+                </label>
             </div>
 
             <div class="flex flex-col gap-2">
@@ -411,6 +452,163 @@
             </div>
         </div>
     </div>
+
+
+
+    <!-- MODAL CÁMARA IA - LECTURA CUCARDA -->
+    <div id="ia-camera-modal" class="fixed inset-0 bg-black z-[72] flex flex-col hidden no-print">
+        <!-- Header -->
+        <div class="absolute top-0 left-0 right-0 flex justify-between items-center px-4 py-3 bg-gradient-to-b from-black/80 to-transparent z-10">
+            <button onclick="cerrarCamaraIA()" class="text-white bg-black/50 backdrop-blur rounded-xl px-4 py-2 text-sm font-bold flex items-center gap-2 active:bg-black/80">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <div class="text-center">
+                <span class="text-white font-bold text-sm drop-shadow block">🧠 IA Lee la Cucarda</span>
+                <span class="text-white/70 text-xs">Enfocá bien la etiqueta</span>
+            </div>
+            <button onclick="cambiarCamaraIA()" class="text-white bg-black/50 backdrop-blur rounded-xl p-2.5 active:bg-black/80">
+                <i class="fas fa-sync-alt text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Video + overlay guía -->
+        <div class="relative w-full h-full">
+            <video id="ia-camera-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
+            <!-- Marco guía -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="border-2 border-white/80 rounded-2xl w-[85%] max-w-sm aspect-[3/2] shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]">
+                    <div class="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-violet-400 rounded-tl-lg -translate-x-0.5 -translate-y-0.5"></div>
+                    <div class="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-violet-400 rounded-tr-lg translate-x-0.5 -translate-y-0.5"></div>
+                    <div class="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-violet-400 rounded-bl-lg -translate-x-0.5 translate-y-0.5"></div>
+                    <div class="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-violet-400 rounded-br-lg translate-x-0.5 translate-y-0.5"></div>
+                </div>
+            </div>
+            <!-- Estado IA procesando -->
+            <div id="ia-procesando" class="hidden absolute inset-0 bg-black/75 flex flex-col items-center justify-center gap-4 z-20">
+                <div class="w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-white font-bold text-lg">Analizando cucarda...</p>
+                <p class="text-violet-300 text-sm">La IA está leyendo la etiqueta</p>
+            </div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="absolute bottom-0 left-0 right-0 pb-10 pt-6 bg-gradient-to-t from-black/80 to-transparent flex justify-center items-center gap-8">
+            <div class="w-14"></div>
+            <!-- Disparador -->
+            <button onclick="capturarFotoIA()" id="btn-capturar-ia"
+                class="w-20 h-20 rounded-full bg-violet-500 border-4 border-violet-300 shadow-2xl flex items-center justify-center active:scale-90 transition-transform focus:outline-none">
+                <i class="fas fa-brain text-white text-2xl"></i>
+            </button>
+            <!-- Galería alternativa -->
+            <label class="cursor-pointer w-14 h-14 bg-black/50 backdrop-blur rounded-full text-white flex items-center justify-center active:bg-black/80">
+                <i class="fas fa-images text-xl"></i>
+                <input type="file" accept="image/*" class="hidden" onchange="procesarFotoIADesdeGaleria(event)">
+            </label>
+        </div>
+    </div>
+
+    <!-- MODAL CÁMARA EN VIVO -->
+    <div id="camera-modal" class="fixed inset-0 bg-black z-[70] flex flex-col hidden no-print">
+        <!-- Barra superior -->
+        <div class="absolute top-0 left-0 right-0 flex justify-between items-center px-4 py-3 bg-gradient-to-b from-black/70 to-transparent z-10">
+            <button onclick="cerrarCamara()" class="text-white bg-black/50 backdrop-blur rounded-xl px-4 py-2 text-sm font-bold flex items-center gap-2 active:bg-black/80">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <span class="text-white font-bold text-sm drop-shadow">📸 Tomar Foto</span>
+            <button onclick="cambiarCamara()" id="btn-flip-cam" class="text-white bg-black/50 backdrop-blur rounded-xl p-2.5 active:bg-black/80" title="Cambiar cámara">
+                <i class="fas fa-sync-alt text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Video feed -->
+        <video id="camera-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
+
+        <!-- Barra inferior -->
+        <div class="absolute bottom-0 left-0 right-0 pb-10 pt-6 bg-gradient-to-t from-black/80 to-transparent flex justify-center items-center gap-8">
+            <!-- Contador de fotos tomadas -->
+            <div class="w-14 h-14 flex items-center justify-center">
+                <span id="foto-count-badge" class="hidden bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full"></span>
+            </div>
+            <!-- Botón disparador -->
+            <button onclick="capturarFoto()" id="btn-capturar"
+                class="w-20 h-20 rounded-full bg-white border-4 border-slate-300 shadow-2xl flex items-center justify-center active:scale-90 transition-transform focus:outline-none">
+                <div class="w-15 h-15 rounded-full bg-white border-2 border-slate-200 w-14 h-14"></div>
+            </button>
+            <!-- Botón cerrar con fotos -->
+            <button onclick="cerrarCamara()" class="w-14 h-14 bg-emerald-600 rounded-full text-white flex items-center justify-center active:bg-emerald-700 shadow-lg">
+                <i class="fas fa-check text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIG NUBE -->
+    <div id="cloud-modal" class="fixed inset-0 bg-slate-900/90 z-[65] flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 text-lg">
+                    <i class="fas fa-cloud text-blue-600"></i> Sincronización en la Nube
+                </h3>
+                <button onclick="cerrarConfigNube()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Estado actual -->
+            <div id="cloud-modal-status" class="rounded-xl p-4 bg-slate-50 border border-slate-200 text-sm text-slate-600 flex items-center gap-3">
+                <i class="fas fa-database text-slate-400 text-xl"></i>
+                <div>
+                    <p class="font-bold text-slate-700">Modo: Solo Local</p>
+                    <p class="text-xs mt-0.5">Los datos se guardan solo en este dispositivo.</p>
+                </div>
+            </div>
+
+            <!-- Pasos -->
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-slate-600 space-y-2">
+                <p class="font-bold text-blue-800 text-sm mb-2">🚀 Activar nube (Firebase gratis)</p>
+                <div class="space-y-2">
+                    <p><span class="bg-blue-600 text-white font-bold rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-1">1</span>
+                        Ir a <a href="https://console.firebase.google.com" target="_blank" class="text-blue-600 font-bold underline">console.firebase.google.com</a> → Crear proyecto</p>
+                    <p><span class="bg-blue-600 text-white font-bold rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-1">2</span>
+                        <strong>Authentication</strong> → Iniciar sesión → Sign-in method → activar <strong>Anónimo</strong></p>
+                    <p><span class="bg-blue-600 text-white font-bold rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-1">3</span>
+                        <strong>Firestore Database</strong> → Crear base de datos → Modo prueba</p>
+                    <p><span class="bg-blue-600 text-white font-bold rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-1">4</span>
+                        ⚙️ Configuración → Registrar app web → copiar el objeto <code class="bg-blue-100 px-1 rounded">firebaseConfig</code></p>
+                    <p><span class="bg-blue-600 text-white font-bold rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-1">5</span>
+                        Pegar aquí abajo y tocar <strong>Conectar</strong></p>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Config JSON de Firebase</label>
+                <textarea id="cloud-modal-config" rows="5"
+                    placeholder='{"apiKey":"AIza...","authDomain":"mi-app.firebaseapp.com","projectId":"mi-app","storageBucket":"mi-app.appspot.com","messagingSenderId":"123456","appId":"1:123..."}'
+                    oninput="limpiarJsonFirebase(this)" onpaste="setTimeout(()=>limpiarJsonFirebase(this),50)"
+                    class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-xs font-mono text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+                <p class="text-[10px] text-slate-400 mt-1">💡 Podés pegar el bloque completo de Firebase, se limpia automáticamente.</p>
+            </div>
+
+            <!-- QR de compartir -->
+            <div id="cloud-qr-section" class="hidden border border-slate-200 rounded-xl p-4 text-center bg-slate-50">
+                <p class="text-xs font-bold text-slate-600 mb-3">📱 Escaneá este QR con otro celular para conectarlo a la misma base de datos:</p>
+                <img id="cloud-qr-img" src="" alt="QR Config" class="mx-auto rounded-lg border border-slate-200 max-w-[200px]">
+                <p class="text-[10px] text-slate-400 mt-2">El QR contiene la configuración de Firebase. Guardá la imagen para compartirla.</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2">
+                <button onclick="conectarNubeDesdeModal()" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition">
+                    <i class="fas fa-plug"></i> Conectar a la Nube
+                </button>
+                <button onclick="generarQRConfig()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition">
+                    <i class="fas fa-qrcode"></i> Generar QR
+                </button>
+                <button onclick="desconectarNube()" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 px-3 rounded-xl text-sm flex items-center justify-center gap-2 transition border border-red-200">
+                    <i class="fas fa-unlink"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Div oculto para escaneo QR desde archivo (no depende del modal) -->
+    <div id="reader-file" style="display:none;width:1px;height:1px;overflow:hidden;position:absolute;top:-9999px;left:-9999px;"></div>
 
     <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO -->
     <div id="confirm-modal" class="fixed inset-0 bg-slate-900/80 z-[60] flex items-center justify-center p-4 hidden no-print">
@@ -431,39 +629,9 @@
         </div>
     </div>
 
-    <!-- Firebase SDK (v11.6.1 CDNs) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, doc, setDoc, getDocs, onSnapshot, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Vinculación al alcance de window inmediato
-        window.FirebaseApp = { initializeApp, getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, getFirestore, collection, doc, setDoc, getDocs, onSnapshot, deleteDoc };
-    </script>
-
-    <!-- Script de lógica de la aplicación -->
-    <script type="module">
-        // Vinculaciones globales urgentes de alcance para que los eventos de HTML no tiren ReferenceError.
-        window.abrirScanner = abrirScanner;
-        window.cerrarScanner = cerrarScanner;
-        window.escanearDesdeArchivo = escanearDesdeArchivo;
-        window.toggleSettings = toggleSettings;
-        window.cargarLogoPersonalizado = cargarLogoPersonalizado;
-        window.borrarLogo = borrarLogo;
-        window.actualizarMarca = actualizarMarca;
-        window.guardarConfiguracionMarca = guardarConfiguracionMarca;
-        window.restaurarValoresPredeterminados = restaurarValoresPredeterminados;
-        window.procesarFotosAdjuntas = procesarFotosAdjuntas;
-        window.guardarRegistro = guardarRegistro;
-        window.limpiarFirma = limpiarFirma;
-        window.resetearFormulario = resetearFormulario;
-        window.exportarExcel = exportarExcel;
-        window.importarCSV = importarCSV;
-        window.toggleHistorial = toggleHistorial;
-        window.limpiarHistorialCompleto = limpiarHistorialCompleto;
-        window.cerrarAlerta = cerrarAlerta;
-        window.setFechaHoy = setFechaHoy;
-        window.copiarConfiguracionNube = copiarConfiguracionNube;
+    <script>
+        // VERSION DEL CHECKLIST - cambiar este numero fuerza reset del localStorage
+        const CHECKLIST_VERSION = "2.0";
 
         // CONFIGURACIÓN DE MARCA POR DEFECTO
         let brandSettings = {
@@ -471,20 +639,12 @@
             subtitulo: "CONSTRUCCIONES METÁLICAS",
             titulo_form: "SISTEMA DE CALIDAD",
             subtitulo_form: "CHECK LIST DE CUMPLIMIENTO",
-            logo_url: ""
+            logo_url: "",
+            db_config: ""
         };
 
-        // Definición de la función de fecha
-        function setFechaHoy() {
-            const hoy = new Date().toISOString().split('T')[0];
-            const fechaInput = document.getElementById('fecha');
-            if (fechaInput) {
-                fechaInput.value = hoy;
-            }
-        }
-
         // DATOS DEL CHECKLIST
-        const checklistData = [
+        let checklistData = [
             {
                 categoria: "Armadura",
                 items: [
@@ -507,7 +667,7 @@
                     { id: "12", desc: "Armadura libre contaminación con desmoldante" },
                     { id: "13", desc: "Colocación de separadores" },
                     { id: "14", desc: "Control de herrajes (diám. y long. De hierros, espesor de planchuela)" },
-                    { id: "15", desc: "Posición de herrajes and Fijación" },
+                    { id: "15", desc: "Posición de herrajes y Fijación" },
                     { id: "17", desc: "Estado, Posición, ventilaciones de Abertura y paralelismo" },
                     { id: "18", desc: "Instalaciones eléctricas, es la descripta y esta ubicada en lugar" },
                     { id: "19", desc: "Instalaciones sanitarias, es la descripta y esta ubicada en lugar" },
@@ -526,189 +686,393 @@
         let database = [];
         let fotosTemporales = []; // Array de Base64 de las imágenes adjuntas actualmente
         let html5QrCode = null; // Instancia global de escáner QR
+        let dbFirebase = null;
+        let storageFirebase = null; // Firebase Storage para subir fotos
+        let unsubscribeRegistros = null;
+        let unsubscribeConfig = null;
+        let esCloudValido = false;
 
-        // Firebase Sync Configuration
-        let db, auth;
-        let isFirebaseEnabled = false;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'bertone-calidad-app';
+        // Service Worker para funcionamiento Offline / PWA
+        // Técnica para archivo HTML único: registra el SW apuntando al propio HTML,
+        // que responde con el código del SW cuando lo solicita el navegador.
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = [
+                    "const CACHE='bertone-v1';",
+                    "self.addEventListener('install',e=>self.skipWaiting());",
+                    "self.addEventListener('activate',e=>e.waitUntil(clients.claim()));",
+                    "self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));"
+                ].join('');
 
-        // Registro de Service Worker con try-catch para evitar crash en sandboxes
-        try {
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    const swCode = `
-                        const CACHE_NAME = 'bertone-calidad-v3';
-                        self.addEventListener('install', e => self.skipWaiting());
-                        self.addEventListener('activate', e => e.waitUntil(clients.claim()));
-                        self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-                    `;
-                    const blob = new Blob([swCode], { type: 'application/javascript' });
+                // Crear un Blob con tipo correcto y registrar vía URL temporal
+                // Solo funciona cuando la página se sirve por HTTP/HTTPS (no file://)
+                if (location.protocol === 'http:' || location.protocol === 'https:') {
+                    const blob = new Blob([swCode], { type: 'text/javascript' });
                     const swUrl = URL.createObjectURL(blob);
-                    // navigator.serviceWorker.register(swUrl).catch(err => console.log('SW no registrado', err)); // DESACTIVADO
-                });
-            }
-        } catch (e) {
-            console.warn("Service Workers bloqueados por políticas de sandbox.", e);
+                    navigator.serviceWorker.register(swUrl, { scope: './' })
+                        .then(() => URL.revokeObjectURL(swUrl))
+                        .catch(() => URL.revokeObjectURL(swUrl)); // silencioso si falla
+                }
+                // En file:// el SW no es posible, pero el resto de la app funciona normal
+            });
         }
 
         // Manejo del evento de instalación PWA
         let deferredPrompt;
-        try {
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                const installBtn = document.getElementById('pwa-install-btn');
-                if (installBtn) {
-                    installBtn.classList.remove('hidden');
-                    installBtn.addEventListener('click', () => {
-                        deferredPrompt.prompt();
-                        deferredPrompt.userChoice.then((choiceResult) => {
-                            if (choiceResult.outcome === 'accepted') {
-                                console.log('El usuario aceptó la instalación');
-                            }
-                            installBtn.classList.add('hidden');
-                            deferredPrompt = null;
-                        });
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) {
+                installBtn.classList.remove('hidden');
+                installBtn.addEventListener('click', () => {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('El usuario aceptó la instalación');
+                        }
+                        installBtn.classList.add('hidden');
+                        deferredPrompt = null;
                     });
-                }
-            });
-        } catch (e) {
-            console.warn("La API de PWA no se encuentra disponible.", e);
+                });
+            }
+        });
+
+        // Inicialización básica
+        window.onload = function() {
+            // Detectar si se abre como file:// - Firebase no funciona en ese caso
+            if (window.location.protocol === 'file:') {
+                setTimeout(() => {
+                    mostrarAlerta(
+                        "⚠️ Abrís el archivo localmente (file://). La nube NO va a funcionar así. " +
+                        "Para usar en todos los dispositivos: subí el archivo a GitHub Pages (gratis) y compartí esa URL. " +
+                        "Abrí el modal ☁️ para ver instrucciones.",
+                        "warning"
+                    );
+                }, 1500);
+            }
+            cargarConfiguracionMarca();
+            cargarChecklistPersonalizado();
+            setFechaHoy();
+            renderChecklist();
+            cargarBaseDatos();
+            inicializarFirebaseCloud();
+        };
+
+        function setFechaHoy() {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('fecha').value = hoy;
         }
 
-        // Sincronización en tiempo real
-        async function initFirebaseSync() {
-            const badge = document.getElementById('cloud-status-badge');
-            
-            // Verificamos primero si el usuario ingresó manualmente una base de datos propia en localStorage
-            let customFirebaseConfig = localStorage.getItem('bertone_custom_firebase_config');
-            let configToUse = null;
-
-            if (customFirebaseConfig) {
-                try {
-                    configToUse = JSON.parse(customFirebaseConfig);
-                } catch (e) {
-                    console.error("Configuración personalizada JSON no es válida:", e);
-                }
-            } else if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                try {
-                    configToUse = JSON.parse(__firebase_config);
-                } catch (e) {
-                    console.error("Error al parsear __firebase_config:", e);
-                }
+        function cargarChecklistPersonalizado() {
+            // Si la version guardada no coincide, ignorar localStorage y usar defaults
+            const versionGuardada = localStorage.getItem('bertone_checklist_version');
+            if (versionGuardada !== CHECKLIST_VERSION) {
+                localStorage.removeItem('bertone_checklist_items');
+                localStorage.setItem('bertone_checklist_version', CHECKLIST_VERSION);
+                console.log('Checklist actualizado a version ' + CHECKLIST_VERSION + ', usando defaults.');
+                return;
             }
+            const guardado = localStorage.getItem('bertone_checklist_items');
+            if (!guardado) return;
+            try {
+                const datos = JSON.parse(guardado);
+                const totalItemsDefault = checklistData.reduce((acc, cat) => acc + cat.items.length, 0);
+                const totalItemsGuardados = Array.isArray(datos) ? datos.reduce((acc, cat) => acc + (cat.items ? cat.items.length : 0), 0) : 0;
+                if (Array.isArray(datos) && datos.length > 0 && totalItemsGuardados >= totalItemsDefault) {
+                    checklistData = datos;
+                } else {
+                    console.warn('Checklist local incompleto (' + totalItemsGuardados + ' vs ' + totalItemsDefault + '), usando defaults.');
+                    localStorage.removeItem('bertone_checklist_items');
+                }
+            } catch (error) {
+                console.warn('No se pudo cargar el checklist personalizado.', error);
+                localStorage.removeItem('bertone_checklist_items');
+            }
+        }
 
-            if (!configToUse) {
-                console.warn("Firebase config no disponible. Ejecutando base local.");
-                badge.className = "bg-slate-500/20 text-slate-400 border border-slate-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1";
-                badge.innerHTML = `<i class="fas fa-wifi-slash"></i> Modo Local (Sin Nube)`;
+        function guardarChecklistPersonalizado() {
+            localStorage.setItem('bertone_checklist_items', JSON.stringify(checklistData));
+            if (esCloudValido && dbFirebase) {
+                dbFirebase.collection("bertone_config").doc("checklist").set({ items: checklistData, updated_at: Date.now() }, { merge: true }).catch(console.error);
+            }
+        }
+
+        function setCloudBadge(texto, tipo = "local") {
+            const badge = document.getElementById('cloud-status-badge');
+            if (!badge) return;
+            const estilos = {
+                local: "bg-slate-800 hover:bg-slate-700 border border-blue-700 text-white transition cursor-pointer",
+                ok:    "bg-emerald-600 hover:bg-emerald-500 text-white transition cursor-pointer",
+                error: "bg-rose-600 hover:bg-rose-500 text-white transition cursor-pointer",
+                wait:  "bg-amber-500 hover:bg-amber-400 text-slate-950 transition cursor-pointer"
+            };
+            badge.className = `${estilos[tipo] || estilos.local} px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-2`;
+            badge.innerHTML = texto;
+        }
+
+        async function inicializarFirebaseCloud() {
+            if (unsubscribeRegistros) unsubscribeRegistros();
+            if (unsubscribeConfig) unsubscribeConfig();
+            unsubscribeRegistros = null;
+            unsubscribeConfig = null;
+            dbFirebase = null;
+            storageFirebase = null;
+            esCloudValido = false;
+
+            const rawConfig = (brandSettings.db_config || '').trim();
+            if (!rawConfig) {
+                setCloudBadge('<i class="fas fa-cloud"></i> ☁️ Configurar Nube', "local");
                 return;
             }
 
             try {
-                const app = window.FirebaseApp.initializeApp(configToUse);
-                auth = window.FirebaseApp.getAuth(app);
-                db = window.FirebaseApp.getFirestore(app);
-
-                // Regla 3: Autenticación obligatoria previa a consultas
-                let userCredential;
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    userCredential = await window.FirebaseApp.signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    userCredential = await window.FirebaseApp.signInAnonymously(auth);
+                // Esperar hasta 15 segundos a que Firebase SDK cargue (incluye storage)
+                if (!window.firebase || !window.firebase.storage) {
+                    setCloudBadge('<i class="fas fa-spinner animate-spin"></i> Cargando SDK...', "wait");
+                    await new Promise((resolve, reject) => {
+                        let intentos = 0;
+                        const check = setInterval(() => {
+                            intentos++;
+                            if (window.firebase && window.firebase.firestore && window.firebase.storage) {
+                                clearInterval(check);
+                                resolve();
+                            } else if (intentos > 75) {
+                                clearInterval(check);
+                                reject(new Error("No se pudo cargar Firebase. Verificá tu conexión a internet e intentá de nuevo."));
+                            }
+                        }, 200);
+                    });
                 }
 
-                window.FirebaseApp.onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        badge.className = "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1";
-                        badge.innerHTML = `<i class="fas fa-cloud"></i> Sincronizado en la Nube`;
-                        isFirebaseEnabled = true;
-                        escucharDatosNube();
-                    } else {
-                        badge.className = "bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1";
-                        badge.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error de Autenticación`;
-                        isFirebaseEnabled = false;
+                // ── Limpiar JSON: el usuario a veces pega "const firebaseConfig = {...};"
+                let jsonStr = rawConfig;
+                const matchObj = rawConfig.match(/\{[\s\S]*\}/);
+                if (matchObj) jsonStr = matchObj[0];
+                // Reemplazar comillas tipográficas
+                jsonStr = jsonStr.replace(/[“”‘’]/g, '"');
+                
+                let config;
+                try {
+                    config = JSON.parse(jsonStr);
+                } catch(e) {
+                    try {
+                        config = JSON.parse(jsObjectAJson(jsonStr));
+                    } catch(e2) {
+                        throw new Error("El JSON de configuración no es válido. Copialó de nuevo desde Firebase Console.");
+                    }
+                }
+
+                if (!config.apiKey || !config.projectId) {
+                    throw new Error("Faltan campos en el JSON. Aseguráte de copiar la config completa con apiKey y projectId.");
+                }
+
+                // Asegurar storageBucket si no está explícito en el JSON
+                if (!config.storageBucket) {
+                    config.storageBucket = config.projectId + ".appspot.com";
+                }
+
+                setCloudBadge('<i class="fas fa-spinner animate-spin"></i> Conectando...', "wait");
+
+                // Reutilizar app si ya existe, o crear nueva con nombre fijo
+                const APP_NAME = "BertoneApp";
+                let app;
+                try {
+                    app = firebase.app(APP_NAME);
+                    // Si el projectId cambió, eliminar y recrear
+                    if (app.options.projectId !== config.projectId) {
+                        await app.delete();
+                        app = firebase.initializeApp(config, APP_NAME);
+                    }
+                } catch(e) {
+                    app = firebase.initializeApp(config, APP_NAME);
+                }
+
+                // Login anónimo con timeout
+                const authPromise = app.auth().signInAnonymously();
+                const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("Tiempo de espera agotado. Verificá que Authentication > Anónimo esté habilitado en Firebase.")), 12000));
+                await Promise.race([authPromise, timeout]);
+
+                dbFirebase = app.firestore();
+                // Storage requiere plan Blaze (pago) - solo inicializar si está disponible
+                try {
+                    storageFirebase = app.storage();
+                } catch(e) {
+                    storageFirebase = null;
+                    console.info("Storage no disponible en este plan:", e.message);
+                }
+                esCloudValido = true;
+                setCloudBadge('<i class="fas fa-cloud"></i> ✅ Nube Activa', "ok");
+                actualizarEstadoModalNube();
+                mostrarAlerta("✅ ¡Conectado a la nube! Los datos se sincronizan en todos los dispositivos.", "success");
+
+                // Escuchar registros en tiempo real
+                unsubscribeRegistros = dbFirebase.collection("bertone_registros").orderBy("id_registro", "desc").onSnapshot(snapshot => {
+                    database = snapshot.docs.map(doc => ({ id_cloud: doc.id, ...doc.data() }));
+                    localStorage.setItem('bertone_quality_records', JSON.stringify(database));
+                    actualizarTablaHistorial();
+                }, err => {
+                    console.error("Firestore snapshot error:", err.code, err.message);
+                    if (err.code === 'permission-denied') {
+                        setCloudBadge('<i class="fas fa-lock"></i> Sin permisos', "error");
+                        mostrarAlerta("⚠️ Sin permisos. Revisá las reglas de Firestore en Firebase Console.", "error");
+                    } else if (err.code === 'unavailable') {
+                        setCloudBadge('<i class="fas fa-wifi"></i> Sin conexión', "wait");
+                        // Reintentar en 10 segundos
+                        setTimeout(() => { if (!esCloudValido) inicializarFirebaseCloud(); }, 10000);
                     }
                 });
-            } catch (err) {
-                console.error("Fallo de conexión Firebase:", err);
-                badge.className = "bg-rose-500/20 text-rose-400 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1";
-                badge.innerHTML = `<i class="fas fa-exclamation-circle"></i> Error de Conexión`;
-                
-                // Si falla signInAnonymously, puede ser que Anonymous Auth no esté habilitado en el Firebase console
-                mostrarAlerta("Error de conexión a la nube. Si estás usando una base de datos propia, asegúrate de activar el método 'Inicio de sesión anónimo' (Anonymous Auth) en la consola web de Firebase.", "error");
+
+                // Escuchar checklist en tiempo real
+                unsubscribeConfig = dbFirebase.collection("bertone_config").doc("checklist").onSnapshot(doc => {
+                    if (!doc.exists) return;
+                    const items = doc.data().items;
+                    if (Array.isArray(items) && items.length > 0) {
+                        checklistData = items;
+                        localStorage.setItem('bertone_checklist_items', JSON.stringify(checklistData));
+                        renderChecklist();
+                    }
+                }, err => console.error("Config sync error:", err));
+
+                // CORREGIDO: Solo sincronizar checklist si la nube no tiene datos aun (no sobreescribir la nube con datos locales)
+                const checklistDoc = await dbFirebase.collection("bertone_config").doc("checklist").get();
+                if (!checklistDoc.exists) {
+                    await dbFirebase.collection("bertone_config").doc("checklist").set({ items: checklistData, updated_at: Date.now() }, { merge: true });
+                }
+
+            } catch (error) {
+                console.error("Firebase error completo:", error.code, error.message, error);
+                setCloudBadge('<i class="fas fa-triangle-exclamation"></i> Error de conexión', "error");
+                const code = error.code || '';
+                let msg = error.message || "Error desconocido";
+
+                if (code === 'auth/operation-not-allowed' || msg.includes('operation-not-allowed')) {
+                    msg = "⚠️ SOLUCIÓN: Firebase Console → Authentication → Sign-in method → Anónimo → HABILITAR.";
+                } else if (code === 'auth/network-request-failed' || msg.includes('network')) {
+                    const esFileProtocol = window.location.protocol === 'file:';
+                    if (esFileProtocol) {
+                        msg = "⚠️ Abrís el archivo directo desde el celular (file://). Firebase no funciona así. SOLUCIÓN: subí el archivo a GitHub Pages o Google Drive y abrilo desde una URL https://";
+                    } else {
+                        msg = "⚠️ Sin internet. Verificá WiFi o datos móviles del dispositivo.";
+                    }
+                } else if (code === 'auth/too-many-requests') {
+                    msg = "⚠️ Demasiados intentos. Esperá unos minutos y volvé a intentar.";
+                } else if (msg.includes('permission') || msg.includes('Permission') || code.includes('permission')) {
+                    msg = "⚠️ SOLUCIÓN: Firebase Console → Firestore Database → Reglas → Cambiar a modo prueba.";
+                } else if (msg.includes('quota') || msg.includes('Quota')) {
+                    msg = "⚠️ Límite de Firebase alcanzado. Plan gratuito superado.";
+                } else if (msg.includes('app/duplicate')) {
+                    msg = "⚠️ Error interno (app duplicada). Recargá la página.";
+                } else if (msg.includes('No se pudo cargar Firebase')) {
+                    msg = "⚠️ No cargaron los scripts de Firebase. Verificá la conexión a internet.";
+                } else if (msg.includes('agotado') || msg.includes('timeout')) {
+                    msg = "⚠️ Tiempo agotado. Verificá que Authentication Anónimo esté habilitado en Firebase Console.";
+                }
+
+                // Mostrar código técnico para facilitar diagnóstico
+                const codigoTecnico = code ? ` [${code}]` : '';
+                mostrarAlerta("❌ No se pudo conectar: " + msg + codigoTecnico, "error");
             }
         }
 
-        function escucharDatosNube() {
-            if (!isFirebaseEnabled || !db) return;
-            const { collection, onSnapshot } = window.FirebaseApp;
-            
-            // Regla 1: Ruta estricta de base acumulada general de la empresa
-            const collectionRef = collection(db, 'artifacts', appId, 'public', 'data', 'quality_records');
+        // Subir fotos a Firebase Storage o comprimir para Firestore si no hay Storage
+        async function subirFotosAStorage(fotosBase64, idRegistro) {
+            if (!fotosBase64 || fotosBase64.length === 0) return fotosBase64;
+            // Sin Storage: comprimir fotos a miniaturas pequeñas para guardar en Firestore
+            if (!storageFirebase) {
+                return await Promise.all(fotosBase64.map(foto => comprimirFotoParaFirestore(foto)));
+            }
+            const urls = [];
+            for (let i = 0; i < fotosBase64.length; i++) {
+                const foto = fotosBase64[i];
+                // Si ya es una URL http (subida previamente), conservar
+                if (foto && foto.startsWith('http')) {
+                    urls.push(foto);
+                    continue;
+                }
+                if (!foto) { urls.push(''); continue; }
+                try {
+                    // Convertir base64 a Blob
+                    const res = await fetch(foto);
+                    const blob = await res.blob();
+                    const ext = blob.type === 'image/png' ? 'png' : 'jpg';
+                    const ref = storageFirebase.ref(`bertone_fotos/${idRegistro}/foto_${i + 1}.${ext}`);
+                    const snapshot = await ref.put(blob);
+                    const url = await snapshot.ref.getDownloadURL();
+                    urls.push(url);
+                } catch (err) {
+                    console.warn(`No se pudo subir foto ${i + 1}:`, err);
+                    urls.push(''); // guardar vacio para no romper el registro
+                }
+            }
+            return urls;
+        }
+        // --- MANEJO DE CAJAS DE CONFIRMACIÓN PERSONALIZADAS ---
+        function mostrarConfirmacion(titulo, mensaje, esPeligroso = true) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirm-modal');
+                const titleEl = document.getElementById('confirm-title');
+                const msgEl = document.getElementById('confirm-message');
+                const btnOk = document.getElementById('confirm-btn-ok');
+                const btnCancel = document.getElementById('confirm-btn-cancel');
 
-            onSnapshot(collectionRef, (snapshot) => {
-                const cloudRecords = [];
-                snapshot.forEach((doc) => {
-                    cloudRecords.push(doc.data());
+                titleEl.innerText = titulo;
+                msgEl.innerText = mensaje;
+
+                if (esPeligroso) {
+                    btnOk.className = "bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded-lg text-sm transition";
+                } else {
+                    btnOk.className = "bg-blue-900 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg text-sm transition";
+                }
+
+                modal.classList.remove('hidden');
+
+                const nuevoBtnOk = btnOk.cloneNode(true);
+                const nuevoBtnCancel = btnCancel.cloneNode(true);
+                btnOk.parentNode.replaceChild(nuevoBtnOk, btnOk);
+                btnCancel.parentNode.replaceChild(nuevoBtnCancel, btnCancel);
+
+                nuevoBtnOk.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    resolve(true);
                 });
-                combinarBasesDeDatos(cloudRecords);
-            }, (error) => {
-                console.error("Error en Snapshot de Firebase:", error);
+
+                nuevoBtnCancel.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    resolve(false);
+                });
             });
-        }
-
-        function combinarBasesDeDatos(cloudRecords) {
-            const map = new Map();
-            database.forEach(r => map.set(r.id_registro, r));
-            cloudRecords.forEach(r => map.set(r.id_registro, r));
-
-            database = Array.from(map.values());
-            database.sort((a, b) => b.id_registro - a.id_registro);
-
-            localStorage.setItem('bertone_quality_records', JSON.stringify(database));
-            actualizarTablaHistorial();
-        }
-
-        async function subirRegistroNube(registro) {
-            if (!isFirebaseEnabled || !db) return;
-            try {
-                const { doc, setDoc } = window.FirebaseApp;
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'quality_records', String(registro.id_registro));
-                await setDoc(docRef, registro);
-            } catch (err) {
-                console.error("Error de subida a base común:", err);
-            }
-        }
-
-        async function borrarRegistroNube(idRegistro) {
-            if (!isFirebaseEnabled || !db) return;
-            try {
-                const { doc, deleteDoc } = window.FirebaseApp;
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'quality_records', String(idRegistro));
-                await deleteDoc(docRef);
-            } catch (err) {
-                console.error("Error de borrado en nube:", err);
-            }
         }
 
         // --- SISTEMA DE ESCANEO DE CÓDIGO QR INTELIGENTE ---
         function abrirScanner() {
+            if (!window.Html5Qrcode) {
+                mostrarAlerta("No se pudo cargar la librería QR. Revise la conexión a internet.", "error");
+                return;
+            }
+            // Verificar si el navegador soporta el acceso directo de cámara activa en vivo
             const soportaCamaraEnVivo = window.isSecureContext && navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
 
             if (soportaCamaraEnVivo) {
-                document.getElementById('qr-modal').classList.remove('hidden');
+                // Entorno Seguro: Abre el escaneo de video fluido tradicional
+                const modal = document.getElementById('qr-modal');
+                modal.classList.remove('hidden');
+                document.getElementById('reader').innerHTML = "";
+
+                // Asegurarse de que no quede instancia anterior
+                if (html5QrCode) {
+                    try { html5QrCode.stop().catch(() => {}); } catch(e) {}
+                    html5QrCode = null;
+                }
+
                 html5QrCode = new Html5Qrcode("reader");
                 
                 const config = { 
-                    fps: 20, 
+                    fps: 15, 
                     qrbox: (width, height) => {
                         const minDim = Math.min(width, height);
-                        const boxSize = Math.floor(minDim * 0.85);
+                        const boxSize = Math.floor(minDim * 0.7);
                         return { width: boxSize, height: boxSize };
-                    },
-                    experimentalFeatures: {
-                        useBarCodeDetectorIfSupported: true
                     }
                 };
 
@@ -718,37 +1082,41 @@
                     onQrCodeSuccess,
                     onQrCodeError
                 ).catch(err => {
-                    console.error("Fallo al arrancar escaneo en vivo:", err);
+                    console.warn("Fallo al arrancar escaneo en vivo:", err);
+                    // Puede ser denegación de permisos o contexto inseguro
                     cerrarScanner();
+                    if (err && (String(err).includes('Permission') || String(err).includes('NotAllowed') || String(err).includes('permission'))) {
+                        mostrarAlerta("Permiso de cámara denegado. Usá el botón 'Subir foto del QR' como alternativa.", "warning");
+                    }
                     ejecutarCargaManualArchivoQR();
                 });
             } else {
+                // Entorno Local/Inseguro (file:// o content:// en móvil): Lanzamos directamente la cámara nativa del teléfono
                 ejecutarCargaManualArchivoQR();
             }
         }
 
         function ejecutarCargaManualArchivoQR() {
-            mostrarAlerta("Iniciando captura de foto o archivo para detectar código QR...", "info");
-            document.getElementById('qr-file-fallback').click();
+            // En mobile, no llamamos .click() aqui (bloqueado en callbacks async iOS/Android)
+            // En cambio abrimos el modal con el label nativo visible para que el usuario lo toque
+            document.getElementById('qr-modal').classList.remove('hidden');
+            mostrarAlerta("Toca el boton \"Subir foto del QR\" del panel para usar la camara.", "info");
         }
 
         function cerrarScanner() {
             document.getElementById('qr-modal').classList.add('hidden');
             if (html5QrCode) {
-                if (html5QrCode.isScanning) {
-                    html5QrCode.stop().then(() => {
-                        html5QrCode.clear();
-                        html5QrCode = null;
-                    }).catch(err => {
-                        console.error("Error al detener el escáner: ", err);
+                const instancia = html5QrCode;
+                html5QrCode = null;
+                instancia.stop()
+                    .catch(() => {})
+                    .finally(() => {
+                        try { instancia.clear(); } catch(e) {}
                     });
-                } else {
-                    html5QrCode.clear();
-                    html5QrCode = null;
-                }
             }
         }
 
+        // Procesar QR leído por la cámara en directo
         function onQrCodeSuccess(decodedText, decodedResult) {
             completarCamposDesdeQR(decodedText);
             cerrarScanner();
@@ -758,235 +1126,180 @@
             // Pasivo
         }
 
+        // ESCANEAR QR DESDE ARCHIVO O FOTO (MÉTODO FALLBACK 100% COMPATIBLE)
         function escanearDesdeArchivo(event) {
             const file = event.target.files[0];
             if (!file) return;
 
-            const html5QrCodeLocal = new Html5Qrcode("reader");
+            // Usamos el div oculto dedicado, no el #reader del modal (que puede estar hidden)
+            const readerDiv = document.getElementById('reader-file');
+            readerDiv.innerHTML = "";
+            const html5QrCodeLocal = new Html5Qrcode("reader-file");
+            mostrarAlerta("Procesando código QR capturado...", "info");
             
-            // Mostrar la cortina de procesamiento de AI
-            document.getElementById('loader-overlay').classList.remove('hidden');
-            
-            // Dejar una décima de segundo para renderizar el loader en pantalla
-            setTimeout(() => {
-                html5QrCodeLocal.scanFile(file, false)
-                    .then(decodedText => {
-                        completarCamposDesdeQR(decodedText);
-                        document.getElementById('loader-overlay').classList.add('hidden');
-                        html5QrCodeLocal.clear();
-                    })
-                    .catch(err => {
-                        console.warn("Escaneo directo fallido. Iniciando binarización de contraste avanzada...", err);
-                        preprocesarYEscanear(file, html5QrCodeLocal);
-                    });
-            }, 100);
+            html5QrCodeLocal.scanFile(file, true)
+                .then(decodedText => {
+                    completarCamposDesdeQR(decodedText);
+                    mostrarAlerta("¡Código QR leído con éxito!", "success");
+                })
+                .catch(err => {
+                    console.error("Error al escanear archivo de imagen: ", err);
+                    mostrarAlerta("No se detectó ningún código QR legible en la foto. Intente de nuevo encuadrando bien de cerca la etiqueta.", "error");
+                })
+                .finally(() => {
+                    try { html5QrCodeLocal.clear(); } catch(e) {}
+                    readerDiv.innerHTML = "";
+                });
 
-            event.target.value = ""; 
+            event.target.value = ""; // Limpiar para permitir re-escaneo
         }
 
-        function preprocesarYEscanear(file, qrInstance) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const img = new Image();
-                img.onload = async function() {
-                    const filtros = [
-                        { name: "Contraste Alto (Grises)", threshold: null, contrast: 1.5, grayscale: true },
-                        { name: "Binarización Clara", threshold: 100, contrast: null, grayscale: true },
-                        { name: "Binarización Media", threshold: 140, contrast: null, grayscale: true },
-                        { name: "Binarización Oscura", threshold: 180, contrast: null, grayscale: true },
-                        { name: "Original Redimensionado", threshold: null, contrast: null, grayscale: false }
-                    ];
-
-                    let exito = false;
-                    for (let filtro of filtros) {
-                        try {
-                            const processedBlob = await aplicarFiltro(img, filtro);
-                            const processedFile = new File([processedBlob], "qr_procesado.png", { type: "image/png" });
-                            const decodedText = await qrInstance.scanFile(processedFile, false);
-                            
-                            completarCamposDesdeQR(decodedText);
-                            mostrarAlerta(`¡Leído con éxito usando filtro: ${filtro.name}!`, "success");
-                            exito = true;
-                            break;
-                        } catch (err) {
-                            console.warn(`Filtro "${filtro.name}" falló:`, err);
-                        }
-                    }
-
-                    // Ocultar overlay de carga
-                    document.getElementById('loader-overlay').classList.add('hidden');
-
-                    if (!exito) {
-                        mostrarAlerta("No se detectó el código QR en la foto de la cucarda. Revisa que el QR no esté muy borroso, inclinado o con sombras extremas y vuelve a intentar.", "error");
-                    }
-                    qrInstance.clear();
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function aplicarFiltro(img, filtro) {
-            return new Promise((resolve) => {
-                const canvasTmp = document.createElement('canvas');
-                const ctxTmp = canvasTmp.getContext('2d');
-                
-                const maxDim = 800;
-                let w = img.width;
-                let h = img.height;
-                if (w > maxDim || h > maxDim) {
-                    if (w > h) {
-                        h = (maxDim / w) * h;
-                        w = maxDim;
-                    } else {
-                        w = (maxDim / h) * w;
-                        h = maxDim;
-                    }
-                }
-                
-                canvasTmp.width = w;
-                canvasTmp.height = h;
-                ctxTmp.drawImage(img, 0, 0, w, h);
-                
-                if (filtro.grayscale || filtro.threshold !== null || filtro.contrast !== null) {
-                    const imgData = ctxTmp.getImageData(0, 0, w, h);
-                    const data = imgData.data;
-                    const factor = filtro.contrast !== null ? (259 * (filtro.contrast + 255)) / (255 * (259 - filtro.contrast)) : 1;
-                    
-                    for (let i = 0; i < data.length; i += 4) {
-                        let r = data[i];
-                        let g = data[i+1];
-                        let b = data[i+2];
-                        let gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-                        if (filtro.contrast !== null) {
-                            gray = factor * (gray - 128) + 128;
-                        }
-                        if (filtro.threshold !== null) {
-                            gray = (gray > filtro.threshold) ? 255 : 0;
-                        }
-                        gray = Math.max(0, Math.min(255, gray));
-                        data[i] = gray;
-                        data[i+1] = gray;
-                        data[i+2] = gray;
-                    }
-                    ctxTmp.putImageData(imgData, 0, 0);
-                }
-                
-                canvasTmp.toBlob((blob) => {
-                    resolve(blob);
-                }, 'image/png');
-            });
-        }
-
-        // LÓGICA DE EXTRACCIÓN DE DATOS DISEÑADA PARA CUCARDAS VIBERT / BERTONE
+        // LÓGICA DE DETECCIÓN E INYECCIÓN DE DATOS CONFIGURADA SEGÚN CUCARDA BERTONE
         function completarCamposDesdeQR(decodedText) {
-            console.log("QR decodificado crudo:", decodedText);
             try {
+                let data = null;
                 let cod = "";
                 let nom = "";
                 let ser = "";
+                const extraerDatosBertone = (texto) => {
+                    const limpio = String(texto || "").replace(/\s+/g, " ").trim();
+                    const codigo = limpio.match(/\b\d{2}-\d{3}-\d{5}\b/)?.[0] || "";
+                    const panel = limpio.match(/\b[A-Z]{2,5}\d{2,4}[A-Z]?\b/i)?.[0]?.toUpperCase() || "";
+                    const candidatosSerie = limpio.match(/\b\d{6,9}\b/g) || [];
+                    const serie = candidatosSerie.find(n => n !== codigo.replace(/\D/g, "")) || "";
+                    return { codigo, panel, serie };
+                };
                 
-                const upperText = decodedText.toUpperCase().trim();
-
-                // DETECCION DE QR DE CONFIGURACIÓN / SINCRONIZACIÓN DE LA NUBE
-                if (decodedText.includes("apiKey") && decodedText.includes("projectId")) {
-                    localStorage.setItem('bertone_custom_firebase_config', decodedText);
-                    document.getElementById('cfg-db-config').value = decodedText;
-                    
-                    // Ocultar modal de escaneo si estuviese abierto
-                    cerrarScanner();
-                    
-                    mostrarAlerta("¡Felicidades! Celular enlazado con la base de datos de la empresa con éxito. Conectando...", "success");
-                    initFirebaseSync();
-                    return;
-                }
-
-                // 1. JSON
+                // 1. Intentar como JSON estructurado
                 try {
-                    const data = JSON.parse(decodedText);
-                    if (data && typeof data === 'object') {
-                        cod = data.codigo || data.code || data.Código || data.CODIGO || "";
-                        ser = data.serie || data.n_serie || data.cucarda_serie || data.SERIE || "";
-                        nom = data.nombre_panel || data.nombre || data.panel || data.modelo || data.PPV || data.descripcion || "";
-                    }
-                } catch (e) {}
-
-                // 2. Extraer Código (ej. 08-007-08541 o 08-007-08544 con guiones)
-                if (!cod) {
-                    const codMatch = upperText.match(/\d{2,4}-\d{2,4}-\d{4,6}/) || upperText.match(/\d+-\d+-\d+/);
-                    if (codMatch) {
-                        cod = codMatch[0];
-                    }
+                    data = JSON.parse(decodedText);
+                } catch (e) {
+                    data = null;
                 }
 
-                // 3. Extraer N° Serie (7 dígitos seguidos de la cucarda de Bertone, ej: 2600040 o 2600001)
-                if (!ser) {
-                    const serMatch = upperText.match(/\b\d{7}\b/) || upperText.match(/\d{7}/) || upperText.match(/\b\d{6,8}\b/);
-                    if (serMatch) {
-                        ser = serMatch[0];
-                    }
-                }
-
-                // 4. Extraer Descripción / Panel (ej: PPV017A o PPV018B o similar)
-                // Busca de forma predictiva secuencias de letras grandes y números de tus moldes en fábrica
-                if (!nom) {
-                    const nomMatch = upperText.match(/[A-Z]{2,4}\d{2,4}[A-Z]?/) || upperText.match(/[A-Z]{2,4}-\d{2,4}[A-Z]?/);
-                    if (nomMatch) {
-                        nom = nomMatch[0];
-                    }
-                }
-
-                // 5. Fallback por separadores clásicos si no hay matches directos por Regex
-                if (!cod || !ser || !nom) {
-                    let parts = upperText.split(/[\s|;,\n]+/);
-                    parts = parts.map(p => p.trim()).filter(p => p.length > 0);
+                if (data && typeof data === 'object') {
+                    cod = data.codigo || data.code || data.Código || data.CODIGO || "";
+                    ser = data.serie || data.n_serie || data.n_serie_cucarda || data.cucarda_serie || data.SERIE || data.N_Serie || "";
+                    nom = data.nombre_panel || data.nombre || data.panel || data.modelo || data.model || data.PPV || data.NOMBRE_PANEL || "";
                     
+                    if (!nom && (data.descripcion || data.description)) {
+                        nom = data.descripcion || data.description;
+                    }
+                } else {
+                    const detectado = extraerDatosBertone(decodedText);
+                    cod = detectado.codigo;
+                    nom = detectado.panel;
+                    ser = detectado.serie;
+
+                    // 2. Intentar parsear como texto separado por barras, comas, o saltos de línea
+                    let parts = [];
+                    if (decodedText.includes('|')) {
+                        parts = decodedText.split('|');
+                    } else if (decodedText.includes(';')) {
+                        parts = decodedText.split(';');
+                    } else if (decodedText.includes(',')) {
+                        parts = decodedText.split(',');
+                    } else if (decodedText.includes('\n')) {
+                        parts = decodedText.split('\n');
+                    }
+
+                    // Limpieza de espacios
+                    parts = parts.map(p => p.trim());
+
                     if (parts.length >= 2) {
-                        if (!cod) {
-                            const foundCod = parts.find(p => p.includes('-'));
-                            if (foundCod) cod = foundCod;
+                        // Intentar identificar inteligentemente por formato típico de Bertone
+                        // Código: ej. 08-007-08544 (contiene guiones y números)
+                        let codigoDetectado = parts.find(p => /^\d{2}-\d{3}-\d{5}$/.test(p)) || parts.find(p => p.includes('-'));
+                        // Serie: ej. 2600001 (número de unos 7 dígitos)
+                        let serieDetectada = parts.find(p => /^\d{7}$/.test(p));
+                        // Nombre: ej. PPV018B (letras y números al final, letras grandes)
+                        let nombreDetectado = parts.find(p => /^[A-Z]{3}\d{3}[A-Z]$/.test(p)) || parts.find(p => p !== codigoDetectado && p !== serieDetectada);
+
+                        cod = cod || codigoDetectado || parts[0] || "";
+                        ser = ser || serieDetectada || (parts[2] || parts[1] || "");
+                        nom = nom || nombreDetectado || (parts[1] || "");
+                    } else {
+                        // Si es texto plano completo
+                        let rawText = decodedText.trim();
+                        // Si tiene formato de código de panel clásico Bertone (ej: "PPV018B") en medio
+                        let matchModel = rawText.match(/[A-Z]{3}\d{3}[A-Z]/);
+                        if (matchModel) {
+                            nom = nom || matchModel[0];
                         }
-                        if (!ser) {
-                            const foundSer = parts.find(p => /^\d{6,8}$/.test(p));
-                            if (foundSer) ser = foundSer;
-                        }
-                        if (!nom) {
-                            const foundNom = parts.find(p => /[A-Z]{2,4}\d{2,4}/.test(p));
-                            if (foundNom) nom = foundNom;
-                        }
+                        cod = cod || rawText;
                     }
                 }
 
-                // Inyección segura en el formulario HTML (ID unificado de la descripción: descripcion_panel)
-                if (cod) document.getElementById('codigo').value = cod;
-                if (nom) document.getElementById('descripcion_panel').value = nom;
-                if (ser) document.getElementById('cucarda_serie').value = ser;
+                // Inyección de los valores extraídos
+                document.getElementById('codigo').value = cod || document.getElementById('codigo').value;
+                document.getElementById('nombre_panel').value = nom || document.getElementById('nombre_panel').value;
+                document.getElementById('cucarda_serie').value = ser || document.getElementById('cucarda_serie').value;
 
-                mostrarAlerta(`Cucarda leída con éxito:\n• Descripción (Panel): ${nom || 'No detectado'}\n• Código: ${cod || 'No detectado'}\n• N° Serie: ${ser || 'No detectado'}`, "success");
+                mostrarAlerta("Campos rellenados: Panel '" + (nom || "Sin Nombre") + "' detectado.", "success");
             } catch (err) {
-                console.error("Error en completarCamposDesdeQR:", err);
-                mostrarAlerta("Error al interpretar los datos de la cucarda.", "error");
+                console.error("Error decodificando QR: ", err);
+                mostrarAlerta("Error al interpretar los datos del código QR.", "error");
             }
         }
 
-        // --- CONFIGURACIÓN DE MARCA ---
+
+        // --- MANEJO DE CONFIGURACIÓN DE MARCA ---
         function toggleSettings() {
             const panel = document.getElementById('settings-panel');
             panel.classList.toggle('hidden');
+        }
+
+        // Fuerza el reset del checklist desde defaults (borra cache local)
+        function resetearChecklistLocal() {
+            localStorage.removeItem('bertone_checklist_items');
+            localStorage.removeItem('bertone_checklist_version');
+            // Recargar defaults hardcodeados
+            checklistData = [
+                {
+                    categoria: "Armadura",
+                    items: [
+                        { id: "01", desc: "Cucarda y etiqueta disponible y corresponde?" },
+                        { id: "02", desc: "Hierros, estribos correctos y distancia correspondiente?" },
+                        { id: "03", desc: "Escalerillas correspondientes bien soldadas y vinculadas?" },
+                        { id: "04", desc: "Distancia de armazon a perimetrales and aberturas?" },
+                        { id: "05", desc: "Armazon con cruces correctos entre vigas y columnas?" },
+                        { id: "06", desc: "Ganchos de izaje accesibles, alineados y correctos de acuerdo a plano?" },
+                        { id: "07", desc: "Plano en A3 disponible?" }
+                    ]
+                },
+                {
+                    categoria: "Controles en Mesa",
+                    items: [
+                        { id: "08", desc: "Cucarda y etiqueta disponible y corresponde?" },
+                        { id: "09", desc: "Limpieza mesa" },
+                        { id: "10", desc: "Control dimensional molde perimetral y escuadra." },
+                        { id: "11", desc: "Separación entre molde perimetral y mesa" },
+                        { id: "12", desc: "Armadura libre contaminación con desmoldante" },
+                        { id: "13", desc: "Colocación de separadores" },
+                        { id: "14", desc: "Control de herrajes (diám. y long. De hierros, espesor de planchuela)" },
+                        { id: "15", desc: "Posición de herrajes y Fijación" },
+                        { id: "17", desc: "Estado, Posición, ventilaciones de Abertura y paralelismo" },
+                        { id: "18", desc: "Instalaciones eléctricas, es la descripta y esta ubicada en lugar" },
+                        { id: "19", desc: "Instalaciones sanitarias, es la descripta y esta ubicada en lugar" },
+                        { id: "20", desc: "Protección de terminales" },
+                        { id: "21", desc: "Protección ganchos de izaje escalerillas" }
+                    ]
+                },
+                {
+                    categoria: "Hormigón Armado",
+                    items: [
+                        { id: "22", desc: "Terminación correcta de cara: enrasada y terminación (Llaneado, corte manguero o flatachado)" }
+                    ]
+                }
+            ];
+            renderChecklist();
+            mostrarAlerta("Items restablecidos correctamente.", "success");
         }
 
         function cargarConfiguracionMarca() {
             const guardado = localStorage.getItem('bertone_brand_settings');
             if (guardado) {
                 brandSettings = JSON.parse(guardado);
-            }
-            // Cargar configuración de base de datos personalizada si existe
-            const customFirebaseConfig = localStorage.getItem('bertone_custom_firebase_config');
-            if (customFirebaseConfig) {
-                document.getElementById('cfg-db-config').value = customFirebaseConfig;
-            } else if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                // Si estamos en la PC del entorno Canvas, autocompletamos con la base por defecto de la plataforma
-                document.getElementById('cfg-db-config').value = __firebase_config;
             }
             aplicarConfiguracionMarcaUI();
         }
@@ -996,6 +1309,8 @@
             document.getElementById('cfg-subtitulo').value = brandSettings.subtitulo;
             document.getElementById('cfg-titulo-form').value = brandSettings.titulo_form;
             document.getElementById('cfg-subtitulo-form').value = brandSettings.subtitulo_form;
+            document.getElementById('cfg-db-config').value = brandSettings.db_config || "";
+
             actualizarMarca();
         }
 
@@ -1032,25 +1347,6 @@
 
                 printLogoContainer.innerHTML = `<span class="text-slate-900 font-black text-sm tracking-wider">${empresa}</span>`;
             }
-
-            // Generar o actualizar el QR de sincronización de la base de datos en pantalla
-            const customFirebaseConfig = localStorage.getItem('bertone_custom_firebase_config');
-            let configToDisplay = "";
-            if (customFirebaseConfig) {
-                configToDisplay = customFirebaseConfig;
-            } else if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                configToDisplay = __firebase_config;
-            }
-
-            const qrImg = document.getElementById('db-sync-qr-img');
-            const qrSection = document.getElementById('pwa-sync-qr-section');
-            if (configToDisplay && qrImg) {
-                // Generar QR de enlace usando la API pública de QR Server
-                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(configToDisplay)}`;
-                if (qrSection) qrSection.classList.remove('hidden');
-            } else {
-                if (qrSection) qrSection.classList.add('hidden');
-            }
         }
 
         function cargarLogoPersonalizado(event) {
@@ -1071,27 +1367,18 @@
             actualizarMarca();
         }
 
+        // Guardar configuración de marca
         function guardarConfiguracionMarca() {
             brandSettings.empresa = document.getElementById('cfg-empresa').value;
             brandSettings.subtitulo = document.getElementById('cfg-subtitulo').value;
             brandSettings.titulo_form = document.getElementById('cfg-titulo-form').value;
             brandSettings.subtitulo_form = document.getElementById('cfg-subtitulo-form').value;
+            brandSettings.db_config = document.getElementById('cfg-db-config').value.trim();
 
             localStorage.setItem('bertone_brand_settings', JSON.stringify(brandSettings));
-
-            // Guardar configuración personalizada de base de datos nube
-            const customDbConfig = document.getElementById('cfg-db-config').value.trim();
-            if (customDbConfig) {
-                localStorage.setItem('bertone_custom_firebase_config', customDbConfig);
-            } else {
-                localStorage.removeItem('bertone_custom_firebase_config');
-            }
-
-            mostrarAlerta("¡Configuración de marca y base de datos guardada con éxito!", "success");
+            mostrarAlerta("¡Configuración de marca guardada con éxito!", "success");
             toggleSettings();
-
-            // Intentar reconectar si se guardó nueva configuración
-            initFirebaseSync();
+            inicializarFirebaseCloud();
         }
 
         async function restaurarValoresPredeterminados() {
@@ -1104,22 +1391,21 @@
             if (confirmado) {
                 brandSettings = {
                     empresa: "BERTONE",
-                    subtitulo: "CONSTRUCCIONES METÁKATAS",
+                    subtitulo: "CONSTRUCCIONES METÁLICAS",
                     titulo_form: "SISTEMA DE CALIDAD",
                     subtitulo_form: "CHECK LIST DE CUMPLIMIENTO",
-                    logo_url: ""
+                    logo_url: "",
+                    db_config: ""
                 };
                 localStorage.setItem('bertone_brand_settings', JSON.stringify(brandSettings));
-                localStorage.removeItem('bertone_custom_firebase_config');
-                document.getElementById('cfg-db-config').value = "";
                 aplicarConfiguracionMarcaUI();
                 mostrarAlerta("Valores restablecidos.", "info");
                 toggleSettings();
-                initFirebaseSync();
             }
         }
 
-        // --- OBSERVACIONES Y ADJUNTOS ---
+
+        // --- ADJUNTAR IMÁGENES / CÁMARA EN OBSERVACIONES ---
         function procesarFotosAdjuntas(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
@@ -1142,6 +1428,7 @@
             img.onload = function() {
                 let width = img.width;
                 let height = img.height;
+
                 if (width > height) {
                     if (width > maxDim) {
                         height *= maxDim / width;
@@ -1187,12 +1474,11 @@
                 const card = document.createElement('div');
                 card.className = "relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-slate-300 shadow bg-slate-100 group";
                 card.innerHTML = `
-                    <img src="${foto}" class="w-full h-full object-cover cursor-pointer hover:opacity-80" onclick="abrirVisor(fotosTemporales, index)" title="Tocá para ampliar">
-                    <button type="button" class="absolute top-1 right-1 bg-red-600 hover:bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow transition btn-del-foto">
+                    <img src="${foto}" class="w-full h-full object-cover">
+                    <button type="button" onclick="eliminarFoto(${index})" class="absolute top-1 right-1 bg-red-600 hover:bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow transition">
                         <i class="fas fa-trash"></i>
                     </button>
                 `;
-                card.querySelector('.btn-del-foto').onclick = () => eliminarFoto(index);
                 container.appendChild(card);
 
                 const printCard = document.createElement('div');
@@ -1210,7 +1496,8 @@
             renderizarPrevisualizacionFotos();
         }
 
-        // --- BASE DE DATOS Y GUARDADO ---
+
+        // --- CARGAR / GUARDAR BASE DE DATOS (ACUMULATIVA) ---
         function cargarBaseDatos() {
             const guardado = localStorage.getItem('bertone_quality_records');
             if (guardado) {
@@ -1232,7 +1519,7 @@
                 id_registro: Date.now(),
                 fecha: document.getElementById('fecha').value,
                 codigo: document.getElementById('codigo').value,
-                nombre_panel: document.getElementById('descripcion_panel').value.toUpperCase(), // Se guarda descripción del panel
+                nombre_panel: document.getElementById('nombre_panel').value,
                 cucarda_serie: document.getElementById('cucarda_serie').value,
                 mesa: document.getElementById('mesa').value,
                 operarios: document.getElementById('operarios').value,
@@ -1244,40 +1531,52 @@
             };
 
             let tieneIncorrectos = false;
-            checklistData.forEach(cat => {
-                cat.items.forEach(item => {
-                    const selector = document.querySelector(`input[name="item_${item.id}"]:checked`);
-                    const valor = selector ? selector.value : "No evaluado";
-                    const comentario = document.querySelector(`input[name="comentario_${item.id}"]`).value;
-                    
-                    registro.items[item.id] = {
-                        state: valor,
-                        comentario: comentario
-                    };
+            try {
+                checklistData.forEach(cat => {
+                    cat.items.forEach(item => {
+                        const selector = document.querySelector(`input[name="item_${item.id}"]:checked`);
+                        const valor = selector ? selector.value : "No evaluado";
+                        const comentComentario = document.querySelector(`input[name="comentario_${item.id}"]`);
+                        const comentario = comentComentario ? comentComentario.value : "";
+                        
+                        registro.items[item.id] = {
+                            estado: valor,
+                            comentario: comentario
+                        };
 
-                    if (valor === "Incorrecto") {
-                        tieneIncorrectos = true;
-                    }
+                        if (valor === "Incorrecto") {
+                            tieneIncorrectos = true;
+                        }
+                    });
                 });
-            });
+            } catch(itemErr) {
+                console.warn("Error leyendo items del checklist:", itemErr);
+            }
 
             registro.resultado_global = tieneIncorrectos ? "Rechazado" : "Aprobado";
 
-            const firmaVacia = isCanvasBlank(canvas);
-            registro.firma = firmaVacia ? null : canvas.toDataURL();
+            registro.firma = null; // Firma digital desactivada
 
-            // Respaldo local
-            // Intentar subir fotos a Google Drive
-            const registroFinal = await subirTodasLasFotosADrive(registro);
-            // Guardar en base de datos local (puede tener fotos en Drive o base64)
-            database.push(registroFinal);
+            database.push(registro);
             localStorage.setItem('bertone_quality_records', JSON.stringify(database));
 
-            // Sincronizar
-            await subirRegistroNube(registro);
+            if (esCloudValido && dbFirebase) {
+                try {
+                    // Subir fotos a Storage o comprimir si no hay Storage disponible
+                    if (storageFirebase) mostrarAlerta("Subiendo fotos a la nube...", "info");
+                    const fotosUrls = await subirFotosAStorage(registro.fotos, registro.id_registro);
+                    const registroNube = { ...registro, fotos: fotosUrls };
+                    // Firma digital desactivada
+                    await dbFirebase.collection("bertone_registros").doc(String(registro.id_registro)).set(registroNube);
+                } catch (error) {
+                    console.error("No se pudo guardar en nube:", error);
+                    mostrarAlerta("Guardado local. Falló la sincronización en nube: " + (error.message || error), "warning");
+                }
+            }
 
             actualizarTablaHistorial();
-            mostrarAlerta("¡Planilla guardada y sincronizada correctamente!", "success");
+            mostrarAlerta(esCloudValido ? "¡Planilla guardada y sincronizada!" : "¡Planilla guardada y acumulada con éxito!", "success");
+            
             resetearFormulario();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -1291,43 +1590,39 @@
             if (database.length === 0) {
                 body.innerHTML = `
                     <tr>
-                        <td colspan="9" class="p-4 text-center text-slate-400 italic">No hay registros guardados en la base de datos unificada.</td>
+                        <td colspan="9" class="p-4 text-center text-slate-400 italic">No hay registros acumulados todavía.</td>
                     </tr>
                 `;
                 return;
             }
 
-            database.forEach(reg => {
+            [...database].reverse().forEach(reg => {
                 const colorRes = reg.resultado_global === "Aprobado" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800";
                 const cantFotos = reg.fotos ? reg.fotos.length : 0;
                 
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 border-b border-slate-100";
-                tr.innerHTML = `
-                    <td class="p-3 font-semibold text-slate-700">${reg.fecha}</td>
-                    <td class="p-3 font-mono text-slate-600">${reg.codigo}</td>
-                    <td class="p-3 text-slate-700 font-bold">${reg.nombre_panel}</td>
-                    <td class="p-3 text-slate-600">${reg.cucarda_serie}</td>
-                    <td class="p-3 text-slate-600">${reg.mesa}</td>
-                    <td class="p-3 text-slate-500">
-                        <span class="font-bold text-slate-700 block text-xs">${reg.nombre_firmante}</span>
-                        <span class="text-[10px] text-slate-400">Ops: ${reg.operarios}</span>
-                    </td>
-                    <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${colorRes}">${reg.resultado_global}</span></td>
-                    <td class="p-3 text-slate-500 text-xs">
-                        ${cantFotos > 0 ? `<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold flex items-center justify-center gap-1 w-max"><i class="fas fa-camera"></i> ${cantFotos}</span>` : 'Sin fotos'}
-                    </td>
-                    <td class="p-3 text-center">
-                        <div class="flex items-center justify-center gap-1">
-                            <button class="text-blue-600 hover:text-blue-800 p-1 mx-1 btn-cargar" title="Cargar planilla"><i class="fas fa-edit"></i></button>
-                            <button class="text-rose-600 hover:text-rose-800 p-1 mx-1 btn-eliminar" title="Eliminar"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
+                body.innerHTML += `
+                    <tr class="hover:bg-slate-50 border-b border-slate-100">
+                        <td class="p-3 font-semibold text-slate-700">${reg.fecha}</td>
+                        <td class="p-3 font-mono text-slate-600">${reg.codigo}</td>
+                        <td class="p-3 text-slate-700 font-bold">${reg.nombre_panel}</td>
+                        <td class="p-3 text-slate-600">${reg.cucarda_serie}</td>
+                        <td class="p-3 text-slate-600">${reg.mesa}</td>
+                        <td class="p-3 text-slate-500">
+                            <span class="font-bold text-slate-700 block text-xs">${reg.nombre_firmante}</span>
+                            <span class="text-[10px] text-slate-400">Ops: ${reg.operarios}</span>
+                        </td>
+                        <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${colorRes}">${reg.resultado_global}</span></td>
+                        <td class="p-3 text-slate-500 text-xs">
+                            ${cantFotos > 0 ? `<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold flex items-center justify-center gap-1 w-max"><i class="fas fa-camera"></i> ${cantFotos}</span>` : 'Sin fotos'}
+                        </td>
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="cargarRegistroEnFormulario(${reg.id_registro})" class="text-blue-600 hover:text-blue-800 p-1 mx-1" title="Cargar/Imprimir esta planilla"><i class="fas fa-edit"></i></button>
+                                <button onclick="eliminarRegistro(${reg.id_registro})" class="text-rose-600 hover:text-rose-800 p-1 mx-1" title="Eliminar"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
                 `;
-
-                tr.querySelector('.btn-cargar').onclick = () => cargarRegistroEnFormulario(reg.id_registro);
-                tr.querySelector('.btn-eliminar').onclick = () => eliminarRegistro(reg.id_registro);
-                body.appendChild(tr);
             });
         }
 
@@ -1337,7 +1632,7 @@
 
             document.getElementById('fecha').value = reg.fecha;
             document.getElementById('codigo').value = reg.codigo;
-            document.getElementById('descripcion_panel').value = reg.nombre_panel; // Inyección correcta en el ID correcto
+            document.getElementById('nombre_panel').value = reg.nombre_panel;
             document.getElementById('cucarda_serie').value = reg.cucarda_serie;
             document.getElementById('mesa').value = reg.mesa;
             document.getElementById('operarios').value = reg.operarios;
@@ -1351,41 +1646,37 @@
                 cat.items.forEach(item => {
                     const itemData = reg.items[item.id];
                     if (itemData) {
-                        const radio = document.querySelector(`input[name="item_${item.id}"][value="${itemData.state}"]`);
+                        const radio = document.querySelector(`input[name="item_${item.id}"][value="${itemData.estado}"]`);
                         if (radio) radio.checked = true;
                         document.querySelector(`input[name="comentario_${item.id}"]`).value = itemData.comentario || "";
                     }
                 });
             });
 
-            limpiarFirma();
-            if (reg.firma && canvas.width > 0 && canvas.height > 0) {
-                const img = new Image();
-                img.src = reg.firma;
-                img.onload = function() {
-                    try {
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    } catch (err) {
-                        console.warn("No se pudo redibujar la firma.", err);
-                    }
-                };
-            }
+            // Firma digital desactivada
 
-            mostrarAlerta("Planilla cargada con éxito. Listo para revisar o editar.", "info");
+            mostrarAlerta("Planilla cargada con éxito. Listo para revisar, reimprimir o editar.", "info");
             window.scrollTo({ top: 400, behavior: 'smooth' });
         }
 
         async function eliminarRegistro(id) {
             const confirmado = await mostrarConfirmacion(
                 "Eliminar planilla", 
-                "¿Estás seguro de que quieres eliminar esta planilla de este dispositivo y de la base de datos común?", 
+                "¿Estás seguro de que querés eliminar esta planilla de este dispositivo?", 
                 true
             );
 
             if (confirmado) {
+                // CORREGIDO: borrar también en Firestore
+                if (esCloudValido && dbFirebase) {
+                    try {
+                        await dbFirebase.collection("bertone_registros").doc(String(id)).delete();
+                    } catch(err) {
+                        console.warn("No se pudo borrar en nube:", err);
+                    }
+                }
                 database = database.filter(r => r.id_registro !== id);
                 localStorage.setItem('bertone_quality_records', JSON.stringify(database));
-                await borrarRegistroNube(id);
                 actualizarTablaHistorial();
                 mostrarAlerta("Registro eliminado.", "info");
             }
@@ -1393,117 +1684,109 @@
 
         async function limpiarHistorialCompleto() {
             const confirmado = await mostrarConfirmacion(
-                "BORRAR HISTORIAL LOCAL", 
-                "Esto borrará las copias guardadas en este dispositivo. Las planillas en la nube seguirán sincronizadas al recargar. ¿Deseas continuar?", 
+                "BORRAR TODO EL HISTORIAL", 
+                "¡ATENCIÓN! Esto borrará permanentemente todas las planillas guardadas localmente en este dispositivo. Esta acción es definitiva.", 
                 true
             );
 
             if (confirmado) {
+                // CORREGIDO: borrar también en Firestore
+                if (esCloudValido && dbFirebase) {
+                    try {
+                        const snapshot = await dbFirebase.collection("bertone_registros").get();
+                        const batch = dbFirebase.batch();
+                        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+                    } catch(err) {
+                        console.warn("No se pudo borrar historial en nube:", err);
+                    }
+                }
                 localStorage.removeItem('bertone_quality_records');
                 database = [];
                 actualizarTablaHistorial();
-                mostrarAlerta("Historial local borrado. Cargando datos de la nube...", "info");
-                escucharDatosNube();
+                mostrarAlerta("Historial completamente borrado.", "info");
             }
         }
 
         function resetearFormulario() {
             document.getElementById('checklist-form').reset();
             setFechaHoy();
-            limpiarFirma();
             fotosTemporales = [];
             renderizarPrevisualizacionFotos();
             mostrarAlerta("Formulario reiniciado.", "info");
         }
 
-        // --- EXPORTAR EXCEL ---
+
+        // --- EXPORTACIÓN DE EXCEL ACUMULATIVO ---
         function exportarExcel() {
             if (database.length === 0) {
-                mostrarAlerta("No hay registros para exportar.", "warning");
+                mostrarAlerta("No hay registros guardados para exportar.", "warning");
                 return;
             }
 
-            // Calcular máximo de fotos
-            const maxFotos = Math.max(...database.map(r => r.fotos ? r.fotos.filter(f=>f&&f.length>5).length : 0), 1);
-
-            // Headers
-            let headers = ["ID Registro", "Fecha", "Código", "Nombre Panel", "Cucarda Serie", "Mesa", "Operarios", "Nombre Firmante", "Observaciones", "Resultado"];
-            for (let i = 1; i <= maxFotos; i++) headers.push(`Foto ${i} (Drive/Local)`);
+            let headers = [
+                "ID Registro", "Fecha", "Código", "Nombre Panel", "Cucarda Serie", 
+                "Mesa", "Operarios", "Nombre del Firmante", "Observaciones Generales", 
+                "Resultado Global", "Cantidad de Fotos"
+            ];
             
             checklistData.forEach(cat => {
                 cat.items.forEach(item => {
-                    headers.push(`[${item.id}] Estado`, `[${item.id}] Comentario`);
+                    headers.push(`${item.id} Estado`, `${item.id} Comentario`);
                 });
             });
 
-            // Filas
             const rows = [headers];
             database.forEach(reg => {
-                const fotos = reg.fotos ? reg.fotos.filter(f => f && f.length > 5) : [];
                 let row = [
                     reg.id_registro,
                     reg.fecha,
-                    reg.codigo || "",
-                    reg.nombre_panel || "",
-                    reg.cucarda_serie || "",
-                    reg.mesa || "",
-                    reg.operarios || "",
+                    reg.codigo,
+                    reg.nombre_panel,
+                    reg.cucarda_serie,
+                    reg.mesa,
+                    reg.operarios,
                     reg.nombre_firmante || "",
                     (reg.observaciones || "").replace(/\n/g, " "),
-                    reg.resultado_global || ""
+                    reg.resultado_global,
+                    reg.fotos ? reg.fotos.length : 0
                 ];
 
-                // Columnas de fotos
-                for (let i = 0; i < maxFotos; i++) {
-                    if (i < fotos.length) {
-                        const f = fotos[i];
-                        row.push(f.startsWith('http') ? f : '(foto local)');
-                    } else {
-                        row.push("");
-                    }
-                }
-
-                // Items del checklist
                 checklistData.forEach(cat => {
                     cat.items.forEach(item => {
-                        const itemData = reg.items[item.id] || { state: "No evaluado", estado: "No evaluado", comentario: "" };
-                        const estado = itemData.estado || itemData.state || "No evaluado";
-                        row.push(estado, (itemData.comentario || "").replace(/\n/g, " "));
+                        const itemData = reg.items[item.id] || { estado: "No evaluado", comentario: "" };
+                        row.push(itemData.estado, (itemData.comentario || "").replace(/\n/g, " "));
                     });
                 });
 
                 rows.push(row);
             });
 
-            // Exportar con XLSX si está disponible
             if (window.XLSX) {
                 const wb = XLSX.utils.book_new();
                 const ws = XLSX.utils.aoa_to_sheet(rows);
-                ws['!cols'] = headers.map(h => {
-                    if (h.startsWith('Foto')) return { wch: 60 };
-                    if (h === 'Observaciones') return { wch: 40 };
-                    return { wch: 18 };
-                });
-                XLSX.utils.book_append_sheet(wb, ws, "Checklist Bertone");
-                XLSX.writeFile(wb, `checklist_BERTONE_${new Date().toISOString().slice(0,10)}.xlsx`);
-                mostrarAlerta("✅ Excel descargado con links de Google Drive.", "success");
-            } else {
-                // Fallback CSV
-                let csv = "data:text/csv;charset=utf-8,\uFEFF";
-                rows.forEach(row => {
-                    csv += row.map(v => `"${String(v||"").replace(/"/g,'""')}"`).join(";") + "\n";
-                });
-                const a = document.createElement("a");
-                a.href = encodeURI(csv);
-                a.download = `checklist_BERTONE_${new Date().toISOString().slice(0,10)}.csv`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                mostrarAlerta("✅ CSV descargado.", "success");
+                XLSX.utils.book_append_sheet(wb, ws, "Checklist");
+                XLSX.writeFile(wb, "checklist_calidad_acumulado_BERTONE.xlsx");
+                mostrarAlerta("Archivo Excel XLSX descargado con éxito.", "success");
+                return;
             }
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            rows.forEach(row => {
+                csvContent += row.map(val => `"${String(val ?? "").replace(/"/g, '""')}"`).join(";") + "\n";
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `checklist_calidad_acumulado_BERTONE.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            mostrarAlerta("Excel Acumulado descargado con éxito.", "success");
         }
 
-        // --- IMPORTACIÓN ---
+
+        // --- IMPORTACIÓN DE ARCHIVOS PARA CONSOLIDACIÓN / COMBINACIÓN ---
         function importarCSV(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1555,7 +1838,7 @@
                         cat.items.forEach(item => {
                             if (colIdx < headers.length) {
                                 registro.items[item.id] = {
-                                    state: row[colIdx] || "No evaluado",
+                                    estado: row[colIdx] || "No evaluado",
                                     comentario: row[colIdx + 1] || ""
                                 };
                             }
@@ -1564,28 +1847,83 @@
                     });
 
                     database.push(registro);
-                    await subirRegistroNube(registro);
                     nuevosRegistros++;
                 }
 
                 if (nuevosRegistros > 0) {
                     localStorage.setItem('bertone_quality_records', JSON.stringify(database));
                     actualizarTablaHistorial();
-                    mostrarAlerta(`¡Combinación exitosa! Se añadieron ${nuevosRegistros} planillas a la nube.`, "success");
+                    // CORREGIDO: sincronizar registros importados a Firestore
+                    if (esCloudValido && dbFirebase) {
+                        const registrosNuevos = database.slice(-nuevosRegistros);
+                        for (const reg of registrosNuevos) {
+                            try {
+                                await dbFirebase.collection("bertone_registros").doc(String(reg.id_registro)).set(reg);
+                            } catch(err) {
+                                console.warn("No se pudo sincronizar registro importado:", err);
+                            }
+                        }
+                    }
+                    mostrarAlerta(`¡Combinación exitosa! Se añadieron ${nuevosRegistros} nuevas planillas a tu base de datos acumulada.`, "success");
                 } else {
-                    mostrarAlerta("No se detectaron nuevas planillas para importar.", "info");
+                    mostrarAlerta("No se detectaron nuevas planillas para importar o ya estaban todas en tu historial.", "info");
                 }
 
             } catch (err) {
-                mostrarAlerta("Error al procesar el archivo CSV de importación.", "error");
+                mostrarAlerta("Error al procesar el archivo. Asegúrese de que sea un reporte exportado previamente.", "error");
                 console.error(err);
             }
         }
 
-        // --- RENDERIZACIÓN CHECKLIST ---
+
+        // --- RENDERIZACIÓN DE CONTROLES DEL CHECKLIST ---
+        function toggleItemManager() {
+            document.getElementById('item-manager').classList.toggle('hidden');
+        }
+
+        function actualizarListaCategorias() {
+            const datalist = document.getElementById('category-list');
+            if (!datalist) return;
+            datalist.innerHTML = checklistData.map(cat => `<option value="${cat.categoria}"></option>`).join("");
+        }
+
+        function agregarItemManual() {
+            const categoria = document.getElementById('new-item-category').value.trim() || "Controles adicionales";
+            const desc = document.getElementById('new-item-desc').value.trim();
+            if (!desc) {
+                mostrarAlerta("Escriba la descripción del nuevo ítem.", "warning");
+                return;
+            }
+            let cat = checklistData.find(c => c.categoria.toLowerCase() === categoria.toLowerCase());
+            if (!cat) {
+                cat = { categoria, items: [] };
+                checklistData.push(cat);
+            }
+            const nums = checklistData.flatMap(c => c.items.map(i => parseInt(i.id, 10))).filter(n => !Number.isNaN(n));
+            const id = String((nums.length ? Math.max(...nums) : 0) + 1).padStart(2, "0");
+            cat.items.push({ id, desc });
+            document.getElementById('new-item-desc').value = "";
+            guardarChecklistPersonalizado();
+            renderChecklist();
+            mostrarAlerta("Ítem agregado.", "success");
+        }
+
+        async function quitarItemManual(itemId) {
+            const confirmado = await mostrarConfirmacion("Quitar ítem", "El ítem se quitará del checklist para los próximos controles.", true);
+            if (!confirmado) return;
+            checklistData.forEach(cat => {
+                cat.items = cat.items.filter(item => item.id !== itemId);
+            });
+            checklistData = checklistData.filter(cat => cat.items.length > 0);
+            guardarChecklistPersonalizado();
+            renderChecklist();
+            mostrarAlerta("Ítem quitado.", "info");
+        }
+
         function renderChecklist() {
             const container = document.getElementById('items-container');
             container.innerHTML = "";
+            actualizarListaCategorias();
 
             checklistData.forEach((cat, catIdx) => {
                 let catHTML = `
@@ -1603,6 +1941,9 @@
                                     ${item.id}
                                 </span>
                                 <span class="text-sm font-semibold text-slate-700">${item.desc}</span>
+                                <button type="button" onclick="quitarItemManual('${item.id}')" class="no-print ml-2 text-rose-500 hover:text-rose-700 text-xs" title="Quitar ítem">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                             
                             <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
@@ -1615,7 +1956,7 @@
                                     <input type="radio" name="item_${item.id}" value="Incorrecto" class="accent-rose-600">
                                     <span>Incorrecto</span>
                                 </label>
-                                
+
                                 <label class="flex-1 sm:flex-initial flex items-center justify-center gap-1 cursor-pointer bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-600 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300 option-btn">
                                     <input type="radio" name="item_${item.id}" value="Mejorable" class="accent-amber-600">
                                     <span>Mejorable</span>
@@ -1632,130 +1973,18 @@
             });
         }
 
-        // --- MANEJO DE FIRMAS ---
-        let canvas, ctx;
-        // let drawing = false;
 
-        // function initSignaturePad() {
-        // canvas = document.getElementById('firma-canvas');
-        // ctx = canvas.getContext('2d');
-            
-        // const initialWidth = canvas.parentElement.clientWidth || 320;
-        // const initialHeight = canvas.parentElement.clientHeight || 100;
-        // canvas.width = initialWidth;
-        // canvas.height = initialHeight;
+        // --- FIRMA (desactivada) ---
+        let canvas = null, ctx = null;
+        let drawing = false;
+        function initSignaturePad() {}
+        function limpiarFirma() {}
+        function startDraw(e) {}
+        function stopDraw() {}
+        function draw(e) {}
+        function isCanvasBlank(c) { return true; }
 
-        // ctx.lineWidth = 2;
-        // ctx.lineCap = 'round';
-        // ctx.strokeStyle = '#1e3a8a';
-
-        // window.addEventListener('resize', () => {
-        // const newWidth = canvas.parentElement.clientWidth;
-        // const newHeight = canvas.parentElement.clientHeight;
-
-        // if (newWidth > 0 && newHeight > 0) {
-        // if (canvas.width > 0 && canvas.height > 0) {
-        // try {
-        // const temp = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        // canvas.width = newWidth;
-        // canvas.height = newHeight;
-        // ctx.putImageData(temp, 0, 0);
-        // } catch (e) {
-        // canvas.width = newWidth;
-        // canvas.height = newHeight;
-        // }
-        // } else {
-        // canvas.width = newWidth;
-        // canvas.height = newHeight;
-        // }
-        // ctx.lineWidth = 2;
-        // ctx.lineCap = 'round';
-        // ctx.strokeStyle = '#1e3a8a';
-        // }
-        // });
-
-        // canvas.addEventListener('mousedown', startDraw);
-        // canvas.addEventListener('mouseup', stopDraw);
-        // canvas.addEventListener('mousemove', draw);
-
-        // canvas.addEventListener('touchstart', (e) => {
-        // const touch = e.touches[0];
-        // const mouseEvent = new MouseEvent('mousedown', {
-        // clientX: touch.clientX,
-        // clientY: touch.clientY
-        // });
-        // canvas.dispatchEvent(mouseEvent);
-        // });
-        // canvas.addEventListener('touchend', () => {
-        // canvas.dispatchEvent(new MouseEvent('mouseup'));
-        // });
-        // canvas.addEventListener('touchmove', (e) => {
-        // const touch = e.touches[0];
-        // const mouseEvent = new MouseEvent('mousemove', {
-        // clientX: touch.clientX,
-        // clientY: touch.clientY
-        // });
-        // canvas.dispatchEvent(mouseEvent);
-        // }, { passive: true });
-        // }
-
-        // function startDraw(e) {
-        // drawing = true;
-        // ctx.beginPath();
-        // const rect = canvas.getBoundingClientRect();
-        // ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-        // }
-
-        // function stopDraw() {
-        // drawing = false;
-        // }
-
-        // function draw(e) {
-        // if (!drawing) return;
-        // const rect = canvas.getBoundingClientRect();
-        // ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-        // ctx.stroke();
-        // }
-
-        // function limpiarFirma() {
-        // ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // }
-
-        // function isCanvasBlank(canvas) {
-        // if (!canvas || canvas.width === 0 || canvas.height === 0) return true;
-        // try {
-        // const context = canvas.getContext('2d');
-        // const buffer = new Uint32Array(
-        // context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
-        // );
-        // return !buffer.some(color => color !== 0);
-        // } catch (e) {
-        // return true;
-        // }
-        // }
-
-        // --- COPIAR CONFIGURACIÓN NUBE ---
-        function copiarConfiguracionNube() {
-            const copyText = document.getElementById("cfg-db-config");
-            if (!copyText || !copyText.value.trim()) {
-                mostrarAlerta("No hay ninguna configuración de base de datos activa para copiar.", "warning");
-                return;
-            }
-            
-            copyText.select();
-            copyText.setSelectionRange(0, 99999); // Para móviles
-            
-            try {
-                // Clipboard fallback compatible para entornos restrictivos
-                document.execCommand('copy');
-                mostrarAlerta("¡Código de enlace copiado! Envíalo a tu celular (por WhatsApp o mail) y pégalo allí para conectar la base común.", "success");
-            } catch (err) {
-                console.error("Fallo al copiar el texto:", err);
-                mostrarAlerta("No se pudo copiar automáticamente. Selecciónalo manualmente, cópialo y envíalo a tu celular.", "warning");
-            }
-        }
-
-        // --- HELPERS GENERALES ---
+                // --- HELPERS GENERALES ---
         function toggleHistorial() {
             const sec = document.getElementById('seccion-historial');
             const btn = document.getElementById('btn-historial-txt');
@@ -1776,7 +2005,7 @@
             if (tipo === "success") box.classList.add("bg-emerald-600");
             else if (tipo === "warning") box.classList.add("bg-amber-600");
             else if (tipo === "info") box.classList.add("bg-blue-600");
-            else box.className += " bg-rose-600";
+            else box.classList.add("bg-rose-600");
 
             text.innerText = msg;
             box.classList.remove('hidden');
@@ -1790,207 +2019,571 @@
             document.getElementById('alert-box').classList.add('hidden');
         }
 
-        // Inicialización segura de la app
-        function inicializarApp() {
-            cargarConfiguracionMarca();
-            setFechaHoy();
-            renderChecklist();
-            // initSignaturePad();
- // DESACTIVADO
-            cargarBaseDatos();
-            initFirebaseSync();
-        }
 
-        // Validación inicial asíncrona para que corra el onload de forma inmediata e independiente
-        if (document.readyState === 'loading') {
-            window.addEventListener('DOMContentLoaded', inicializarApp);
-        } else {
-            inicializarApp();
-        }
-    
-        // ═══ VISOR DE FOTOS ═══
-        let _vFotos = [], _vIdx = 0, _vScale = 1, _vDist = 0, _vStartX = 0, _vDragging = false;
+        // ═══════════════════════════════════════════════════
+        //  MÓDULO CÁMARA IA - LEE CUCARDA CON VISIÓN ARTIFICIAL
+        // ═══════════════════════════════════════════════════
+        let iaCameraStream = null;
+        let iaFrontal = false;
 
-        function abrirVisor(fotos, idx) {
-            _vFotos = (fotos || []).filter(f => f && f.length > 5);
-            if (_vFotos.length === 0) return;
-            _vIdx = Math.min(idx || 0, _vFotos.length - 1);
-            _vScale = 1;
-            const m = document.getElementById('visor-fotos-modal');
-            m.style.display = 'flex';
-            m.classList.remove('hidden');
-            _visorShow();
-            const c = document.getElementById('visor-img-container');
-            c.addEventListener('touchstart', _vTS, { passive: false });
-            c.addEventListener('touchmove', _vTM, { passive: false });
-            c.addEventListener('touchend', _vTE);
-        }
-
-        function cerrarVisor() {
-            const m = document.getElementById('visor-fotos-modal');
-            m.style.display = 'none';
-            m.classList.add('hidden');
-            const c = document.getElementById('visor-img-container');
-            c.removeEventListener('touchstart', _vTS);
-            c.removeEventListener('touchmove', _vTM);
-            c.removeEventListener('touchend', _vTE);
-        }
-
-        function _visorShow() {
-            document.getElementById('visor-img').src = _vFotos[_vIdx];
-            document.getElementById('visor-img').style.transform = `scale(${_vScale})`;
-            document.getElementById('visor-contador').textContent = `${_vIdx + 1} / ${_vFotos.length}`;
-            document.getElementById('visor-prev').style.display = _vFotos.length > 1 ? 'flex' : 'none';
-            document.getElementById('visor-next').style.display = _vFotos.length > 1 ? 'flex' : 'none';
-        }
-
-        function visorNavegar(d) {
-            _vIdx = (_vIdx + d + _vFotos.length) % _vFotos.length;
-            _vScale = 1;
-            _visorShow();
-        }
-
-        function visorZoom(d) {
-            _vScale = Math.min(5, Math.max(0.5, _vScale + d));
-            document.getElementById('visor-img').style.transform = `scale(${_vScale})`;
-        }
-
-        function visorResetZoom() {
-            _vScale = 1;
-            document.getElementById('visor-img').style.transform = 'scale(1)';
-        }
-
-        function _vTS(e) {
-            if (e.touches.length === 2) {
-                _vDist = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-            } else if (e.touches.length === 1) {
-                _vStartX = e.touches[0].clientX;
-                _vDragging = true;
+        async function abrirCamaraIA() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                // Sin cámara en vivo → pedir imagen desde galería
+                document.querySelector('#ia-camera-modal label input[type=file]').click();
+                return;
             }
+            document.getElementById('ia-camera-modal').classList.remove('hidden');
+            await iniciarStreamCamaraIA();
         }
 
-        function _vTM(e) {
-            e.preventDefault();
-            if (e.touches.length === 2) {
-                const d = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-                if (_vDist > 0) {
-                    _vScale = Math.min(5, Math.max(0.5, _vScale + (d - _vDist) * 0.01));
-                    document.getElementById('visor-img').style.transform = `scale(${_vScale})`;
-                }
-                _vDist = d;
-            }
-        }
-
-        function _vTE(e) {
-            if (e.changedTouches.length === 1 && _vDragging && _vScale <= 1.1) {
-                const diff = _vStartX - e.changedTouches[0].clientX;
-                if (Math.abs(diff) > 50) visorNavegar(diff > 0 ? 1 : -1);
-            }
-            _vDragging = false;
-            _vDist = 0;
-        }
-
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarVisor(); });
-
-        
-        // ═══ GOOGLE DRIVE FUNCTIONS ═══
-        const GDRIVE_CLIENT_ID = 'REEMPLAZAR_CON_TU_CLIENT_ID';
-        let gdriveToken = null;
-
-        async function solicitarTokenDrive() {
-            return new Promise((resolve, reject) => {
-                if (gdriveToken) { resolve(gdriveToken); return; }
-                const client = window.google?.accounts?.oauth2?.initTokenClient({
-                    client_id: GDRIVE_CLIENT_ID,
-                    scope: 'https://www.googleapis.com/auth/drive.file',
-                    callback: (r) => { if (r.error) reject(r.error); else { gdriveToken = r.access_token; resolve(r.access_token); } }
-                });
-                if (!client) { reject(new Error('Google API no cargada')); return; }
-                client.requestAccessToken();
-            });
-        }
-
-        async function crearCarpetaDrive(token, nombre) {
-            const r = await fetch(`https://www.googleapis.com/drive/v3/files?q=name='${nombre}'+and+mimeType='application/vnd.google-apps.folder'+and+trashed=false`, 
-                { headers: { Authorization: 'Bearer ' + token } });
-            const d = await r.json();
-            if (d.files && d.files.length > 0) return d.files[0].id;
-            const cr = await fetch("https://www.googleapis.com/drive/v3/files", {
-                method: 'POST',
-                headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name: nombre, mimeType: 'application/vnd.google-apps.folder' })
-            });
-            return (await cr.json()).id;
-        }
-
-        async function subirFotoADrive(token, folderId, base64, nombre) {
-            if (!base64 || !base64.includes(',')) return null;
-            const [header, data] = base64.split(',');
-            const mime = header.match(/:(.*?);/)[1];
-            const bytes = atob(data);
-            const arr = new Uint8Array(bytes.length);
-            for (let i = 0; i < bytes.length; i++) arr[i] = bytes.charCodeAt(i);
-            const blob = new Blob([arr], { type: mime });
-            
-            const meta = JSON.stringify({ name: nombre, parents: [folderId] });
-            const fd = new FormData();
-            fd.append('metadata', new Blob([meta], { type: 'application/json' }));
-            fd.append('file', blob);
-
-            const r = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,webViewLink',
-                { method: 'POST', headers: { Authorization: 'Bearer ' + token }, body: fd });
-            const f = await r.json();
-
-            await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}/permissions`,
-                { method: 'POST', headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ role: 'reader', type: 'anyone' }) });
-
-            return f.webViewLink || `https://drive.google.com/file/d/${f.id}/view`;
-        }
-
-        async function subirTodasLasFotosADrive(registro) {
-            if (!registro.fotos || registro.fotos.length === 0) return registro;
-            if (GDRIVE_CLIENT_ID === 'REEMPLAZAR_CON_TU_CLIENT_ID') return registro;
-            
+        async function iniciarStreamCamaraIA() {
             try {
-                mostrarAlerta('📤 Subiendo fotos a Google Drive...', 'info');
-                const token = await solicitarTokenDrive();
-                const folderId = await crearCarpetaDrive(token, 'Bertone Calidad - Fotos');
-                
-                const links = [];
-                for (let i = 0; i < registro.fotos.length; i++) {
-                    const f = registro.fotos[i];
-                    if (!f || f.startsWith('http')) { links.push(f); continue; }
-                    const link = await subirFotoADrive(token, folderId, f, 
-                        `Panel_${registro.nombre_panel}_ID${registro.id_registro}_Foto${i + 1}.jpg`);
-                    links.push(link || f);
+                if (iaCameraStream) {
+                    iaCameraStream.getTracks().forEach(t => t.stop());
+                    iaCameraStream = null;
                 }
-                return { ...registro, fotos: links, fotos_en_drive: true };
-            } catch (e) {
-                console.warn('Error Drive:', e.message);
-                return registro;
+                iaCameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: iaFrontal ? 'user' : { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+                    audio: false
+                });
+                const video = document.getElementById('ia-camera-video');
+                video.srcObject = iaCameraStream;
+                await video.play().catch(() => {});
+            } catch(err) {
+                cerrarCamaraIA();
+                mostrarAlerta("No se pudo acceder a la cámara: " + (err.message || err), "error");
             }
         }
 
-        </script>
+        function cerrarCamaraIA() {
+            if (iaCameraStream) {
+                iaCameraStream.getTracks().forEach(t => t.stop());
+                iaCameraStream = null;
+            }
+            document.getElementById('ia-camera-modal').classList.add('hidden');
+            document.getElementById('ia-procesando').classList.add('hidden');
+        }
 
-    <!-- ═══════ VISOR DE FOTOS (pinch-zoom + swipe) ═══════ -->
-    <div id="visor-fotos-modal" class="fixed inset-0 z-[9999] bg-black bg-opacity-95 hidden" style="display:none; flex-direction: column; justify-content: center; align-items: center;">
-        <div class="absolute top-0 left-0 right-0 flex items-center justify-between px-4 py-3 bg-black bg-opacity-60 z-10">
-            <span id="visor-contador" class="text-white text-sm font-bold">1 / 1</span>
-            <button onclick="cerrarVisor()" class="text-white text-3xl w-10 h-10 flex items-center justify-center">✕</button>
-        </div>
-        <div id="visor-img-container" class="absolute inset-0 flex items-center justify-center overflow-hidden" style="touch-action: none;">
-            <img id="visor-img" src="" alt="" class="max-w-full max-h-full object-contain select-none" draggable="false" style="transform-origin: center; transition: transform 0.08s;">
-        </div>
-        <button id="visor-prev" onclick="visorNavegar(-1)" class="absolute left-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-60 text-white text-4xl w-12 h-16 flex items-center justify-center rounded">‹</button>
-        <button id="visor-next" onclick="visorNavegar(1)" class="absolute right-2 top-1/2 -translate-y-1/2 bg-black bg-opacity-60 text-white text-4xl w-12 h-16 flex items-center justify-center rounded">›</button>
-        <div class="absolute bottom-0 left-0 right-0 flex items-center justify-center gap-3 px-4 py-3 bg-black bg-opacity-60">
-            <button onclick="visorZoom(-0.4)" class="text-white text-2xl w-10 h-10 bg-slate-700 rounded flex items-center justify-center">−</button>
-            <button onclick="visorResetZoom()" class="text-white text-xs px-4 h-10 bg-slate-700 rounded">Reset</button>
-            <button onclick="visorZoom(0.4)" class="text-white text-2xl w-10 h-10 bg-slate-700 rounded flex items-center justify-center">+</button>
-        </div>
-    </div>
+        function cambiarCamaraIA() {
+            iaFrontal = !iaFrontal;
+            iniciarStreamCamaraIA();
+        }
 
+        function capturarFotoIA() {
+            const video = document.getElementById('ia-camera-video');
+            if (!video.videoWidth) {
+                mostrarAlerta("La cámara aún no está lista.", "warning");
+                return;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width  = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            // Flash
+            const flash = document.createElement('div');
+            flash.style.cssText = 'position:fixed;inset:0;background:white;z-index:9999;opacity:0.8;pointer-events:none;';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 150);
+
+            // Comprimir y enviar a la IA
+            const base64 = canvas.toDataURL('image/jpeg', 0.88);
+            enviarFotoAIA(base64);
+        }
+
+        function procesarFotoIADesdeGaleria(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('ia-camera-modal').classList.remove('hidden');
+                enviarFotoAIA(e.target.result);
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        // ═══════════════════════════════════════════════════
+        //  LECTOR IA CUCARDA - usa Tesseract.js (OCR local, sin internet extra)
+        // ═══════════════════════════════════════════════════
+        let tesseractWorker = null;
+
+        async function obtenerWorkerOCR() {
+            if (tesseractWorker) return tesseractWorker;
+            actualizarSpinnerIA("Cargando motor OCR...");
+            tesseractWorker = await Tesseract.createWorker('spa+eng', 1, {
+                logger: m => {
+                    if (m.status === 'recognizing text') {
+                        const pct = Math.round((m.progress || 0) * 100);
+                        actualizarSpinnerIA("Analizando imagen... " + pct + "%");
+                    }
+                }
+            });
+            return tesseractWorker;
+        }
+
+        function actualizarSpinnerIA(texto) {
+            const p = document.querySelector('#ia-procesando p.text-violet-300');
+            if (p) p.textContent = texto;
+        }
+
+        async function enviarFotoAIA(base64DataUrl) {
+            const spinner = document.getElementById('ia-procesando');
+            spinner.classList.remove('hidden');
+            spinner.style.display = 'flex';
+            document.getElementById('btn-capturar-ia').disabled = true;
+
+            try {
+                actualizarSpinnerIA("Analizando etiqueta...");
+
+                // Extraer el base64 puro (sin el prefijo data:image/...;base64,)
+                const base64Pure = base64DataUrl.split(',')[1];
+                const mimeType = base64DataUrl.split(';')[0].split(':')[1] || 'image/jpeg';
+
+                // Usar Claude API para leer la cucarda con precisión
+                const response = await fetch("https://api.anthropic.com/v1/messages", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 300,
+                        messages: [{
+                            role: "user",
+                            content: [
+                                {
+                                    type: "image",
+                                    source: { type: "base64", media_type: mimeType, data: base64Pure }
+                                },
+                                {
+                                    type: "text",
+                                    text: `Esta es una cucarda/etiqueta de Premoldeados Bertone. Extraé estos campos y respondé SOLO con JSON válido, sin texto extra:
+{
+  "codigo": "el código en formato DD-DDD-DDDDD, ej: 08-007-08546",
+  "cucarda_serie": "el número de serie, ej: 2600003",
+  "nombre_panel": "el nombre/código del panel en letras grandes, ej: L102A o PPV018B o Panel interior",
+  "descripcion": "el texto de Descripción si aparece"
+}
+Si un campo no se ve claramente, dejalo como cadena vacía "".`
+                                }
+                            ]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error API: " + response.status);
+                }
+
+                const data = await response.json();
+                const texto = data.content?.[0]?.text || '';
+
+                // Parsear JSON de la respuesta
+                let campos = { codigo: '', cucarda_serie: '', nombre_panel: '', descripcion: '' };
+                try {
+                    const clean = texto.replace(/```json|```/g, '').trim();
+                    campos = { ...campos, ...JSON.parse(clean) };
+                } catch(parseErr) {
+                    // Si no es JSON válido, intentar extracción con regex como fallback
+                    console.warn("No se pudo parsear JSON, usando regex fallback:", texto);
+                    campos = extraerCamposDeCucarda(texto);
+                }
+
+                cerrarCamaraIA();
+                let camposLlenos = 0;
+
+                const mappings = [
+                    { key: 'codigo',        id: 'codigo' },
+                    { key: 'nombre_panel',  id: 'nombre_panel' },
+                    { key: 'cucarda_serie', id: 'cucarda_serie' },
+                    { key: 'mesa',          id: 'mesa' },
+                    { key: 'operarios',     id: 'operarios' }
+                ];
+
+                for (const { key, id } of mappings) {
+                    const el = document.getElementById(id);
+                    if (el && campos[key] && campos[key].toString().trim()) {
+                        el.value = campos[key].toString().trim();
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                        camposLlenos++;
+                    }
+                }
+
+                if (camposLlenos > 0) {
+                    mostrarAlerta("✅ Se reconocieron " + camposLlenos + " campo" + (camposLlenos > 1 ? "s" : "") + " de la cucarda. Verificá antes de guardar.", "success");
+                } else {
+                    console.warn("Campos vacíos. Respuesta IA:", texto);
+                    mostrarAlerta("⚠️ No se reconocieron campos. Acercá más la cámara y asegurate de que la etiqueta esté bien iluminada.", "warning");
+                }
+
+            } catch (err) {
+                cerrarCamaraIA();
+                console.error("Error IA cucarda:", err);
+                // Si falla la API, intentar con OCR local como fallback
+                actualizarSpinnerIA("Intentando OCR local...");
+                try {
+                    const imgEl = new Image();
+                    await new Promise((res, rej) => { imgEl.onload=res; imgEl.onerror=rej; imgEl.src=base64DataUrl; });
+                    const canvas = document.createElement('canvas');
+                    const escala = Math.min(4, 1600 / Math.max(imgEl.width, imgEl.height));
+                    canvas.width = Math.round(imgEl.width * escala);
+                    canvas.height = Math.round(imgEl.height * escala);
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+                    ctx.filter = 'contrast(1.8) brightness(1.1) grayscale(1)';
+                    ctx.drawImage(canvas, 0, 0);
+                    const worker = await obtenerWorkerOCR();
+                    const resultado = await worker.recognize(canvas);
+                    const campos = extraerCamposDeCucarda(resultado.data.text || '');
+                    cerrarCamaraIA();
+                    let camposLlenos = 0;
+                    [['codigo','codigo'],['nombre_panel','nombre_panel'],['cucarda_serie','cucarda_serie']].forEach(([k,id]) => {
+                        const el = document.getElementById(id);
+                        if (el && campos[k]) { el.value = campos[k]; camposLlenos++; }
+                    });
+                    if (camposLlenos > 0) mostrarAlerta("✅ OCR local: " + camposLlenos + " campo(s) reconocidos.", "success");
+                    else mostrarAlerta("No se pudo leer la etiqueta. Completá los campos manualmente.", "warning");
+                } catch(ocrErr) {
+                    cerrarCamaraIA();
+                    mostrarAlerta("Error al procesar la imagen. Completá los campos manualmente.", "error");
+                }
+            } finally {
+                document.getElementById('btn-capturar-ia').disabled = false;
+                spinner.classList.add('hidden');
+                spinner.style.display = 'none';
+            }
+        }
+
+        function extraerCamposDeCucarda(texto) {
+            // Normalizar texto
+            const t = texto.replace(/\r/g, '\n').replace(/[ \t]+/g, ' ').trim();
+            const lineas = t.split('\n').map(l => l.trim()).filter(l => l.length > 1);
+            const campos = { codigo: '', nombre_panel: '', cucarda_serie: '', descripcion: '' };
+
+            // ── CÓDIGO: patrón fijo Bertone  XX-XXX-XXXXX  (ej: 08-007-08546)
+            // Acepta guión, barra, espacio como separador, y OCR que confunde - con _
+            const rCodigo = t.match(/\b(\d{2}[-_/ ]\d{3}[-_/ ]\d{5})\b/);
+            if (rCodigo) campos.codigo = rCodigo[1].replace(/[_/ ]/g, '-');
+
+            // ── N° SERIE: número de 7 dígitos (ej: 2600003, 2500123)
+            // Primero buscar con label explícito
+            const rSerieLabel = t.match(/n[°o]?\s*[.:]?\s*serie\s*[:.#]?\s*(\d{5,8})/i);
+            if (rSerieLabel) {
+                campos.cucarda_serie = rSerieLabel[1];
+            } else {
+                // Buscar número de 7 dígitos solo (formato Bertone: 26xxxxx o 25xxxxx)
+                const rSerie7 = t.match(/\b(2[0-9]{6})\b/);
+                if (rSerie7) campos.cucarda_serie = rSerie7[1];
+                // Fallback: cualquier número 5-8 dígitos en su propia línea
+                if (!campos.cucarda_serie) {
+                    for (const linea of lineas) {
+                        if (/^\d{5,8}$/.test(linea)) { campos.cucarda_serie = linea; break; }
+                    }
+                }
+            }
+
+            // ── NOMBRE PANEL (letras grandes): aparece al final de la cucarda
+            // Formato: L102A, V018D, PPV018B, SF2000, etc.
+            // Buscar el texto más grande — suele ser la última línea significativa
+            // o aparecer después de "Descripción:" o solo en línea propia
+            const rDescLabel = t.match(/descripci[oó]n\s*[:.]\s*(.+)/i);
+            if (rDescLabel) {
+                // Descripción puede ser "Panel interior", "LOSA L102A", etc.
+                const desc = rDescLabel[1].trim();
+                campos.descripcion = desc;
+                // Si la descripción termina en un código tipo L102A, usarlo como nombre
+                const mCodPanel = desc.match(/([A-Z]{1,4}\d{2,4}[A-Z]?)$/i);
+                if (mCodPanel) campos.nombre_panel = mCodPanel[1].toUpperCase();
+            }
+
+            // Si no encontramos nombre_panel desde descripción, buscar línea con código alfanumérico grande
+            // Patrones: L102A, V018D, PPV018B, SF2000, PI-001
+            if (!campos.nombre_panel) {
+                // Buscar línea que sea solo un código alfanumérico (nombre en letras grandes)
+                for (const linea of lineas) {
+                    if (/^[A-Z]{1,4}\d{2,4}[A-Z]?$/i.test(linea) && linea.length >= 3) {
+                        campos.nombre_panel = linea.toUpperCase();
+                        break;
+                    }
+                }
+            }
+
+            // Fallback nombre_panel: código alfanumérico en cualquier parte del texto
+            if (!campos.nombre_panel) {
+                const rAlfanum = t.match(/\b([A-Z]{1,4}\d{2,4}[A-Z]?)\b/i);
+                if (rAlfanum && rAlfanum[1].length >= 3) {
+                    campos.nombre_panel = rAlfanum[1].toUpperCase();
+                }
+            }
+
+            // Si descripcion tiene el nombre completo y nombre_panel es distinto, usar descripcion completa
+            if (campos.descripcion && !campos.nombre_panel) {
+                campos.nombre_panel = campos.descripcion;
+            }
+
+            console.log('OCR campos extraídos:', campos, '| Texto bruto:', t.substring(0, 200));
+            return campos;
+        }
+
+        // Comprime foto a miniatura pequeña (< 50KB) para guardar en Firestore sin Storage
+        async function comprimirFotoParaFirestore(base64) {
+            if (!base64 || base64.startsWith('http')) return base64;
+            try {
+                const img = new Image();
+                await new Promise((res, rej) => { img.onload=res; img.onerror=rej; img.src=base64; });
+                const canvas = document.createElement('canvas');
+                const MAX = 400; // máximo 400px en cualquier lado
+                const ratio = Math.min(MAX/img.width, MAX/img.height, 1);
+                canvas.width = Math.round(img.width * ratio);
+                canvas.height = Math.round(img.height * ratio);
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                return canvas.toDataURL('image/jpeg', 0.5); // calidad 50%
+            } catch(e) {
+                return ''; // si falla, no guardar foto
+            }
+        }
+
+        // ═══════════════════════════════════════════════════
+        //  MÓDULO CÁMARA EN VIVO
+        // ═══════════════════════════════════════════════════
+        let cameraStream = null;
+        let camaraFrontal = false;
+        let fotosEnSesionCamara = 0;
+
+        async function abrirCamara() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                // Fallback: abrir galería con capture
+                mostrarAlerta("Tu navegador no soporta cámara en vivo. Usá Galería.", "warning");
+                document.getElementById('input-fotos-galeria').click();
+                return;
+            }
+            fotosEnSesionCamara = fotosTemporales.length;
+            document.getElementById('camera-modal').classList.remove('hidden');
+            await iniciarStreamCamara();
+        }
+
+        async function iniciarStreamCamara() {
+            try {
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(t => t.stop());
+                    cameraStream = null;
+                }
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: camaraFrontal ? 'user' : { ideal: 'environment' },
+                        width:  { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    },
+                    audio: false
+                });
+                const video = document.getElementById('camera-video');
+                video.srcObject = cameraStream;
+                await video.play().catch(() => {});
+                actualizarContadorCamara();
+            } catch(err) {
+                cerrarCamara();
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    mostrarAlerta("Permiso de cámara denegado. Habilitá el acceso en la configuración del celular.", "error");
+                } else {
+                    mostrarAlerta("No se pudo abrir la cámara: " + (err.message || err), "error");
+                }
+            }
+        }
+
+        function cerrarCamara() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+            }
+            document.getElementById('camera-modal').classList.add('hidden');
+            fotosEnSesionCamara = 0;
+        }
+
+        function cambiarCamara() {
+            camaraFrontal = !camaraFrontal;
+            iniciarStreamCamara();
+        }
+
+        function capturarFoto() {
+            const video = document.getElementById('camera-video');
+            if (!video.videoWidth || !video.srcObject) {
+                mostrarAlerta("La cámara aún no está lista. Esperá un instante.", "warning");
+                return;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width  = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            // Flash visual
+            const flash = document.createElement('div');
+            flash.style.cssText = 'position:fixed;inset:0;background:white;z-index:9999;opacity:0.8;pointer-events:none;';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 150);
+
+            comprimirImagen(canvas.toDataURL('image/jpeg', 0.92), 1280, 0.82, function(compressed) {
+                fotosTemporales.push(compressed);
+                renderizarPrevisualizacionFotos();
+                actualizarContadorCamara();
+            });
+        }
+
+        function actualizarContadorCamara() {
+            const badge = document.getElementById('foto-count-badge');
+            const total = fotosTemporales.length;
+            if (total > 0) {
+                badge.classList.remove('hidden');
+                badge.textContent = total + (total === 1 ? ' foto' : ' fotos');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+
+        // ═══════════════════════════════════════════════════
+        //  MÓDULO NUBE - MODAL DE CONFIGURACIÓN
+        // ═══════════════════════════════════════════════════
+        function limpiarJsonFirebase(el) {
+            let v = el.value;
+            // Extraer solo el bloque { ... }
+            const m = v.match(/\{[\s\S]*\}/);
+            if (m) v = m[0];
+            // Quitar comillas tipográficas
+            v = v.replace(/[“”‘’]/g, '"');
+            el.value = v;
+        }
+
+        function jsObjectAJson(str) {
+            var i = str.indexOf('{');
+            var j = str.lastIndexOf('}');
+            if (i < 0 || j < 0) return str;
+            try {
+                // Use Function to evaluate JS object literal safely
+                return JSON.stringify(Function('return (' + str.substring(i, j+1) + ')')());
+            } catch(e) {
+                return str.substring(i, j+1);
+            }
+        }
+
+        function abrirConfigNube() {
+            const modal = document.getElementById('cloud-modal');
+            // Sincronizar valor actual
+            document.getElementById('cloud-modal-config').value = brandSettings.db_config || '';
+            actualizarEstadoModalNube();
+            modal.classList.remove('hidden');
+        }
+
+        function cerrarConfigNube() {
+            document.getElementById('cloud-modal').classList.add('hidden');
+        }
+
+        function actualizarEstadoModalNube() {
+            // Mostrar aviso file:// si corresponde
+            const alertaFile = document.getElementById('alerta-file-protocol');
+            if (alertaFile) {
+                if (window.location.protocol === 'file:') {
+                    alertaFile.classList.remove('hidden');
+                } else {
+                    alertaFile.classList.add('hidden');
+                }
+            }
+            const statusDiv = document.getElementById('cloud-modal-status');
+            if (esCloudValido) {
+                statusDiv.className = 'rounded-xl p-4 bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 flex items-center gap-3';
+                statusDiv.innerHTML = '<i class="fas fa-check-circle text-emerald-500 text-xl"></i><div><p class="font-bold text-emerald-700">✅ Conectado a la Nube</p><p class="text-xs mt-0.5">Todos los dispositivos con esta config se sincronizan en tiempo real.</p></div>';
+            } else {
+                statusDiv.className = 'rounded-xl p-4 bg-slate-50 border border-slate-200 text-sm text-slate-600 flex items-center gap-3';
+                statusDiv.innerHTML = '<i class="fas fa-database text-slate-400 text-xl"></i><div><p class="font-bold text-slate-700">Modo: Solo Local</p><p class="text-xs mt-0.5">Los datos se guardan solo en este dispositivo.</p></div>';
+            }
+        }
+
+        async function conectarNubeDesdeModal() {
+            const textarea = document.getElementById('cloud-modal-config');
+            limpiarJsonFirebase(textarea);
+            const raw = textarea.value.trim();
+            if (!raw) {
+                mostrarAlerta("Pegá primero la configuración JSON de Firebase.", "warning");
+                return;
+            }
+            // Extraer JSON limpio
+            const match = raw.match(/\{[\s\S]*\}/);
+            const jsonStr = match ? match[0] : raw;
+            // Intentar parsear directo, si falla convertir de JS a JSON
+            let config;
+            let jsonLimpio = jsonStr;
+            try {
+                config = JSON.parse(jsonLimpio);
+            } catch(e) {
+                // Puede ser formato JS (sin comillas en claves) — convertir
+                try {
+                    jsonLimpio = jsObjectAJson(jsonStr);
+                    config = JSON.parse(jsonLimpio);
+                } catch(e2) {
+                    mostrarAlerta("No se pudo leer el JSON. Copiá el bloque completo desde Firebase → Configuración → formato Config. Error: " + e2.message, "error");
+                    return;
+                }
+            }
+            if (!config.apiKey || !config.projectId) {
+                mostrarAlerta("Faltan campos. El JSON debe tener al menos apiKey y projectId.", "error");
+                return;
+            }
+            // Guardar siempre el JSON limpio
+            brandSettings.db_config = jsonStr;
+            document.getElementById('cfg-db-config').value = jsonStr;
+            localStorage.setItem('bertone_brand_settings', JSON.stringify(brandSettings));
+            cerrarConfigNube();
+            mostrarAlerta("Conectando a la nube...", "info");
+            await inicializarFirebaseCloud();
+        }
+
+        async function desconectarNube() {
+            brandSettings.db_config = '';
+            document.getElementById('cfg-db-config').value = '';
+            document.getElementById('cloud-modal-config').value = '';
+            localStorage.setItem('bertone_brand_settings', JSON.stringify(brandSettings));
+            if (unsubscribeRegistros) unsubscribeRegistros();
+            if (unsubscribeConfig) unsubscribeConfig();
+            dbFirebase = null;
+            storageFirebase = null;
+            esCloudValido = false;
+            setCloudBadge('<i class="fas fa-cloud"></i> <span id="cloud-badge-txt">☁️ Configurar Nube</span>', "local");
+            actualizarEstadoModalNube();
+            mostrarAlerta("Desconectado de la nube. La app sigue en modo local.", "info");
+        }
+
+        function generarQRConfig() {
+            const config = document.getElementById('cloud-modal-config').value.trim();
+            if (!config) {
+                mostrarAlerta("Primero ingresá la configuración de Firebase.", "warning");
+                return;
+            }
+            try {
+                JSON.parse(config);
+            } catch(e) {
+                mostrarAlerta("El JSON no es válido.", "error");
+                return;
+            }
+            const encoded = encodeURIComponent(config);
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&ecc=M&data=${encoded}`;
+            document.getElementById('cloud-qr-img').src = qrUrl;
+            document.getElementById('cloud-qr-section').classList.remove('hidden');
+        }
+
+        function compartirConfigCloud() {
+            const config = document.getElementById('cfg-db-config').value.trim();
+            if (!config) {
+                abrirConfigNube();
+                return;
+            }
+            abrirConfigNube();
+            document.getElementById('cloud-modal-config').value = config;
+            generarQRConfig();
+        }
+
+        function toggleGuiaFirebase() {
+            document.getElementById('guia-firebase').classList.toggle('hidden');
+        }
+
+    </script>
 </body>
 </html>
