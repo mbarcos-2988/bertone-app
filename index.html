@@ -335,13 +335,20 @@
                             </div>
                             <div class="no-print">
                                 <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Firma Digitalizada / Trazo (Opcional)</label>
-                                <div class="relative bg-white border border-slate-300 rounded-lg overflow-hidden h-[100px]">
-                                    <canvas id="firma-canvas" class="w-full h-full cursor-crosshair"></canvas>
-                                </div>
-                                <button type="button" onclick="limpiarFirma()" class="mt-1 text-[11px] text-red-500 hover:text-red-700 font-semibold flex items-center gap-1">
-                                    <i class="fas fa-eraser"></i> Limpiar Trazo
-                                </button>
-                            </div>
+                                    <!-- <div class="relative bg-white border border-slate-300 rounded-lg overflow-hidden h-[100px]">
+ -->
+                                    <!-- <canvas id="firma-canvas" class="w-full h-full cursor-crosshair"></canvas>
+ -->
+                                    <!-- </div>
+ -->
+                                    <!-- <button type="button" onclick="limpiarFirma()" class="mt-1 text-[11px] text-red-500 hover:text-red-700 font-semibold flex items-center gap-1">
+ -->
+                                    <!-- <i class="fas fa-eraser"></i> Limpiar Trazo
+ -->
+                                    <!-- </button>
+ -->
+                                    <!-- </div>
+ -->
                         </div>
                     </div>
                 </div>
@@ -1627,105 +1634,105 @@
 
         // --- MANEJO DE FIRMAS ---
         let canvas, ctx;
-        let drawing = false;
+        // let drawing = false;
 
-        function initSignaturePad() {
-            canvas = document.getElementById('firma-canvas');
-            ctx = canvas.getContext('2d');
+        // function initSignaturePad() {
+        // canvas = document.getElementById('firma-canvas');
+        // ctx = canvas.getContext('2d');
             
-            const initialWidth = canvas.parentElement.clientWidth || 320;
-            const initialHeight = canvas.parentElement.clientHeight || 100;
-            canvas.width = initialWidth;
-            canvas.height = initialHeight;
+        // const initialWidth = canvas.parentElement.clientWidth || 320;
+        // const initialHeight = canvas.parentElement.clientHeight || 100;
+        // canvas.width = initialWidth;
+        // canvas.height = initialHeight;
 
-            ctx.lineWidth = 2;
-            ctx.lineCap = 'round';
-            ctx.strokeStyle = '#1e3a8a';
+        // ctx.lineWidth = 2;
+        // ctx.lineCap = 'round';
+        // ctx.strokeStyle = '#1e3a8a';
 
-            window.addEventListener('resize', () => {
-                const newWidth = canvas.parentElement.clientWidth;
-                const newHeight = canvas.parentElement.clientHeight;
+        // window.addEventListener('resize', () => {
+        // const newWidth = canvas.parentElement.clientWidth;
+        // const newHeight = canvas.parentElement.clientHeight;
 
-                if (newWidth > 0 && newHeight > 0) {
-                    if (canvas.width > 0 && canvas.height > 0) {
-                        try {
-                            const temp = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                            canvas.width = newWidth;
-                            canvas.height = newHeight;
-                            ctx.putImageData(temp, 0, 0);
-                        } catch (e) {
-                            canvas.width = newWidth;
-                            canvas.height = newHeight;
-                        }
-                    } else {
-                        canvas.width = newWidth;
-                        canvas.height = newHeight;
-                    }
-                    ctx.lineWidth = 2;
-                    ctx.lineCap = 'round';
-                    ctx.strokeStyle = '#1e3a8a';
-                }
-            });
+        // if (newWidth > 0 && newHeight > 0) {
+        // if (canvas.width > 0 && canvas.height > 0) {
+        // try {
+        // const temp = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        // canvas.width = newWidth;
+        // canvas.height = newHeight;
+        // ctx.putImageData(temp, 0, 0);
+        // } catch (e) {
+        // canvas.width = newWidth;
+        // canvas.height = newHeight;
+        // }
+        // } else {
+        // canvas.width = newWidth;
+        // canvas.height = newHeight;
+        // }
+        // ctx.lineWidth = 2;
+        // ctx.lineCap = 'round';
+        // ctx.strokeStyle = '#1e3a8a';
+        // }
+        // });
 
-            canvas.addEventListener('mousedown', startDraw);
-            canvas.addEventListener('mouseup', stopDraw);
-            canvas.addEventListener('mousemove', draw);
+        // canvas.addEventListener('mousedown', startDraw);
+        // canvas.addEventListener('mouseup', stopDraw);
+        // canvas.addEventListener('mousemove', draw);
 
-            canvas.addEventListener('touchstart', (e) => {
-                const touch = e.touches[0];
-                const mouseEvent = new MouseEvent('mousedown', {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY
-                });
-                canvas.dispatchEvent(mouseEvent);
-            });
-            canvas.addEventListener('touchend', () => {
-                canvas.dispatchEvent(new MouseEvent('mouseup'));
-            });
-            canvas.addEventListener('touchmove', (e) => {
-                const touch = e.touches[0];
-                const mouseEvent = new MouseEvent('mousemove', {
-                    clientX: touch.clientX,
-                    clientY: touch.clientY
-                });
-                canvas.dispatchEvent(mouseEvent);
-            }, { passive: true });
-        }
+        // canvas.addEventListener('touchstart', (e) => {
+        // const touch = e.touches[0];
+        // const mouseEvent = new MouseEvent('mousedown', {
+        // clientX: touch.clientX,
+        // clientY: touch.clientY
+        // });
+        // canvas.dispatchEvent(mouseEvent);
+        // });
+        // canvas.addEventListener('touchend', () => {
+        // canvas.dispatchEvent(new MouseEvent('mouseup'));
+        // });
+        // canvas.addEventListener('touchmove', (e) => {
+        // const touch = e.touches[0];
+        // const mouseEvent = new MouseEvent('mousemove', {
+        // clientX: touch.clientX,
+        // clientY: touch.clientY
+        // });
+        // canvas.dispatchEvent(mouseEvent);
+        // }, { passive: true });
+        // }
 
-        function startDraw(e) {
-            drawing = true;
-            ctx.beginPath();
-            const rect = canvas.getBoundingClientRect();
-            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-        }
+        // function startDraw(e) {
+        // drawing = true;
+        // ctx.beginPath();
+        // const rect = canvas.getBoundingClientRect();
+        // ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        // }
 
-        function stopDraw() {
-            drawing = false;
-        }
+        // function stopDraw() {
+        // drawing = false;
+        // }
 
-        function draw(e) {
-            if (!drawing) return;
-            const rect = canvas.getBoundingClientRect();
-            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-            ctx.stroke();
-        }
+        // function draw(e) {
+        // if (!drawing) return;
+        // const rect = canvas.getBoundingClientRect();
+        // ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        // ctx.stroke();
+        // }
 
-        function limpiarFirma() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
+        // function limpiarFirma() {
+        // ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // }
 
-        function isCanvasBlank(canvas) {
-            if (!canvas || canvas.width === 0 || canvas.height === 0) return true;
-            try {
-                const context = canvas.getContext('2d');
-                const buffer = new Uint32Array(
-                    context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
-                );
-                return !buffer.some(color => color !== 0);
-            } catch (e) {
-                return true;
-            }
-        }
+        // function isCanvasBlank(canvas) {
+        // if (!canvas || canvas.width === 0 || canvas.height === 0) return true;
+        // try {
+        // const context = canvas.getContext('2d');
+        // const buffer = new Uint32Array(
+        // context.getImageData(0, 0, canvas.width, canvas.height).data.buffer
+        // );
+        // return !buffer.some(color => color !== 0);
+        // } catch (e) {
+        // return true;
+        // }
+        // }
 
         // --- COPIAR CONFIGURACIÓN NUBE ---
         function copiarConfiguracionNube() {
@@ -1788,7 +1795,8 @@
             cargarConfiguracionMarca();
             setFechaHoy();
             renderChecklist();
-            initSignaturePad();
+            // initSignaturePad();
+ // DESACTIVADO
             cargarBaseDatos();
             initFirebaseSync();
         }
