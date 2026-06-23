@@ -8,70 +8,73 @@
     <meta name="theme-color" content="#1e3a8a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Crect width="512" height="512" rx="96" fill="%231e3a8a"/%3E%3Ctext x="256" y="238" font-family="Arial, Helvetica, sans-serif" font-size="88" font-weight="900" text-anchor="middle" fill="white"%3EB%3C/text%3E%3Ctext x="256" y="330" font-family="Arial, Helvetica, sans-serif" font-size="54" font-weight="900" text-anchor="middle" fill="white"%3EBERTONE%3C/text%3E%3C/svg%3E'>
-
-    <!-- Dependencias Externas Estables -->
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
     
-    <!-- Firebase SDK (Compat Mode) -->
     <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-app-compat.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-auth-compat.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-firestore-compat.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-storage-compat.min.js"></script>
-    
+
     <style>
         @media print { .no-print { display: none !important; } .print-card { border: 1px solid #ccc; box-shadow: none; padding: 10px; } }
         .option-btn { transition: all 0.2s ease; }
         .gallery-scrollbar::-webkit-scrollbar { height: 6px; }
         .gallery-scrollbar::-webkit-scrollbar-thumb { background-color: #cbd5e1; border-radius: 3px; }
+        
+        #pantalla-carga {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #1e3a8a; color: white; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 999999;
+            transition: opacity 0.4s ease;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-24 relative">
 
-    <!-- Panel de Configuración de Marca -->
+    <div id="pantalla-carga">
+        <svg style="width: 60px; height: 60px; animation: spin 1s linear infinite;" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" stroke-opacity="0.3"></circle>
+            <path fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <h2 style="margin-top: 15px; font-size: 1.2rem; font-weight: bold;">Cargando BERTONE...</h2>
+        <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+    </div>
+
     <div id="settings-panel" class="bg-slate-800 text-white p-4 hidden no-print">
         <div class="max-w-7xl mx-auto">
             <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-4">
-                <h3 class="text-sm font-bold uppercase text-slate-300 flex items-center gap-2"><i class="fas fa-cog"></i> Personalización Corporativa</h3>
+                <h3 class="text-sm font-bold uppercase text-slate-300 flex items-center gap-2"><i class="fas fa-cog"></i> Configuración</h3>
                 <button type="button" onclick="toggleSettings()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <label class="block text-xs text-slate-400 font-semibold mb-1">Empresa</label>
                     <input type="text" id="cfg-empresa" value="BERTONE" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-sm text-white focus:outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs text-slate-400 font-semibold mb-1">Subtítulo del Formulario</label>
+                    <label class="block text-xs text-slate-400 font-semibold mb-1">Subtítulo</label>
                     <input type="text" id="cfg-subtitulo" value="Checklist de Cumplimiento de Paneles" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-sm text-white focus:outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs text-slate-400 font-semibold mb-1">Logo Corporativo (Opcional)</label>
-                    <div class="flex items-center gap-2">
-                        <input type="file" id="cfg-logo-file" accept="image/*" onchange="cargarLogoPersonalizado(event)" class="text-xs text-slate-300">
-                        <button type="button" id="btn-borrar-logo" onclick="borrarLogo()" class="hidden bg-red-600 text-xs px-2 py-1 rounded">Quitar</button>
-                    </div>
                 </div>
             </div>
             <div class="mt-4 pt-4 border-t border-slate-700 flex justify-end gap-2">
-                <button type="button" onclick="guardarConfiguracionMarca()" class="bg-blue-600 text-xs font-bold px-4 py-2 rounded">Guardar Cambios</button>
-                <button type="button" onclick="restaurarValoresPredeterminados()" class="bg-slate-600 text-xs font-bold px-4 py-2 rounded">Restaurar Valores de Fábrica</button>
+                <button type="button" onclick="guardarConfiguracionMarca()" class="bg-blue-600 text-xs font-bold px-4 py-2 rounded">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- Encabezado Principal -->
     <header class="bg-blue-900 text-white shadow-md py-4 px-6 mb-6 no-print">
         <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div id="brand-logo-container" class="bg-white p-1.5 rounded-lg flex items-center justify-center min-w-[100px] min-h-[44px]">
                     <div id="brand-text-logo" class="text-blue-900 font-black text-xl tracking-wider px-1">BERTONE</div>
-                    <img id="brand-img-logo" src="" alt="Logo" class="hidden max-h-11 object-contain">
                 </div>
                 <div>
                     <h1 id="brand-form-title" class="text-lg font-bold">SISTEMA DE CALIDAD</h1>
@@ -80,57 +83,52 @@
             </div>
             <div class="flex flex-wrap gap-2 justify-center">
                 <button type="button" onclick="toggleSettings()" class="bg-blue-800 hover:bg-blue-700 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2"><i class="fas fa-edit"></i> Personalizar</button>
-                <button type="button" onclick="generarReportePDFDesdeFormulario()" class="bg-blue-600 hover:bg-blue-500 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2"><i class="fas fa-file-pdf"></i> Exportar PDF Actual</button>
+                <button type="button" onclick="generarReportePDFDesdeFormulario()" class="bg-blue-600 hover:bg-blue-500 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2"><i class="fas fa-file-pdf"></i> Exportar PDF</button>
                 <button type="button" onclick="exportarExcel()" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2"><i class="fas fa-file-excel"></i> Exportar Excel</button>
                 <button type="button" onclick="toggleHistorial()" class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2">
                     <i class="fas fa-history"></i> <span id="btn-historial-txt">Base de Datos ([0])</span>
                 </button>
                 <button type="button" onclick="abrirConfigNube()" id="cloud-status-badge" class="bg-slate-800 px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-2 border border-blue-700">
-                    <i class="fas fa-cloud"></i> <span id="cloud-badge-txt">Configurar Nube</span>
+                    <i class="fas fa-cloud"></i> <span id="cloud-badge-txt">Activar Nube</span>
                 </button>
             </div>
         </div>
     </header>
 
-    <!-- Contenido Principal -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 mb-12">
         <div id="alert-box" class="hidden mb-6 p-4 rounded-lg text-white font-semibold flex justify-between items-center no-print">
             <span id="alert-msg"></span>
             <button type="button" onclick="cerrarAlerta()" class="text-white"><i class="fas fa-times"></i></button>
         </div>
 
-        <!-- Escáners Rápidos -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6 no-print">
             <button type="button" onclick="activarLectorQR()" class="bg-blue-950 text-white p-4 rounded-xl shadow font-bold text-sm flex items-center justify-center gap-3 hover:bg-blue-900">
                 <i class="fas fa-qrcode text-xl text-blue-400"></i> Escanear Código QR
             </button>
             <button type="button" onclick="abrirOcrCamara()" class="bg-slate-800 text-white p-4 rounded-xl shadow font-bold text-sm flex items-center justify-center gap-3 hover:bg-slate-700">
-                <i class="fas fa-expand text-xl text-orange-400"></i> Procesar Etiqueta Inteligente (OCR)
+                <i class="fas fa-expand text-xl text-orange-400"></i> Escáner OCR de Textos
             </button>
         </div>
 
         <div id="qr-reader-container" class="hidden bg-white p-4 rounded-xl border mb-6 no-print">
-            <div id="reader" class="w-full max-w-sm mx-auto"></div>
-            <button type="button" onclick="detenerLectorQR()" class="mt-3 block mx-auto bg-red-600 text-white text-xs px-4 py-2 rounded-lg">Cerrar Cámara Lector</button>
+            <div id="reader" class="w-full max-w-sm mx-auto overflow-hidden rounded"></div>
+            <button type="button" onclick="detenerLectorQR()" class="mt-3 block mx-auto bg-red-600 text-white text-xs px-4 py-2 rounded-lg">Cerrar Lector QR</button>
         </div>
 
-        <!-- Sección de Historial Local -->
         <section id="seccion-historial" class="hidden mb-8 bg-white p-6 rounded-xl shadow-md border border-slate-200 no-print">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-database text-blue-900"></i> Registros de Control Almacenados</h2>
+                <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2"><i class="fas fa-database text-blue-900"></i> Registros Guardados</h2>
                 <button type="button" onclick="limpiarHistorialCompleto()" class="bg-red-50 text-red-600 text-xs px-3 py-2 rounded-lg border border-red-200 font-bold hover:bg-red-100">Borrar Base Local</button>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
-                        <tr class="bg-slate-100 text-slate-700 uppercase tracking-wider text-xs">
-                            <th class="p-3 border-b">Fecha</th>
-                            <th class="p-3 border-b">Código</th>
-                            <th class="p-3 border-b">Panel</th>
-                            <th class="p-3 border-b">Cucarda/Serie</th>
-                            <th class="p-3 border-b">Mesa</th>
-                            <th class="p-3 border-b">Resultado</th>
-                            <th class="p-3 border-b text-center">Acciones</th>
+                        <tr class="bg-slate-100 text-slate-700 uppercase tracking-wider text-xs border-b">
+                            <th class="p-3">Fecha</th>
+                            <th class="p-3">Panel</th>
+                            <th class="p-3">Serie</th>
+                            <th class="p-3">Resultado</th>
+                            <th class="p-3 text-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tabla-historial-body"></tbody>
@@ -138,820 +136,452 @@
             </div>
         </section>
 
-        <!-- Formulario del Checklist -->
         <form id="checklist-form" onsubmit="guardarRegistro(event)" class="bg-white rounded-xl shadow-md border border-slate-200 p-6 md:p-8 print-card">
             <input type="hidden" id="edit_registro_id" value="">
             
             <div id="cartel-edicion" class="hidden mb-4 bg-amber-50 border border-amber-300 text-amber-900 p-3 rounded-lg text-xs font-bold flex justify-between items-center">
-                <span><i class="fas fa-edit mr-1"></i> MODO EDICIÓN ACTIVO: Modificando una planilla existente.</span>
-                <button type="button" onclick="cancelarEdicion()" class="bg-amber-200 px-2 py-1 rounded hover:bg-amber-300">Cancelar Edición</button>
+                <span><i class="fas fa-edit mr-1"></i> Editando planilla.</span>
+                <button type="button" onclick="cancelarEdicion()" class="bg-amber-200 px-2 py-1 rounded">Cancelar</button>
             </div>
 
-            <!-- Cabecera de Datos -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Fecha de Inspección</label>
-                    <input type="date" id="fecha" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Código de Barra / Etiqueta</label>
-                    <input type="text" id="codigo" required placeholder="Ej. 08-007-08544" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Nomenclatura / Nombre Panel</label>
-                    <input type="text" id="nombre_panel" required placeholder="Ej. PPV018B" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 font-bold text-blue-900 outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">N° Serie / Cucarda asignada</label>
-                    <input type="text" id="cucarda_serie" required placeholder="Ej. 2600001" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Mesa de Armado</label>
-                    <input type="text" id="mesa" required placeholder="Ej. Mesa 02" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Operarios Vinculados</label>
-                    <input type="text" id="operarios" required placeholder="Ej. J. Pérez, M. Gómez" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500">
-                </div>
+                <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Fecha</label><input type="date" id="fecha" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500"></div>
+                <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Código Barra</label><input type="text" id="codigo" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500"></div>
+                <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Nombre Panel</label><input type="text" id="nombre_panel" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 font-bold text-blue-900 outline-none focus:border-blue-500"></div>
+                <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">N° Serie / Cucarda</label><input type="text" id="cucarda_serie" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500"></div>
+                <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Mesa</label><input type="text" id="mesa" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500"></div>
+                <div><label class="block text-xs font-bold uppercase text-slate-500 mb-1">Operarios</label><input type="text" id="operarios" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 outline-none focus:border-blue-500"></div>
             </div>
 
-            <!-- Contenedor de Ítems Dinámicos -->
             <div class="mb-8">
-                <div class="flex justify-between items-center mb-6 pb-2 border-b-2 border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800">Criterios de Verificación de Calidad</h3>
-                </div>
-                <div class="space-y-6" id="items-container"></div>
+                <h3 class="text-lg font-bold text-slate-800 mb-4 border-b-2 border-slate-200 pb-2">Criterios de Verificación</h3>
+                <div id="items-container" class="space-y-4"></div>
             </div>
 
-            <!-- Sección Multimedia y Notas -->
             <div class="mb-8 border border-slate-200 rounded-xl p-4 bg-slate-50/50">
                 <div class="flex justify-between items-center mb-4">
-                    <label class="block text-sm font-bold text-slate-700 uppercase">Evidencias Fotográficas Adjuntas</label>
+                    <label class="block text-sm font-bold text-slate-700 uppercase">Evidencias Fotográficas</label>
                     <div class="flex gap-2 no-print">
-                        <button type="button" onclick="abrirCamaraGeneral()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold py-2 px-3 rounded-lg"><i class="fas fa-camera"></i> Capturar Foto</button>
-                        <label class="cursor-pointer bg-slate-600 hover:bg-slate-500 text-white text-xs font-bold py-2 px-3 rounded-lg select-none">
-                            <i class="fas fa-images"></i> Subir de Galería
+                        <button type="button" onclick="abrirCamaraGeneral()" class="bg-blue-900 text-white text-xs font-bold py-2 px-3 rounded-lg"><i class="fas fa-camera"></i> Tomar Foto</button>
+                        <label class="cursor-pointer bg-slate-600 text-white text-xs font-bold py-2 px-3 rounded-lg">
+                            <i class="fas fa-images"></i> Subir
                             <input type="file" id="input-fotos-galeria" accept="image/*" multiple class="hidden" onchange="procesarFotosAdjuntas(event)">
                         </label>
                     </div>
                 </div>
-                <textarea id="observaciones" rows="3" placeholder="Anotaciones de desvíos críticos, observaciones generales o acciones correctivas inmediatas realizadas en la mesa..." class="w-full bg-white border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500 mb-4"></textarea>
+                <textarea id="observaciones" rows="3" placeholder="Anotaciones de desvíos..." class="w-full bg-white border border-slate-300 rounded-lg p-3 outline-none focus:border-blue-500 mb-4"></textarea>
                 <div id="gallery-wrapper" class="hidden">
                     <div id="fotos-preview-container" class="flex gap-4 overflow-x-auto pb-3 gallery-scrollbar"></div>
                 </div>
             </div>
 
-            <!-- Firma y Envío -->
             <div class="mb-8 border border-slate-300 rounded-xl p-6 bg-slate-50">
                 <div class="mb-4">
-                    <label class="block text-xs uppercase font-bold text-slate-500 mb-1">Nombre del Auditor Responsable (Firma Digital / Nombre Obligatorio)</label>
-                    <input type="text" id="nombre_firmante" required placeholder="Nombre y Apellido del Supervisor" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm focus:border-blue-500">
+                    <label class="block text-xs uppercase font-bold text-slate-500 mb-1">Firma / Auditor</label>
+                    <input type="text" id="nombre_firmante" required class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 focus:border-blue-500">
                 </div>
-                <div class="flex flex-col sm:flex-row gap-2 no-print">
-                    <button type="submit" id="btn-guardar-main" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg text-sm"><i class="fas fa-save"></i> Guardar y Validar Planilla</button>
-                    <button type="button" onclick="resetearFormulario()" class="bg-slate-200 text-slate-700 font-semibold py-3 px-4 rounded-lg text-sm hover:bg-slate-300">Limpiar Formulario</button>
+                <div class="flex gap-2 no-print">
+                    <button type="submit" class="flex-1 bg-blue-900 text-white font-bold py-3 rounded-lg text-sm"><i class="fas fa-save"></i> Guardar Planilla</button>
+                    <button type="button" onclick="resetearFormulario()" class="bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-lg text-sm">Limpiar</button>
                 </div>
             </div>
         </form>
     </main>
 
-    <!-- Modales de Interfaz -->
     <div id="zoom-modal" class="fixed inset-0 bg-black/90 z-[100] hidden flex flex-col items-center justify-center p-4 no-print" onclick="cerrarZoom()">
         <img id="img-zoom-target" class="max-w-full max-h-[85vh] object-contain rounded" src="">
     </div>
 
     <div id="camera-modal" class="fixed inset-0 bg-black z-[70] flex flex-col hidden no-print">
-        <div class="absolute top-0 left-0 right-0 flex justify-between items-center px-4 py-3 bg-gradient-to-b from-black/70 to-transparent z-10">
-            <button type="button" onclick="cerrarCamaraGeneral()" class="text-white bg-black/50 rounded-xl px-4 py-2 text-sm font-bold">Cancelar</button>
-            <button type="button" onclick="cambiarCamara()" class="text-white bg-black/50 rounded-xl p-2.5"><i class="fas fa-sync-alt text-lg"></i></button>
+        <div class="absolute top-0 left-0 right-0 flex justify-between p-4 z-10">
+            <button type="button" onclick="cerrarCamaraGeneral()" class="text-white bg-black/50 rounded-xl px-4 py-2 font-bold">Cancelar</button>
+            <button type="button" onclick="cambiarCamara()" class="text-white bg-black/50 rounded-xl p-3"><i class="fas fa-sync-alt"></i></button>
         </div>
         <video id="camera-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
-        <div class="absolute bottom-0 left-0 right-0 pb-10 flex justify-center items-center">
+        <div class="absolute bottom-0 left-0 right-0 pb-10 flex justify-center">
             <button type="button" onclick="capturarFotoEnVivo()" class="w-20 h-20 rounded-full bg-white border-4 border-slate-300 shadow-2xl"></button>
         </div>
     </div>
 
     <div id="ocr-modal" class="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white p-5 rounded-2xl max-w-md w-full text-center space-y-4">
-            <h3 class="font-bold text-slate-800 text-base"><i class="fas fa-eye text-orange-500"></i> Escáner Inteligente de Etiquetas (OCR)</h3>
-            <p class="text-xs text-slate-500 text-left">Suba o capture una foto en plano recto y con buena iluminación de la etiqueta para procesar automáticamente los identificadores.</p>
-            <input type="file" id="ocr-file" accept="image/*" capture="environment" onchange="procesarOcrImagen(event)" class="w-full text-sm block border rounded-lg p-2 bg-slate-50">
-            <div id="ocr-loading" class="hidden text-blue-600 font-bold text-xs animate-pulse bg-blue-50 py-3 rounded-lg">Analizando texto mediante OCR, espere por favor...</div>
+            <h3 class="font-bold text-slate-800 text-base"><i class="fas fa-eye text-orange-500"></i> Escáner Inteligente (OCR)</h3>
+            <input type="file" accept="image/*" capture="environment" onchange="procesarOcrImagen(event)" class="w-full text-sm block border rounded-lg p-2 bg-slate-50">
+            <div id="ocr-loading" class="hidden text-blue-600 font-bold text-xs animate-pulse">Analizando texto...</div>
             <button type="button" onclick="cerrarOcrCamara()" class="w-full bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-xs font-bold">Cancelar</button>
         </div>
     </div>
 
     <div id="cloud-modal" class="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4 hidden no-print">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 flex flex-col gap-4">
-            <h3 class="font-bold text-slate-800"><i class="fas fa-cloud text-blue-900"></i> Integración Cloud de Firebase</h3>
-            <p class="text-xs text-slate-500">Introduzca las credenciales JSON de inicialización de su proyecto Firebase Firestore/Storage.</p>
-            <textarea id="cloud-modal-config" rows="5" placeholder="Pegue la constante firebaseConfig aquí..." class="w-full border rounded-lg p-2 font-mono text-xs bg-slate-50"></textarea>
+            <h3 class="font-bold text-slate-800"><i class="fas fa-cloud text-blue-900"></i> Integración Firebase</h3>
+            <textarea id="cloud-modal-config" rows="5" placeholder="Pegue firebaseConfig aquí..." class="w-full border rounded-lg p-2 font-mono text-xs bg-slate-50"></textarea>
             <div class="flex gap-2">
-                <button type="button" onclick="guardarConfigNubeDesdeModal()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-2 rounded-lg text-sm">Establecer Conexión</button>
-                <button type="button" onclick="desconectarNube()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded-lg text-sm">Remover Conexión</button>
+                <button type="button" onclick="guardarConfigNubeDesdeModal()" class="flex-1 bg-emerald-600 text-white font-bold py-2 rounded-lg">Conectar</button>
+                <button type="button" onclick="desconectarNube()" class="flex-1 bg-red-600 text-white font-bold py-2 rounded-lg">Remover</button>
             </div>
         </div>
     </div>
 
-    <footer class="w-full bg-slate-200 border-t border-slate-300 text-center py-3 text-slate-600 text-xs font-bold uppercase absolute bottom-0 left-0 no-print">
-        Creado por Barcos Martin
-    </footer>
-
-    <!-- LÓGICA CORE DE LA APLICACIÓN -->
     <script>
+        // SEGURIDAD DOM: Acceso mediante Optional Chaining
+        const el = (id) => document.getElementById(id);
+
         const idbNombre = "BertoneCalidadDB";
         const idbAlmacen = "registros_calidad";
-        let idbRef = null;
-
-        let db = null, storage = null, html5QrcodeScanner = null;
-        let registrosLocales = [];
-        let fotosAdjuntas = [], streamCamara = null, camaraFrontal = false;
-        let totalItemsGlobales = 0;
+        let idbRef = null, db = null, storage = null;
+        let html5QrcodeInstance = null, qrScannerRunning = false;
+        let registrosLocales = [], fotosAdjuntas = [], streamCamara = null, camaraFrontal = false;
 
         const estructuraCategorias = [
-            {
-                nombre: "Dimensiones y Geometría",
-                items: [
-                    "Longitud del panel según planos estructurales (+/- 5mm)",
-                    "Ancho del panel verificado en extremos y centro (+/- 5mm)",
-                    "Espesor total del panel (EPS + mallas) controlado",
-                    "Escuadría y ortogonalidad de las esquinas (Medición de diagonales)",
-                    "Verificación de plomo y ausencia de alabeos en la estructura del panel"
-                ]
-            },
-            {
-                nombre: "Estructura y Soldadura",
-                items: [
-                    "Paso de la malla de acero longitudinal y transversal verificado",
-                    "Calidad de soldadura en nudos (Ausencia de puntos quemados o sueltos)",
-                    "Colocación y cantidad correcta de conectores por m2",
-                    "Doble conector angular en esquinas y puntos críticos de tensión",
-                    "Refuerzos de mallas U en aberturas (Puertas y ventanas) colocados",
-                    "Refuerzos de mallas L en esquinas perimetrales vinculados"
-                ]
-            },
-            {
-                nombre: "EPS e Inserciones",
-                items: [
-                    "Densidad del EPS visualmente homogénea y según requerimiento técnico",
-                    "Espesor del alma de EPS constante en toda la superficie",
-                    "Continuidad del EPS (Ausencia de huecos, grietas o roturas físicas)",
-                    "Alineación y fijación correcta de canalizaciones y vainas eléctricas",
-                    "Inserciones de refuerzos para anclajes o cargas pesadas ejecutadas",
-                    "Ubicación exacta de vanos para aberturas según replanteo"
-                ]
-            },
-            {
-                nombre: "Terminación Final",
-                items: [
-                    "Separación uniforme entre la malla de acero y alma de EPS",
-                    "Limpieza del panel (Ausencia de óxido, grasas o restos metálicos sueltos)",
-                    "Estabilidad estructural al movimiento (Mallas firmemente tensadas)",
-                    "Identificación visible: Código, N° de serie o Cucarda correctamente adherida",
-                    "Inspección visual conforme: Panel libre de rebabas y óptimo para despacho"
-                ]
-            }
+            { nombre: "Dimensiones y Geometría", items: ["Longitud del panel según planos (+/- 5mm)", "Ancho del panel verificado (+/- 5mm)", "Espesor total (EPS + mallas) controlado", "Escuadría y ortogonalidad", "Verificación de plomo y ausencia de alabeos"] },
+            { nombre: "Estructura y Soldadura", items: ["Paso de la malla verificado", "Calidad de soldadura en nudos", "Colocación de conectores por m2", "Doble conector en esquinas", "Refuerzos U en aberturas", "Refuerzos L en esquinas"] },
+            { nombre: "EPS e Inserciones", items: ["Densidad del EPS homogénea", "Espesor del alma constante", "Continuidad del EPS", "Alineación de canalizaciones", "Inserciones de refuerzos", "Ubicación de vanos para aberturas"] },
+            { nombre: "Terminación Final", items: ["Separación entre malla y EPS", "Limpieza del panel", "Estabilidad estructural al movimiento", "Identificación visible adherida", "Inspección visual conforme"] }
         ];
 
         let listaItemsFijos = [];
         estructuraCategorias.forEach(cat => cat.items.forEach(it => listaItemsFijos.push(it)));
 
+        // INICIALIZACIÓN PROTEGIDA (Previene errores de pantalla blanca)
         document.addEventListener("DOMContentLoaded", () => {
-            renderizarItemsControl();
-            document.getElementById('fecha').valueAsDate = new Date();
-            cargarConfiguracionMarca();
-            
-            iniciarBaseDeDatosLocal(() => {
-                actualizarHistorialUI();
-                inicializarFirebase();
-            });
+            try {
+                renderizarItemsControl();
+                if(el('fecha')) el('fecha').valueAsDate = new Date();
+                
+                try { cargarConfiguracionMarca(); } catch(err) { console.warn("LocalStorage bloqueado por navegador móvil."); }
+                
+                // Retirar pantalla de carga de forma segura
+                const pantallaCarga = el('pantalla-carga');
+                if(pantallaCarga) {
+                    pantallaCarga.style.opacity = '0';
+                    setTimeout(() => pantallaCarga.style.display = 'none', 400);
+                }
+
+                iniciarBaseDeDatosLocal(() => {
+                    actualizarHistorialUI();
+                    try { inicializarFirebase(); } catch(err) { console.warn("Fallo Firebase Offline."); }
+                });
+            } catch (err) {
+                console.error("Error global:", err);
+                if(el('pantalla-carga')) el('pantalla-carga').style.display = 'none';
+            }
         });
 
         function iniciarBaseDeDatosLocal(callback) {
-            const peticion = indexedDB.open(idbNombre, 1);
-            peticion.onupgradeneeded = (e) => {
-                const dbInstancia = e.target.result;
-                if (!dbInstancia.objectStoreNames.contains(idbAlmacen)) {
-                    dbInstancia.createObjectStore(idbAlmacen, { keyPath: "id" });
-                }
-            };
-            peticion.onsuccess = (e) => {
-                idbRef = e.target.result;
-                cargarRegistrosDeIndexedDB(callback);
-            };
-            peticion.onerror = (e) => {
-                console.error("Error crítico de inicialización de Base de Datos Local:", e);
-                registrosLocales = [];
-                callback();
-            };
+            if (!window.indexedDB) { registrosLocales = []; return callback(); }
+            try {
+                const peticion = indexedDB.open(idbNombre, 1);
+                peticion.onupgradeneeded = (e) => {
+                    if (!e.target.result.objectStoreNames.contains(idbAlmacen)) {
+                        e.target.result.createObjectStore(idbAlmacen, { keyPath: "id" });
+                    }
+                };
+                peticion.onsuccess = (e) => { idbRef = e.target.result; cargarRegistrosDeIndexedDB(callback); };
+                peticion.onerror = () => { registrosLocales = []; callback(); };
+            } catch(e) { registrosLocales = []; callback(); }
         }
 
         function cargarRegistrosDeIndexedDB(callback) {
             if (!idbRef) return callback();
-            const tx = idbRef.transaction(idbAlmacen, "readonly");
-            const store = tx.objectStore(idbAlmacen);
-            const request = store.getAll();
-            request.onsuccess = (e) => {
-                registrosLocales = e.target.result || [];
-                registrosLocales.sort((a, b) => b.id.localeCompare(a.id));
-                callback();
-            };
-            request.onerror = () => {
-                registrosLocales = [];
-                callback();
-            };
+            try {
+                const req = idbRef.transaction(idbAlmacen, "readonly").objectStore(idbAlmacen).getAll();
+                req.onsuccess = (e) => { registrosLocales = e.target.result || []; registrosLocales.sort((a, b) => b.id.localeCompare(a.id)); callback(); };
+                req.onerror = () => callback();
+            } catch(err) { callback(); }
         }
 
         function persistirRegistroLocalmente(reg, callback) {
             if (!idbRef) return callback();
-            const tx = idbRef.transaction(idbAlmacen, "readwrite");
-            const store = tx.objectStore(idbAlmacen);
-            const request = store.put(reg);
-            request.onsuccess = () => callback();
-            request.onerror = (e) => console.error("Error al escribir registro en Base Local:", e);
+            try {
+                const req = idbRef.transaction(idbAlmacen, "readwrite").objectStore(idbAlmacen).put(reg);
+                req.onsuccess = () => callback();
+            } catch(err) { callback(); }
         }
 
         function eliminarRegistroDeIndexedDB(id, callback) {
             if (!idbRef) return callback();
-            const tx = idbRef.transaction(idbAlmacen, "readwrite");
-            const store = tx.objectStore(idbAlmacen);
-            const request = store.delete(id);
-            request.onsuccess = () => callback();
+            try {
+                const req = idbRef.transaction(idbAlmacen, "readwrite").objectStore(idbAlmacen).delete(id);
+                req.onsuccess = () => callback();
+            } catch(err) { callback(); }
         }
 
         function vaciarIndexedDBCompleto(callback) {
             if (!idbRef) return callback();
-            const tx = idbRef.transaction(idbAlmacen, "readwrite");
-            const store = tx.objectStore(idbAlmacen);
-            const request = store.clear();
-            request.onsuccess = () => callback();
+            try {
+                const req = idbRef.transaction(idbAlmacen, "readwrite").objectStore(idbAlmacen).clear();
+                req.onsuccess = () => callback();
+            } catch(err) { callback(); }
         }
 
+        // RENDER UI
         function renderizarItemsControl() {
-            const container = document.getElementById('items-container');
-            container.innerHTML = "";
+            const container = el('items-container');
+            if(!container) return; container.innerHTML = "";
             let globalIndex = 1;
-
             estructuraCategorias.forEach(cat => {
-                let html = `
-                <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white mb-4">
-                    <div class="bg-slate-100 px-4 py-2.5 font-bold text-sm text-slate-700 flex justify-between items-center">
-                        <span><i class="fas fa-folder text-blue-900 mr-2"></i>${cat.nombre}</span>
-                    </div>
-                    <div class="divide-y divide-slate-100">`;
-
-                cat.items.forEach(itemDescripcion => {
+                let html = `<div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm bg-white mb-4"><div class="bg-slate-100 px-4 py-2.5 font-bold text-sm text-slate-700"><span><i class="fas fa-folder text-blue-900 mr-2"></i>${cat.nombre}</span></div><div class="divide-y divide-slate-100">`;
+                cat.items.forEach(itemDesc => {
                     html += `
-                    <div class="p-4 flex flex-col gap-3 hover:bg-slate-50/50 transition item-dom-row" data-id="${globalIndex}">
-                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                            <div class="flex items-center gap-2 flex-1">
-                                <button type="button" onclick="editarTextoItem(${globalIndex})" class="text-slate-400 hover:text-blue-600 p-1 no-print" title="Editar descripción">
-                                    <i class="fas fa-pen text-xs"></i>
-                                </button>
-                                <p id="txt-item-desc-${globalIndex}" class="text-sm font-semibold text-slate-800">${itemDescripcion}</p>
+                    <div class="p-4 flex flex-col gap-3 item-dom-row" data-id="${globalIndex}">
+                        <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                            <p id="txt-item-desc-${globalIndex}" class="text-sm font-semibold text-slate-800 flex-1">${itemDesc}</p>
+                            <div class="flex bg-slate-100 p-1 rounded-lg gap-1">
+                                <button type="button" onclick="setControlValue(${globalIndex}, 'CONFORME')" id="btn-${globalIndex}-C" class="option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md text-slate-600">CONFORME</button>
+                                <button type="button" onclick="setControlValue(${globalIndex}, 'NO CONFORME')" id="btn-${globalIndex}-NC" class="option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md text-slate-600">NO CONFORME</button>
+                                <button type="button" onclick="setControlValue(${globalIndex}, 'MEJORABLE')" id="btn-${globalIndex}-M" class="option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md text-slate-600">MEJORABLE</button>
                             </div>
-                            <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                                <div class="flex flex-wrap rounded-lg bg-slate-100 p-1 border border-slate-200 gap-1">
-                                    <button type="button" onclick="setControlValue(${globalIndex}, 'CONFORME')" id="btn-${globalIndex}-C" class="option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:bg-white">CONFORME</button>
-                                    <button type="button" onclick="setControlValue(${globalIndex}, 'NO CONFORME')" id="btn-${globalIndex}-NC" class="option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:bg-white">NO CONFORME</button>
-                                    <button type="button" onclick="setControlValue(${globalIndex}, 'MEJORABLE')" id="btn-${globalIndex}-M" class="option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:bg-white">MEJORABLE</button>
-                                </div>
-                                <input type="hidden" id="item-val-${globalIndex}" value="">
-                            </div>
+                            <input type="hidden" id="item-val-${globalIndex}">
                         </div>
                         <input type="text" id="item-obs-${globalIndex}" placeholder="Añadir observación específica..." class="w-full bg-slate-50 border border-slate-200 text-xs rounded-lg px-3 py-1.5 outline-none">
                     </div>`;
                     globalIndex++;
                 });
-
                 html += `</div></div>`;
                 container.insertAdjacentHTML('beforeend', html);
             });
-            totalItemsGlobales = globalIndex - 1;
-        }
-
-        function editarTextoItem(id) {
-            const el = document.getElementById(`txt-item-desc-${id}`);
-            const nuevoTexto = prompt("Modificar descripción del criterio:", el.innerText);
-            if(nuevoTexto && nuevoTexto.trim() !== "") {
-                el.innerText = nuevoTexto.trim();
-                mostrarAlerta("Criterio actualizado temporalmente.", "success");
-            }
         }
 
         function setControlValue(id, value) {
-            const input = document.getElementById(`item-val-${id}`);
+            const input = el(`item-val-${id}`);
             if(!input) return; input.value = value;
-            const btnC = document.getElementById(`btn-${id}-C`), btnNC = document.getElementById(`btn-${id}-NC`), btnM = document.getElementById(`btn-${id}-M`);
-            if(btnC && btnNC && btnM) {
-                [btnC, btnNC, btnM].forEach(b => b.className = "option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md text-slate-600 hover:bg-white");
-                if(value === 'CONFORME') btnC.className = "option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md bg-emerald-600 text-white shadow-sm";
-                else if(value === 'NO CONFORME') btnNC.className = "option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md bg-red-600 text-white shadow-sm";
-                else if(value === 'MEJORABLE') btnM.className = "option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md bg-amber-500 text-white shadow-sm";
+            ['C', 'NC', 'M'].forEach(t => { if(el(`btn-${id}-${t}`)) el(`btn-${id}-${t}`).className = "option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md text-slate-600"; });
+            if(value === 'CONFORME') el(`btn-${id}-C`).className = "option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md bg-emerald-600 text-white shadow-sm";
+            if(value === 'NO CONFORME') el(`btn-${id}-NC`).className = "option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md bg-red-600 text-white shadow-sm";
+            if(value === 'MEJORABLE') el(`btn-${id}-M`).className = "option-btn px-2.5 py-1.5 text-[11px] font-bold rounded-md bg-amber-500 text-white shadow-sm";
+        }
+
+        // LECTOR QR PROGRAMÁTICO CORREGIDO
+        function activarLectorQR() {
+            const container = el('qr-reader-container');
+            if(!container || qrScannerRunning) return;
+            container.classList.remove('hidden');
+
+            if(typeof Html5Qrcode === 'undefined') {
+                mostrarAlerta("Librería QR no detectada. Comprueba conexión.");
+                return container.classList.add('hidden');
+            }
+
+            try {
+                if(!html5QrcodeInstance) html5QrcodeInstance = new Html5Qrcode("reader");
+                qrScannerRunning = true;
+                
+                html5QrcodeInstance.start(
+                    { facingMode: "environment" }, 
+                    { fps: 10, qrbox: { width: 250, height: 250 } },
+                    (text) => {
+                        if(el('codigo')) el('codigo').value = text.replace(/[\r\n]+/g, " ").trim();
+                        mostrarAlerta("Código QR escaneado con éxito.", "success");
+                        detenerLectorQR();
+                    },
+                    (err) => {} 
+                ).catch(err => {
+                    console.error("Cámara bloqueada o sin permisos:", err);
+                    mostrarAlerta("Permiso de cámara denegado o entorno inseguro.", "error");
+                    detenerLectorQR();
+                });
+            } catch(err) {
+                console.error(err);
+                detenerLectorQR();
             }
         }
 
-        function activarLectorQR() {
-            document.getElementById('qr-reader-container').classList.remove('hidden');
-            html5QrcodeScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-            html5QrcodeScanner.render((text) => {
-                document.getElementById('codigo').value = text.replace(/[\r\n]+/g, " ").trim();
-                detenerLectorQR(); mostrarAlerta("Código QR escaneado con éxito.", "success");
-            });
+        function detenerLectorQR() { 
+            qrScannerRunning = false;
+            const container = el('qr-reader-container');
+            if (html5QrcodeInstance && html5QrcodeInstance.isScanning) { 
+                html5QrcodeInstance.stop().then(() => { if(container) container.classList.add('hidden'); }).catch(e => { if(container) container.classList.add('hidden'); });
+            } else {
+                if(container) container.classList.add('hidden');
+            }
         }
-        function detenerLectorQR() { if(html5QrcodeScanner) html5QrcodeScanner.clear(); document.getElementById('qr-reader-container').classList.add('hidden'); }
 
-        function abrirOcrCamara() { document.getElementById('ocr-modal').classList.remove('hidden'); }
-        function cerrarOcrCamara() { document.getElementById('ocr-modal').classList.add('hidden'); }
-        
+        // OCR
+        function abrirOcrCamara() { const m = el('ocr-modal'); if(m) m.classList.remove('hidden'); }
+        function cerrarOcrCamara() { const m = el('ocr-modal'); if(m) m.classList.add('hidden'); }
         function procesarOcrImagen(e) {
+            if(typeof Tesseract === 'undefined') return alert("Librería OCR no cargó.");
             const file = e.target.files[0]; if(!file) return;
-            document.getElementById('ocr-loading').classList.remove('hidden');
+            const loading = el('ocr-loading'); if(loading) loading.classList.remove('hidden');
             Tesseract.recognize(file, 'eng').then(({ data: { text } }) => {
                 const lines = text.split('\n').map(l => l.trim());
-                let codDec = "", panDec = "", serDec = "";
                 lines.forEach(linea => {
-                    if (!codDec && /\b\d{2}[-\s]\d{3}[-\s]\d{4,6}\b/.test(linea)) {
-                        let m = linea.match(/\b\d{2}[-\s]\d{3}[-\s]\d{4,6}\b/); if(m) codDec = m[0];
-                    }
-                    if (!panDec && /\b(PPV\d+[A-Z]*|PANEL\s*\d+|PL\d+)/i.test(linea)) {
-                        let match = linea.match(/\b(PPV\d+[A-Z]*|PANEL\s*\d+|PL\d+)/i); if(match) panDec = match[0].toUpperCase();
-                    }
-                    if (!serDec && /\b\d{6,9}\b/.test(linea)) {
-                        let m = linea.match(/\b\d{6,9}\b/); if(m) serDec = m[0];
-                    }
+                    let mCod = linea.match(/\b\d{2}[-\s]\d{3}[-\s]\d{4,6}\b/); if(mCod && el('codigo')) el('codigo').value = mCod[0];
+                    let mPan = linea.match(/\b(PPV\d+[A-Z]*|PANEL\s*\d+|PL\d+)/i); if(mPan && el('nombre_panel')) el('nombre_panel').value = mPan[0].toUpperCase();
+                    let mSer = linea.match(/\b\d{6,9}\b/); if(mSer && el('cucarda_serie')) el('cucarda_serie').value = mSer[0];
                 });
-                if(codDec) document.getElementById('codigo').value = codDec;
-                if(panDec) document.getElementById('nombre_panel').value = panDec;
-                if(serDec) document.getElementById('cucarda_serie').value = serDec;
-                mostrarAlerta("Procesamiento OCR completado de forma precisa.", "success");
-            }).finally(() => { document.getElementById('ocr-loading').classList.add('hidden'); cerrarOcrCamara(); });
+                mostrarAlerta("Escaneo OCR exitoso.", "success");
+            }).finally(() => { if(loading) loading.classList.add('hidden'); cerrarOcrCamara(); });
         }
 
-        function cargarLogoPersonalizado(e) {
-            const file = e.target.files[0]; if(!file) return;
-            const r = new FileReader();
-            r.onload = (evt) => { localStorage.setItem('bertone_logo_b64', evt.target.result); aplicarLogoUI(evt.target.result); };
-            r.readAsDataURL(file);
-        }
-        function aplicarLogoUI(src) {
-            const txt = document.getElementById('brand-text-logo'), img = document.getElementById('brand-img-logo'), btn = document.getElementById('btn-borrar-logo');
-            if(src) { txt.classList.add('hidden'); img.src = src; img.classList.remove('hidden'); btn.classList.remove('hidden'); }
-            else { txt.classList.remove('hidden'); img.classList.add('hidden'); btn.classList.add('hidden'); }
-        }
-        function borrarLogo() { localStorage.removeItem('bertone_logo_b64'); aplicarLogoUI(null); }
-
-        function guardarConfiguracionMarca() {
-            const marca = { empresa: document.getElementById('cfg-empresa').value, subtitulo: document.getElementById('cfg-subtitulo').value };
-            localStorage.setItem('bertone_marca_config', JSON.stringify(marca));
-            if(!localStorage.getItem('bertone_logo_b64')) document.getElementById('brand-text-logo').innerText = marca.empresa;
-            document.getElementById('brand-form-subtitle').innerText = marca.subtitulo;
-            toggleSettings(); mostrarAlerta("Configuración de marca guardada.", "success");
-        }
-        function cargarConfiguracionMarca() {
-            const l = localStorage.getItem('bertone_logo_b64'); if(l) aplicarLogoUI(l);
-            const s = JSON.parse(localStorage.getItem('bertone_marca_config')); if(!s) return;
-            document.getElementById('cfg-empresa').value = s.empresa || "BERTONE";
-            document.getElementById('cfg-subtitulo').value = s.subtitulo || "Checklist de Cumplimiento de Paneles";
-            if(!l) document.getElementById('brand-text-logo').innerText = s.empresa;
-            document.getElementById('brand-form-subtitle').innerText = s.subtitulo;
-        }
-        function restaurarValoresPredeterminados() { if(confirm("¿Restaurar toda la configuración local?")) { localStorage.clear(); vaciarIndexedDBCompleto(() => { window.location.reload(); }); } }
-
+        // CÁMARA NORMAL
         function abrirCamaraGeneral() {
-            document.getElementById('camera-modal').classList.remove('hidden');
+            const m = el('camera-modal'); if(!m) return; m.classList.remove('hidden');
             navigator.mediaDevices.getUserMedia({ video: { facingMode: camaraFrontal ? "user" : "environment" } })
-                .then(st => { streamCamara = st; document.getElementById('camera-video').srcObject = st; })
-                .catch(() => { mostrarAlerta("Acceso denegado a los hardware de captura.", "error"); cerrarCamaraGeneral(); });
+                .then(st => { streamCamara = st; const v = el('camera-video'); if(v) v.srcObject = st; })
+                .catch(() => { mostrarAlerta("Permiso de cámara denegado.", "error"); cerrarCamaraGeneral(); });
         }
-        function cerrarCamaraGeneral() { if(streamCamara) streamCamara.getTracks().forEach(t => t.stop()); document.getElementById('camera-modal').classList.add('hidden'); }
+        function cerrarCamaraGeneral() { if(streamCamara) streamCamara.getTracks().forEach(t => t.stop()); const m = el('camera-modal'); if(m) m.classList.add('hidden'); }
         function cambiarCamara() { camaraFrontal = !camaraFrontal; cerrarCamaraGeneral(); abrirCamaraGeneral(); }
-        
         function capturarFotoEnVivo() {
-            const v = document.getElementById('camera-video'), c = document.createElement('canvas');
-            c.width = v.videoWidth; c.height = v.videoHeight;
-            c.getContext('2d').drawImage(v, 0, 0);
-            comprimirImagenBase64(c.toDataURL('image/jpeg', 0.6), 600, (res) => { fotosAdjuntas.push(res); actualizarGaleriaUI(); cerrarCamaraGeneral(); });
+            const v = el('camera-video'), c = document.createElement('canvas');
+            if(!v) return; c.width = v.videoWidth; c.height = v.videoHeight; c.getContext('2d').drawImage(v, 0, 0);
+            comprimir(c.toDataURL('image/jpeg', 0.6), (res) => { fotosAdjuntas.push(res); actualizarGaleriaUI(); cerrarCamaraGeneral(); });
         }
         function procesarFotosAdjuntas(e) {
             Array.from(e.target.files).forEach(f => {
-                const r = new FileReader();
-                r.onload = (evt) => comprimirImagenBase64(evt.target.result, 600, (res) => { fotosAdjuntas.push(res); actualizarGaleriaUI(); });
-                r.readAsDataURL(f);
+                const r = new FileReader(); r.onload = (evt) => comprimir(evt.target.result, (res) => { fotosAdjuntas.push(res); actualizarGaleriaUI(); }); r.readAsDataURL(f);
             });
         }
-        function comprimirImagenBase64(b64, max, cb) {
-            const img = new Image();
-            img.onload = () => {
-                let w = img.width, h = img.height;
-                if (w > h) { if (w > max) { h = Math.round((h * max) / w); w = max; } }
-                else { if (h > max) { w = Math.round((w * max) / h); h = max; } }
-                const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
-                canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                cb(canvas.toDataURL('image/jpeg', 0.6));
-            };
-            img.src = b64;
+        function comprimir(b64, cb) {
+            const img = new Image(); img.onload = () => {
+                const canvas = document.createElement('canvas'); canvas.width = 600; canvas.height = Math.round((img.height*600)/img.width);
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height); cb(canvas.toDataURL('image/jpeg', 0.6));
+            }; img.src = b64;
         }
         function actualizarGaleriaUI() {
-            const box = document.getElementById('fotos-preview-container'); box.innerHTML = "";
-            if(fotosAdjuntas.length === 0) { document.getElementById('gallery-wrapper').classList.add('hidden'); return; }
-            document.getElementById('gallery-wrapper').classList.remove('hidden');
-            fotosAdjuntas.forEach((f, i) => {
-                box.insertAdjacentHTML('beforeend', `
-                    <div class="relative min-w-[90px] h-[90px] border rounded-lg overflow-hidden bg-black">
-                        <img src="${f}" class="w-full h-full object-cover cursor-pointer" onclick="abrirZoom('${f}')">
-                        <button type="button" onclick="eliminarFoto(${i})" class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 text-xs flex items-center justify-center">&times;</button>
-                    </div>`);
-            });
+            const box = el('fotos-preview-container'); const w = el('gallery-wrapper');
+            if(!box || !w) return; box.innerHTML = "";
+            if(fotosAdjuntas.length === 0) return w.classList.add('hidden');
+            w.classList.remove('hidden');
+            fotosAdjuntas.forEach((f, i) => box.insertAdjacentHTML('beforeend', `<div class="relative min-w-[90px] h-[90px] border rounded-lg bg-black"><img src="${f}" class="w-full h-full object-cover cursor-pointer" onclick="abrirZoom('${f}')"><button type="button" onclick="fotosAdjuntas.splice(${i},1);actualizarGaleriaUI();" class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center">&times;</button></div>`));
         }
-        function eliminarFoto(i) { fotosAdjuntas.splice(i, 1); actualizarGaleriaUI(); }
-        function abrirZoom(src) { document.getElementById('img-zoom-target').src = src; document.getElementById('zoom-modal').classList.remove('hidden'); }
-        function cerrarZoom() { document.getElementById('zoom-modal').classList.add('hidden'); }
-        function toggleSettings() { document.getElementById('settings-panel').classList.toggle('hidden'); }
-        function toggleHistorial() { document.getElementById('seccion-historial').classList.toggle('hidden'); }
+        function abrirZoom(src) { const img = el('img-zoom-target'), modal = el('zoom-modal'); if(img && modal) { img.src = src; modal.classList.remove('hidden'); } }
+        function cerrarZoom() { const m = el('zoom-modal'); if(m) m.classList.add('hidden'); }
 
-        function cargarRegistroParaEditar(idx) {
-            const reg = registrosLocales[idx]; if(!reg) return;
-            document.getElementById('edit_registro_id').value = reg.id;
-            document.getElementById('cartel-edicion').classList.remove('hidden');
-            
-            document.getElementById('fecha').value = reg.fecha;
-            document.getElementById('codigo').value = reg.codigo;
-            document.getElementById('nombre_panel').value = reg.nombre_panel;
-            document.getElementById('cucarda_serie').value = reg.cucarda_serie;
-            document.getElementById('mesa').value = reg.mesa;
-            document.getElementById('operarios').value = reg.operarios;
-            document.getElementById('observaciones').value = reg.observaciones || "";
-            document.getElementById('nombre_firmante').value = reg.nombre_firmante || "";
-
-            const domRows = document.querySelectorAll('.item-dom-row');
-            domRows.forEach(row => {
-                const rowId = row.getAttribute('data-id');
-                const pElement = document.getElementById(`txt-item-desc-${rowId}`);
-                if(reg.respuestas_ordenadas && reg.respuestas_ordenadas[rowId - 1]) {
-                    const ans = reg.respuestas_ordenadas[rowId - 1];
-                    pElement.innerText = ans.descripcion;
-                    setControlValue(rowId, ans.valor);
-                    document.getElementById(`item-obs-${rowId}`).value = ans.observacion || "";
-                }
-            });
-            fotosAdjuntas = reg.fotos ? [...reg.fotos] : []; actualizarGaleriaUI();
-            document.getElementById('checklist-form').scrollIntoView({ behavior: 'smooth' });
+        // UTILS
+        function toggleSettings() { const p = el('settings-panel'); if(p) p.classList.toggle('hidden'); }
+        function toggleHistorial() { const h = el('seccion-historial'); if(h) h.classList.toggle('hidden'); }
+        function mostrarAlerta(msg, tipo='success') { 
+            const b = el('alert-box'), t = el('alert-msg'); if(!b || !t) return;
+            b.className = `mb-6 p-4 rounded-lg text-white font-semibold flex justify-between items-center no-print ${tipo === 'success' ? 'bg-emerald-600' : 'bg-red-600'}`; 
+            t.innerText = msg; b.classList.remove('hidden'); setTimeout(cerrarAlerta, 4000); 
         }
+        function cerrarAlerta() { const b = el('alert-box'); if(b) b.classList.add('hidden'); }
 
-        function cancelarEdicion() {
-            document.getElementById('edit_registro_id').value = ""; document.getElementById('cartel-edicion').classList.add('hidden');
-            resetearFormulario();
+        // CONFIGURACIÓN LOCALSTORAGE
+        function cargarConfiguracionMarca() {
+            const l = localStorage.getItem('bertone_logo_b64'); if(l) aplicarLogoUI(l);
+            const sStr = localStorage.getItem('bertone_marca_config'); if(!sStr) return;
+            const s = JSON.parse(sStr);
+            if(s) {
+                if(el('cfg-empresa')) el('cfg-empresa').value = s.empresa; if(el('cfg-subtitulo')) el('cfg-subtitulo').value = s.subtitulo;
+                if(!l && el('brand-text-logo')) el('brand-text-logo').innerText = s.empresa;
+                if(el('brand-form-subtitle')) el('brand-form-subtitle').innerText = s.subtitulo;
+            }
         }
+        function guardarConfiguracionMarca() {
+            localStorage.setItem('bertone_marca_config', JSON.stringify({ empresa: el('cfg-empresa').value, subtitulo: el('cfg-subtitulo').value }));
+            cargarConfiguracionMarca(); toggleSettings();
+        }
+        function cargarLogoPersonalizado(e) {
+            if(e.target.files[0]) {
+                const r = new FileReader(); r.onload = (evt) => { localStorage.setItem('bertone_logo_b64', evt.target.result); aplicarLogoUI(evt.target.result); }; r.readAsDataURL(e.target.files[0]);
+            }
+        }
+        function aplicarLogoUI(src) {
+            const t=el('brand-text-logo'), i=el('brand-img-logo'), b=el('btn-borrar-logo');
+            if(!t || !i || !b) return;
+            if(src) { t.classList.add('hidden'); i.src = src; i.classList.remove('hidden'); b.classList.remove('hidden'); }
+            else { t.classList.remove('hidden'); i.classList.add('hidden'); b.classList.add('hidden'); }
+        }
+        function borrarLogo() { localStorage.removeItem('bertone_logo_b64'); aplicarLogoUI(null); }
+        function restaurarValoresPredeterminados() { if(confirm("¿Restaurar todo?")) { localStorage.clear(); vaciarIndexedDBCompleto(() => window.location.reload()); } }
 
+        // GESTIÓN FORMULARIO
         function guardarRegistro(e) {
             e.preventDefault();
-            const respuestas = {}, observacionesItems = {}, respuestas_ordenadas = [];
-            let finalRes = "CONFORME";
-
+            const respuestas_ordenadas = []; let finalRes = "CONFORME";
             document.querySelectorAll('.item-dom-row').forEach(row => {
-                const id = row.getAttribute('data-id');
-                const val = document.getElementById(`item-val-${id}`).value || "PENDIENTE";
-                const obs = document.getElementById(`item-obs-${id}`).value.trim();
-                const descText = document.getElementById(`txt-item-desc-${id}`).innerText.trim();
-                
-                respuestas[descText] = val;
-                observacionesItems[descText] = obs;
-                respuestas_ordenadas.push({ id: id, descripcion: descText, valor: val, observacion: obs });
-                
+                const id = row.getAttribute('data-id'), val = el(`item-val-${id}`).value || "PENDIENTE", obs = el(`item-obs-${id}`).value.trim(), desc = el(`txt-item-desc-${id}`).innerText.trim();
+                respuestas_ordenadas.push({ id, descripcion: desc, valor: val, observacion: obs });
                 if(val === "NO CONFORME") finalRes = "RECHAZADO";
             });
-
-            const idEd = document.getElementById('edit_registro_id').value;
-            const esN = (idEd === "");
+            const idEd = el('edit_registro_id').value, esN = (idEd === "");
             const reg = {
-                id: esN ? ("REG-" + Date.now()) : idEd, 
-                fecha: document.getElementById('fecha').value,
-                codigo: document.getElementById('codigo').value.trim(), 
-                nombre_panel: document.getElementById('nombre_panel').value.trim(),
-                cucarda_serie: document.getElementById('cucarda_serie').value.trim(), 
-                mesa: document.getElementById('mesa').value.trim(),
-                operarios: document.getElementById('operarios').value.trim(), 
-                observaciones: document.getElementById('observaciones').value.trim(),
-                nombre_firmante: document.getElementById('nombre_firmante').value.trim(), 
-                resultado: finalRes, respuestas, observacionesItems, respuestas_ordenadas, 
-                fotos: [...fotosAdjuntas], fotosUrlsNube: []
+                id: esN ? ("REG-" + Date.now()) : idEd, fecha: el('fecha').value, codigo: el('codigo').value.trim(), nombre_panel: el('nombre_panel').value.trim(), cucarda_serie: el('cucarda_serie').value.trim(), mesa: el('mesa').value.trim(), operarios: el('operarios').value.trim(), observaciones: el('observaciones').value.trim(), nombre_firmante: el('nombre_firmante').value.trim(), resultado: finalRes, respuestas_ordenadas, fotos: [...fotosAdjuntas], fotosUrlsNube: []
             };
-
-            if(esN) {
-                registrosLocales.unshift(reg);
-            } else {
-                const targetIdx = registrosLocales.findIndex(r => r.id === idEd);
-                if(targetIdx !== -1) registrosLocales[targetIdx] = reg;
-            }
-            
-            persistirRegistroLocalmente(reg, () => {
-                cancelarEdicion(); 
-                actualizarHistorialUI(); 
-                mostrarAlerta("Planilla validada y guardada localmente.", "success");
-                if(db && storage) sincronizarRegistroNube(reg);
-            });
+            if(esN) registrosLocales.unshift(reg); else registrosLocales[registrosLocales.findIndex(r => r.id === idEd)] = reg;
+            persistirRegistroLocalmente(reg, () => { cancelarEdicion(); actualizarHistorialUI(); mostrarAlerta("Guardado correcto"); if(db && storage) sincronizarNube(reg); });
         }
-
-        async function sincronizarRegistroNube(reg) {
-            try {
-                const urls = [];
-                for(let i=0; i<reg.fotos.length; i++) {
-                    if(reg.fotos[i].startsWith('http')) urls.push(reg.fotos[i]);
-                    else {
-                        const ref = storage.ref().child(`fotos_calidad/${reg.id}_${i}.jpg`);
-                        await ref.putString(reg.fotos[i], 'data_url'); urls.push(await ref.getDownloadURL());
-                    }
-                }
-                reg.fotosUrlsNube = urls; await db.collection("registros_calidad").doc(reg.id).set(reg);
-                actualizarHistorialUI();
-            } catch(err) { console.error("Error en sincronización Cloud Remota:", err); }
+        function cargarRegistroParaEditar(idx) {
+            const reg = registrosLocales[idx];
+            if(el('edit_registro_id')) el('edit_registro_id').value = reg.id; if(el('cartel-edicion')) el('cartel-edicion').classList.remove('hidden');
+            ['fecha','codigo','nombre_panel','cucarda_serie','mesa','operarios','observaciones','nombre_firmante'].forEach(k => { if(el(k)) el(k).value = reg[k] || ""; });
+            reg.respuestas_ordenadas.forEach(ans => { if(el(`txt-item-desc-${ans.id}`)) el(`txt-item-desc-${ans.id}`).innerText = ans.descripcion; setControlValue(ans.id, ans.valor); if(el(`item-obs-${ans.id}`)) el(`item-obs-${ans.id}`).value = ans.observacion; });
+            fotosAdjuntas = [...(reg.fotos||[])]; actualizarGaleriaUI(); if(el('checklist-form')) el('checklist-form').scrollIntoView();
         }
-
+        function cancelarEdicion() { if(el('edit_registro_id')) el('edit_registro_id').value = ""; if(el('cartel-edicion')) el('cartel-edicion').classList.add('hidden'); resetearFormulario(); }
+        function resetearFormulario() { const f = el('checklist-form'); if(f) f.reset(); if(el('fecha')) el('fecha').valueAsDate = new Date(); fotosAdjuntas = []; actualizarGaleriaUI(); renderizarItemsControl(); }
         function actualizarHistorialUI() {
-            const tbody = document.getElementById('tabla-historial-body'); if(!tbody) return; tbody.innerHTML = "";
-            document.getElementById('btn-historial-txt').innerText = `Base de Datos ([${registrosLocales.length}])`;
-            if(registrosLocales.length === 0) { tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-400">No se encontraron registros grabados en almacenamiento local.</td></tr>`; return; }
-
-            registrosLocales.forEach((reg, index) => {
-                const badge = reg.resultado === 'CONFORME' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800';
-                let btnF = reg.fotos && reg.fotos.length > 0 ? `<button type="button" onclick="fotosAdjuntas=[...registrosLocales[${index}].fotos];actualizarGaleriaUI();" class="text-emerald-700 underline font-bold"><i class="fas fa-image"></i> (${reg.fotos.length})</button>` : `<span class="text-slate-400">Sin fotos</span>`;
-                tbody.insertAdjacentHTML('beforeend', `
-                    <tr class="border-b text-xs hover:bg-slate-50">
-                        <td class="p-3">${reg.fecha}</td>
-                        <td class="p-3 font-semibold">${reg.codigo}</td>
-                        <td class="p-3 font-bold text-blue-900">${reg.nombre_panel}</td>
-                        <td class="p-3">${reg.cucarda_serie}</td>
-                        <td class="p-3">${reg.mesa}</td>
-                        <td class="p-3"><span class="px-2 py-0.5 font-bold rounded-full ${badge}">${reg.resultado}</span></td>
-                        <td class="p-3 text-center flex gap-4 justify-center items-center">
-                            ${btnF}
-                            <button type="button" onclick="generarReportePDFDesdeHistorial(${index})" class="text-red-700 font-bold" title="Exportar PDF"><i class="fas fa-file-pdf text-sm"></i></button>
-                            <button type="button" onclick="cargarRegistroParaEditar(${index})" class="text-blue-600" title="Editar"><i class="fas fa-pencil-alt"></i></button>
-                            <button type="button" onclick="eliminarRegistroIndividual(${index})" class="text-red-500" title="Eliminar"><i class="fas fa-trash-alt"></i></button>
-                        </td>
-                    </tr>`);
+            const tbody = el('tabla-historial-body'); if(!tbody) return; tbody.innerHTML = ""; 
+            if(el('btn-historial-txt')) el('btn-historial-txt').innerText = `Base Datos ([${registrosLocales.length}])`;
+            if(registrosLocales.length === 0) { tbody.innerHTML=`<tr><td colspan="5" class="p-4 text-center text-slate-400">Sin registros</td></tr>`; return; }
+            registrosLocales.forEach((reg, i) => {
+                const btnF = reg.fotos?.length > 0 ? `<button onclick="fotosAdjuntas=[...registrosLocales[${i}].fotos];actualizarGaleriaUI();" class="text-emerald-700 font-bold"><i class="fas fa-image"></i></button>` : `-`;
+                tbody.insertAdjacentHTML('beforeend', `<tr class="border-b text-xs hover:bg-slate-50"><td class="p-3">${reg.fecha}</td><td class="p-3 font-bold text-blue-900">${reg.nombre_panel}</td><td class="p-3">${reg.cucarda_serie}</td><td class="p-3 font-bold ${reg.resultado==='CONFORME'?'text-emerald-600':'text-red-600'}">${reg.resultado}</td><td class="p-3 text-center flex gap-3 justify-center">${btnF}<button onclick="generarReportePDFDesdeHistorial(${i})" class="text-red-700" title="PDF"><i class="fas fa-file-pdf"></i></button><button onclick="cargarRegistroParaEditar(${i})" class="text-blue-600"><i class="fas fa-pencil-alt"></i></button><button onclick="if(confirm('¿Eliminar?')){eliminarRegistroDeIndexedDB('${reg.id}',()=>registrosLocales.splice(${i},1));actualizarHistorialUI();}" class="text-red-500"><i class="fas fa-trash-alt"></i></button></td></tr>`);
             });
         }
-        
-        function eliminarRegistroIndividual(idx) { 
-            const reg = registrosLocales[idx];
-            if(!reg) return;
-            if(confirm("¿Confirmar la eliminación del registro seleccionado de forma permanente?")) { 
-                eliminarRegistroDeIndexedDB(reg.id, () => {
-                    registrosLocales.splice(idx, 1); 
-                    actualizarHistorialUI(); 
-                    mostrarAlerta("Registro eliminado.", "success");
-                });
-            } 
-        }
-        
-        function limpiarHistorialCompleto() { 
-            if(confirm("🚨 ADVERTENCIA CRÍTICA: ¿Desea vaciar por completo la base de datos local? Esta acción no se puede deshacer.")) { 
-                vaciarIndexedDBCompleto(() => {
-                    registrosLocales = []; 
-                    actualizarHistorialUI(); 
-                    mostrarAlerta("Base de datos local vaciada.", "success");
-                });
-            } 
-        }
-        
-        function resetearFormulario() { document.getElementById('checklist-form').reset(); document.getElementById('fecha').valueAsDate = new Date(); fotosAdjuntas = []; actualizarGaleriaUI(); renderizarItemsControl(); }
+        function limpiarHistorialCompleto() { if(confirm("¿Vaciar base entera?")) vaciarIndexedDBCompleto(() => { registrosLocales = []; actualizarHistorialUI(); }); }
 
-        function generarReportePDFDesdeHistorial(idx) {
-            const reg = registrosLocales[idx];
-            if(reg) descargarPDFRegistro(reg);
-        }
-
+        // EXPORTACIÓN PDF Y EXCEL
+        function generarReportePDFDesdeHistorial(idx) { descargarPDFRegistro(registrosLocales[idx]); }
         function generarReportePDFDesdeFormulario() {
-            const respuestas_ordenadas = [];
-            let finalRes = "CONFORME";
-
-            document.querySelectorAll('.item-dom-row').forEach(row => {
-                const id = row.getAttribute('data-id');
-                const val = document.getElementById(`item-val-${id}`).value || "PENDIENTE";
-                const obs = document.getElementById(`item-obs-${id}`).value.trim();
-                const descText = document.getElementById(`txt-item-desc-${id}`).innerText.trim();
-                respuestas_ordenadas.push({ id: id, descripcion: descText, valor: val, observacion: obs });
-                if(val === "NO CONFORME") finalRes = "RECHAZADO";
-            });
-
-            const tempReg = {
-                id: document.getElementById('edit_registro_id').value || "TEMP-" + Date.now(), 
-                fecha: document.getElementById('fecha').value,
-                codigo: document.getElementById('codigo').value.trim() || "S/C", 
-                nombre_panel: document.getElementById('nombre_panel').value.trim() || "S/N",
-                cucarda_serie: document.getElementById('cucarda_serie').value.trim() || "S/S", 
-                mesa: document.getElementById('mesa').value.trim() || "-",
-                operarios: document.getElementById('operarios').value.trim() || "-", 
-                observaciones: document.getElementById('observaciones').value.trim() || "Sin desvíos reportados.",
-                nombre_firmante: document.getElementById('nombre_firmante').value.trim() || "No especificado", 
-                resultado: finalRes, 
-                respuestas_ordenadas: respuestas_ordenadas,
-                fotos: [...fotosAdjuntas],
-                fotosUrlsNube: []
-            };
-
-            descargarPDFRegistro(tempReg);
+            if(typeof html2pdf === 'undefined') return alert("Librería PDF no cargó.");
+            const ro = []; let r = "CONFORME";
+            document.querySelectorAll('.item-dom-row').forEach(row => { const id = row.getAttribute('data-id'), val = el(`item-val-${id}`).value||"PENDIENTE"; ro.push({id, descripcion: el(`txt-item-desc-${id}`).innerText.trim(), valor: val, observacion: el(`item-obs-${id}`).value}); if(val==="NO CONFORME") r="RECHAZADO"; });
+            descargarPDFRegistro({ id: "TEMP", fecha: el('fecha').value, codigo: el('codigo').value||"-", nombre_panel: el('nombre_panel').value||"-", cucarda_serie: el('cucarda_serie').value||"-", mesa: el('mesa').value||"-", operarios: el('operarios').value||"-", observaciones: el('observaciones').value, nombre_firmante: el('nombre_firmante').value||"-", resultado: r, respuestas_ordenadas: ro, fotos: fotosAdjuntas });
         }
-
         function descargarPDFRegistro(reg) {
-            mostrarAlerta("Compilando recursos e inyectando fotos en el PDF...", "info");
-            const marcaConfig = JSON.parse(localStorage.getItem('bertone_marca_config')) || { empresa: "BERTONE", subtitulo: "Checklist de Cumplimiento de Paneles" };
-
-            let tablaItemsHTML = "";
-            if (reg.respuestas_ordenadas && reg.respuestas_ordenadas.length > 0) {
-                let globalIdx = 0;
-                estructuraCategorias.forEach(cat => {
-                    tablaItemsHTML += `<tr style="background-color: #f1f5f9; border: 1px solid #cbd5e1;"><td colspan="3" style="padding: 6px 10px; font-weight: bold; color: #1e3a8a; font-size: 11px; text-transform: uppercase;">${cat.nombre}</td></tr>`;
-                    cat.items.forEach(() => {
-                        const ans = reg.respuestas_ordenadas[globalIdx];
-                        if (ans) {
-                            let colorBadge = "#d1fae5", colorTexto = "#065f46";
-                            if (ans.valor === "NO CONFORME") { colorBadge = "#fee2e2"; colorTexto = "#991b1b"; }
-                            else if (ans.valor === "MEJORABLE") { colorBadge = "#fef3c7"; colorTexto = "#92400e"; }
-                            else if (ans.valor === "PENDIENTE") { colorBadge = "#f1f5f9"; colorTexto = "#64748b"; }
-
-                            tablaItemsHTML += `
-                                <tr style="border: 1px solid #cbd5e1;">
-                                    <td style="padding: 6px 10px; width: 55%; font-size: 10px; font-weight: bold; color:#334155;">${ans.descripcion}</td>
-                                    <td style="padding: 6px 10px; width: 15%; text-align: center;"><span style="background-color: ${colorBadge}; color: ${colorTexto}; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 9px; display: inline-block;">${ans.valor}</span></td>
-                                    <td style="padding: 6px 10px; width: 30%; color: #475569; font-style: italic; font-size: 10px;">${ans.observacion || "-"}</td>
-                                </tr>`;
-                        }
-                        globalIdx++;
-                    });
-                });
+            mostrarAlerta("Generando PDF..."); 
+            let sStr; try { sStr = localStorage.getItem('bertone_marca_config'); } catch(e){}
+            const cfg = sStr ? JSON.parse(sStr) : { empresa: "BERTONE", subtitulo: "Checklist" };
+            const temp = document.createElement('div'); temp.style.cssText = 'position:absolute; left:0; top:0; width:750px; background:#fff; padding:20px; font-family:sans-serif; z-index:-999;';
+            let htmlItems = "";
+            if(reg.respuestas_ordenadas) {
+                reg.respuestas_ordenadas.forEach(ans => htmlItems += `<tr style="border: 1px solid #cbd5e1; font-size:10px;"><td style="padding:6px;">${ans.descripcion}</td><td style="padding:6px; font-weight:bold;">${ans.valor}</td><td style="padding:6px;">${ans.observacion||"-"}</td></tr>`);
             }
-
-            const fuenteFotos = (reg.fotosUrlsNube && reg.fotosUrlsNube.length > 0) ? reg.fotosUrlsNube : (reg.fotos || []);
-
-            let fotosHTML = (fuenteFotos.length === 0) ? `<p style="color: #94a3b8; font-style: italic; font-size: 11px; margin-top: 10px;">No se anexaron registros fotográficos para esta auditoría.</p>` : `<div style="margin-top: 15px; display: block;">`;
-            if(fuenteFotos.length > 0) {
-                fuenteFotos.forEach((f, i) => {
-                    fotosHTML += `
-                        <div style="display: inline-block; border: 1px solid #cbd5e1; padding: 5px; background: #ffffff; border-radius: 6px; margin-right: 15px; margin-bottom: 15px; vertical-align: top;">
-                            <div style="width: 320px; height: 240px; overflow: hidden; display: flex; align-items: center; justify-content: center; background-color: #f8fafc; border-radius: 4px;">
-                                <img src="${f}" style="max-width: 100%; max-height: 100%; display: block;" />
-                            </div>
-                            <p style="text-align: center; margin: 5px 0 0 0; font-size: 10px; font-weight: bold; color: #475569;">Fotografía N° ${i+1}</p>
-                        </div>`;
-                });
-                fotosHTML += `</div>`;
-            }
-
-            const tempContainer = document.createElement('div');
-            tempContainer.style.position = 'absolute';
-            tempContainer.style.left = '-9999px';
-            tempContainer.style.top = '0';
-            tempContainer.style.width = '750px';
-            tempContainer.style.backgroundColor = '#ffffff';
-            tempContainer.style.padding = '20px';
-            tempContainer.style.fontFamily = 'Arial, sans-serif';
-            tempContainer.style.color = '#1e293b';
-
-            tempContainer.innerHTML = `
-                <div style="padding: 10px; background-color: #ffffff; color: #1e293b;">
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 15px; border-bottom: 3px solid #1e3a8a;">
-                        <tr>
-                            <td style="padding-bottom: 10px;"><h1 style="font-size: 22px; font-weight: bold; color: #1e3a8a; margin: 0;">INFORME TÉCNICO DE CALIDAD</h1><p style="font-size: 11px; color: #475569; margin: 3px 0 0 0; font-weight: bold;">${marcaConfig.subtitulo}</p></td>
-                            <td style="text-align: right; padding-bottom: 10px; vertical-align: middle;"><span style="font-size: 20px; font-weight: 900; color: #1e3a8a; display: block; margin: 0;">${marcaConfig.empresa}</span><span style="font-size: 10px; color: #64748b; font-weight: bold; display: block; margin-top: 2px;">Cód: ${reg.codigo}</span></td>
-                        </tr>
-                    </table>
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; background-color: #f8fafc; border: 1px solid #e2e8f0; font-size: 10px;">
-                        <tr><td style="padding: 8px 12px; border: 1px solid #e2e8f0;"><strong>Fecha:</strong> ${reg.fecha}</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0;"><strong>Panel:</strong> <span style="color: #1e3a8a; font-weight: bold;">${reg.nombre_panel}</span></td><td style="padding: 8px 12px; border: 1px solid #e2e8f0;"><strong>Serie/Cucarda:</strong> ${reg.cucarda_serie}</td></tr>
-                        <tr><td style="padding: 8px 12px; border: 1px solid #e2e8f0;"><strong>Mesa:</strong> ${reg.mesa}</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0;"><strong>Operarios:</strong> ${reg.operarios}</td><td style="padding: 8px 12px; border: 1px solid #e2e8f0;"><strong>Dictamen Final:</strong> <span style="color: ${reg.resultado==='CONFORME'?'#059669':'#dc2626'}; font-weight: bold; text-transform: uppercase; font-size: 11px;">${reg.resultado}</span></td></tr>
-                    </table>
-                    <h3 style="color: #1e3a8a; font-size: 11px; text-transform: uppercase; margin: 0 0 8px 0; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;">Auditoría de Puntos Críticos</h3>
-                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 10px;">
-                        <thead><tr style="background-color: #1e3a8a; color: #ffffff; text-align: left;"><th style="padding: 7px 10px; border: 1px solid #1e3a8a;">Punto de Control</th><th style="padding: 7px 10px; text-align: center; border: 1px solid #1e3a8a;">Estado</th><th style="padding: 7px 10px; border: 1px solid #1e3a8a;">Desvíos / Notas</th></tr></thead>
-                        <tbody>${tablaItemsHTML}</tbody>
-                    </table>
-                    <div class="html2pdf__page-break"></div>
-                    <h3 style="color: #1e3a8a; font-size: 11px; text-transform: uppercase; margin: 15px 0 5px 0; border-bottom: 1px solid #cbd5e1; padding-bottom: 3px;">Registro Fotográfico</h3>
-                    ${fotosHTML}
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 30px; border-top: 1px solid #cbd5e1; padding-top: 15px;">
-                        <tr>
-                            <td style="vertical-align: top; width: 60%; font-size: 10px; color: #475569; padding-top: 10px;"><strong>Observaciones Generales de Fábrica:</strong><br>${reg.observaciones}</td>
-                            <td style="text-align: right; width: 40%; vertical-align: top; padding-top: 10px;"><div style="border-bottom: 1px solid #94a3b8; width: 200px; margin-left: auto; height: 35px;"></div><p style="margin: 5px 0 0 0; font-size: 11px; font-weight: bold; color: #1e3a8a;">Auditor Firma: ${reg.nombre_firmante}</p></td>
-                        </tr>
-                    </table>
-                </div>`;
-
-            document.body.appendChild(tempContainer);
-
-            const opciones = {
-                margin: [10, 10, 10, 10], 
-                filename: `INFORME_CALIDAD_${reg.nombre_panel}_${reg.cucarda_serie}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, logging: false, letterRendering: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
-
-            const imagenes = tempContainer.querySelectorAll('img');
-            const promesasImagenes = Array.from(imagenes).map(img => {
-                return new Promise((resolve) => {
-                    if (img.complete) { resolve(); } 
-                    else { img.onload = resolve; img.onerror = resolve; }
-                });
-            });
-
-            Promise.all(promesasImagenes).then(() => {
-                setTimeout(() => {
-                    html2pdf().set(opciones).from(tempContainer).save().then(() => { 
-                        mostrarAlerta("Documento PDF exportado con éxito.", "success"); 
-                        document.body.removeChild(tempContainer);
-                    }).catch(err => {
-                        console.error(err);
-                        document.body.removeChild(tempContainer);
-                    });
-                }, 150);
-            });
+            let htmlFotos = reg.fotos?.length ? `<div style="margin-top:10px;">` + reg.fotos.map((f,i) => `<div style="display:inline-block; margin:5px;"><img src="${f}" width="200"><p style="font-size:10px;">Foto ${i+1}</p></div>`).join('') + `</div>` : "";
+            temp.innerHTML = `<div><h1 style="color:#1e3a8a; margin:0;">${cfg.empresa}</h1><h3 style="margin:5px 0;">${cfg.subtitulo}</h3><p style="font-size:11px;">Panel: ${reg.nombre_panel} | Serie: ${reg.cucarda_serie} | Resultado: ${reg.resultado}</p><table style="width:100%; border-collapse:collapse; margin-top:15px;"><tr style="background:#1e3a8a; color:#fff;"><th style="padding:5px;">Criterio</th><th>Estado</th><th>Notas</th></tr>${htmlItems}</table>${htmlFotos}</div>`;
+            document.body.appendChild(temp);
+            setTimeout(() => { html2pdf().set({filename: `Reporte_${reg.nombre_panel}.pdf`, image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}, jsPDF:{unit:'mm',format:'a4'}}).from(temp).save().then(() => { if(temp.parentNode) document.body.removeChild(temp); }); }, 500);
         }
-
         async function exportarExcel() {
-            if(registrosLocales.length === 0) { alert("No existen datos para estructurar el archivo Excel."); return; }
-            mostrarAlerta("Construyendo matriz con enlaces hipervínculos...", "success");
-            
-            const wb = new ExcelJS.Workbook();
-            const ws = wb.addWorksheet('Control de Calidad');
-            
-            ws.getColumn(10).width = 25; 
-            ws.getColumn(11).width = 25;
-
-            const h = ["Fecha", "Código", "Nombre Panel", "N° Serie", "Mesa", "Operarios", "Resultado", "Observaciones Generales", "Responsable", "Foto Evidencia 1", "Foto Evidencia 2"];
-            const baseItems = (registrosLocales[0] && registrosLocales[0].respuestas_ordenadas) ? registrosLocales[0].respuestas_ordenadas.map(ro => ro.descripcion) : listaItemsFijos;
-
-            baseItems.forEach(desc => { h.push(`[Control] ${desc}`); h.push(`[Obs Especifica] ${desc}`); });
-            ws.addRow(h);
-            const headerRow = ws.getRow(1);
-            headerRow.font = { bold: true, color: { argb: 'FFFFFF' } };
-            headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: '1E3A8A' } };
-
-            for (let i = 0; i < registrosLocales.length; i++) {
-                const r = registrosLocales[i];
-                const rowD = [r.fecha, r.codigo, r.nombre_panel, r.cucarda_serie, r.mesa, r.operarios, r.resultado, r.observaciones, r.nombre_firmante, "", ""];
-                
-                if(r.respuestas_ordenadas && r.respuestas_ordenadas.length > 0) {
-                    r.respuestas_ordenadas.forEach(ro => { rowD.push(ro.valor); rowD.push(ro.observacion); });
-                } else {
-                    listaItemsFijos.forEach(desc => { rowD.push(r.respuestas?.[desc] || ""); rowD.push(r.observacionesItems?.[desc] || ""); });
-                }
-                
-                const addedRow = ws.addRow(rowD);
-                
-                for (let f = 0; f < 2; f++) {
-                    const cell = addedRow.getCell(10 + f);
-                    if (r.fotosUrlsNube && r.fotosUrlsNube[f]) {
-                        cell.value = { text: `🔗 Abrir Foto ${f+1}`, hyperlink: r.fotosUrlsNube[f] };
-                        cell.font = { underline: true, color: { argb: '1E3A8A' }, bold: true };
-                    } else if (r.fotos && r.fotos[f]) {
-                        cell.value = "Local (Activa Nube para ver Link)";
-                        cell.font = { italic: true, color: { argb: '7F8C8D' } };
-                    } else {
-                        cell.value = "Sin foto";
-                        cell.font = { color: { argb: 'CCCCCC' } };
-                    }
-                }
-            }
-
-            const buf = await wb.xlsx.writeBuffer();
-            saveAs(new Blob([buf], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" }), `Reporte_Consolidado_Calidad_BERTONE.xlsx`);
+            if(typeof ExcelJS === 'undefined') return alert("Librería Excel no cargó.");
+            if(!registrosLocales.length) return alert("No hay datos.");
+            mostrarAlerta("Generando Excel...");
+            const wb = new ExcelJS.Workbook(), ws = wb.addWorksheet('Control');
+            const h = ["Fecha", "Código", "Panel", "Serie", "Mesa", "Operarios", "Resultado", "Notas", "Firma"];
+            listaItemsFijos.forEach(d => h.push(`[Valor] ${d}`, `[Obs] ${d}`)); ws.addRow(h);
+            registrosLocales.forEach(r => {
+                const row = [r.fecha, r.codigo, r.nombre_panel, r.cucarda_serie, r.mesa, r.operarios, r.resultado, r.observaciones, r.nombre_firmante];
+                listaItemsFijos.forEach(desc => { const ans = r.respuestas_ordenadas?.find(a=>a.descripcion===desc); row.push(ans?ans.valor:"", ans?ans.observacion:""); });
+                ws.addRow(row);
+            });
+            const buf = await wb.xlsx.writeBuffer(); saveAs(new Blob([buf]), `Reporte_Calidad.xlsx`);
         }
 
+        // FIREBASE (NUBE)
         function inicializarFirebase() {
-            const cfg = localStorage.getItem('bertone_firebase_config'); if(!cfg) return;
+            let cfgStr; try { cfgStr = localStorage.getItem('bertone_firebase_config'); } catch(e){return;}
+            if(!cfgStr || typeof firebase === 'undefined') return;
             try {
-                if(firebase.apps.length === 0) firebase.initializeApp(JSON.parse(cfg));
+                if(!firebase.apps.length) firebase.initializeApp(JSON.parse(cfgStr));
                 db = firebase.firestore(); storage = firebase.storage();
                 firebase.auth().signInAnonymously().then(() => {
-                    document.getElementById('cloud-status-badge').className = "bg-emerald-950 text-white px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-2 border border-emerald-500";
-                    document.getElementById('cloud-badge-txt').innerText = "Servicios Cloud Conectados";
-                    
-                    db.collection("registros_calidad").orderBy("id", "desc").limit(40).onSnapshot(snap => {
-                        const rem = []; 
-                        snap.forEach(d => rem.push(d.data())); 
-                        if(rem.length > 0) {
-                            rem.forEach(remoteReg => {
-                                const idx = registrosLocales.findIndex(l => l.id === remoteReg.id);
-                                if(idx !== -1) { registrosLocales[idx] = remoteReg; } 
-                                else { registrosLocales.push(remoteReg); }
-                                persistirRegistroLocalmente(remoteReg, () => {});
-                            });
-                            registrosLocales.sort((a, b) => b.id.localeCompare(a.id));
-                            actualizarHistorialUI(); 
-                        }
-                    });
+                    if(el('cloud-status-badge')) el('cloud-status-badge').className = "bg-emerald-950 text-white px-3 py-2 rounded-lg font-bold text-xs border border-emerald-500";
+                    if(el('cloud-badge-txt')) el('cloud-badge-txt').innerText = "Nube Conectada";
+                    db.collection("registros_calidad").limit(40).onSnapshot(s => { s.forEach(d => { const dt=d.data(), i=registrosLocales.findIndex(l=>l.id===dt.id); if(i!==-1)registrosLocales[i]=dt; else registrosLocales.push(dt); persistirRegistroLocalmente(dt,()=>{}); }); actualizarHistorialUI(); });
                 });
-            } catch(e){ console.error("Error cargando configuración remota de Firebase:", e); }
+            } catch(e) { console.error(e); }
         }
-        
-        function abrirConfigNube() { document.getElementById('cloud-modal').classList.remove('hidden'); document.getElementById('cloud-modal-config').value = localStorage.getItem('bertone_firebase_config') || ""; }
-        function guardarConfigNubeDesdeModal() { try { JSON.parse(document.getElementById('cloud-modal-config').value); localStorage.setItem('bertone_firebase_config', document.getElementById('cloud-modal-config').value.trim()); window.location.reload(); } catch(e){ alert("Esquema JSON inválido. Verifique las llaves."); } }
-        function desconectarNube() { localStorage.removeItem('bertone_firebase_config'); window.location.reload(); }
-        
-        function mostrarAlerta(msg, tipo) { const b = document.getElementById('alert-box'); b.className = `mb-6 p-4 rounded-lg text-white font-semibold flex justify-between items-center no-print ${tipo === 'success' ? 'bg-emerald-600' : 'bg-blue-600'}`; document.getElementById('alert-msg').innerText = msg; b.classList.remove('hidden'); setTimeout(cerrarAlerta, 4000); }
-        function cerrarAlerta() { document.getElementById('alert-box').classList.add('hidden'); }
+        async function sincronizarNube(reg) {
+            try { const urls=[]; for(let i=0;i<reg.fotos.length;i++) { if(reg.fotos[i].startsWith('http')) urls.push(reg.fotos[i]); else urls.push(await (await storage.ref().child(`fotos/${reg.id}_${i}.jpg`).putString(reg.fotos[i], 'data_url')).ref.getDownloadURL()); } reg.fotosUrlsNube = urls; await db.collection("registros_calidad").doc(reg.id).set(reg); actualizarHistorialUI(); } catch(e){}
+        }
+        function abrirConfigNube() { if(el('cloud-modal')) el('cloud-modal').classList.remove('hidden'); try { if(el('cloud-modal-config')) el('cloud-modal-config').value = localStorage.getItem('bertone_firebase_config')||""; } catch(e){} }
+        function guardarConfigNubeDesdeModal() { try { JSON.parse(el('cloud-modal-config').value); localStorage.setItem('bertone_firebase_config', el('cloud-modal-config').value.trim()); window.location.reload(); } catch(e){ alert("JSON inválido."); } }
+        function desconectarNube() { try { localStorage.removeItem('bertone_firebase_config'); window.location.reload(); } catch(e){} }
     </script>
 </body>
 </html>
