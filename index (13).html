@@ -1,0 +1,2883 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Calidad - BERTONE</title>
+    
+    <!-- Configuración para PWA (Permite añadir como icono de Acceso Directo en el celular) -->
+    <meta name="theme-color" content="#1e3a8a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Calidad Bertone">
+    <meta name="description" content="Sistema de Control de Calidad Bertone - Construcciones Metálicas">
+    
+    <!-- Favicon mejorado con logo BERTONE -->
+    <link rel="icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Cdefs%3E%3ClinearGradient id="grad" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" style="stop-color:%231e40af;stop-opacity:1" /%3E%3Cstop offset="100%25" style="stop-color:%231e3a8a;stop-opacity:1" /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="512" height="512" rx="96" fill="url(%23grad)"/%3E%3Ctext x="256" y="200" font-family="Arial, Helvetica, sans-serif" font-size="96" font-weight="900" text-anchor="middle" fill="white"%3EB%3C/text%3E%3Ctext x="256" y="320" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700" text-anchor="middle" fill="%23e0f2fe"%3EBERTONE%3C/text%3E%3Crect x="80" y="350" width="352" height="8" rx="4" fill="%23fbbf24"/%3E%3C/svg%3E'>
+    <link rel="apple-touch-icon" href='data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"%3E%3Cdefs%3E%3ClinearGradient id="grad" x1="0%25" y1="0%25" x2="100%25" y2="100%25"%3E%3Cstop offset="0%25" style="stop-color:%231e40af;stop-opacity:1" /%3E%3Cstop offset="100%25" style="stop-color:%231e3a8a;stop-opacity:1" /%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="512" height="512" rx="96" fill="url(%23grad)"/%3E%3Ctext x="256" y="200" font-family="Arial, Helvetica, sans-serif" font-size="96" font-weight="900" text-anchor="middle" fill="white"%3EB%3C/text%3E%3Ctext x="256" y="320" font-family="Arial, Helvetica, sans-serif" font-size="48" font-weight="700" text-anchor="middle" fill="%23e0f2fe"%3EBERTONE%3C/text%3E%3Crect x="80" y="350" width="352" height="8" rx="4" fill="%23fbbf24"/%3E%3C/svg%3E'>
+    
+    <!-- Manifest mejorado para PWA -->
+    <link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22Sistema%20de%20Calidad%20Bertone%22%2C%22short_name%22%3A%22Calidad%20Bertone%22%2C%22description%22%3A%22Control%20de%20Calidad%20para%20Construcciones%20Metálicas%22%2C%22start_url%22%3A%22.%22%2C%22scope%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22orientation%22%3A%22portrait%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%231e3a8a%22%2C%22categories%22%3A%5B%22productivity%22%2C%22utilities%22%5D%2C%22screenshots%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D%2527http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2527%2520viewBox%253D%25270%25200%2520540%2520720%2527%253E%253Crect%2520fill%253D%2527%25231e3a8a%2527%2520width%253D%2527540%2527%2520height%253D%2527720%2527%252F%253E%253Ctext%2520x%253D%2527270%2527%2520y%253D%2527360%2527%2520font-size%253D%252772%2527%2520fill%253D%2527white%2527%2520text-anchor%253D%2527middle%2527%2520font-weight%253D%2527bold%2527%253EBertone%253C%252Ftext%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22540x720%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22form_factor%22%3A%22narrow%22%7D%5D%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D%2527http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2527%2520viewBox%253D%25270%25200%2520512%2520512%2527%253E%253Cdefs%253E%253ClinearGradient%2520id%253D%2527grad%2527%2520x1%253D%25270%2525%2527%2520y1%253D%25270%2525%2527%2520x2%253D%2527100%2525%2527%2520y2%253D%2527100%2525%2527%253E%253Cstop%2520offset%253D%25270%2525%2527%2520style%253D%2527stop-color%253A%25231e40af%253Bstop-opacity%253A1%2527%2520%252F%253E%253Cstop%2520offset%253D%2527100%2525%2527%2520style%253D%2527stop-color%253A%25231e3a8a%253Bstop-opacity%253A1%2527%2520%252F%253E%253C%252FlinearGradient%253E%253C%252Fdefs%253E%253Crect%2520width%253D%2527512%2527%2520height%253D%2527512%2527%2520rx%253D%25296%2527%2520fill%253D%2527url%2528%2523grad%2529%2527%252F%253E%253Ctext%2520x%253D%2527256%2527%2520y%253D%2527200%2527%2520font-family%253D%2527Arial%252C%2520Helvetica%252C%2520sans-serif%2527%2520font-size%253D%2527120%2527%2520font-weight%253D%2527900%2527%2520text-anchor%253D%2527middle%2527%2520fill%253D%2527white%2527%253EB%253C%252Ftext%253E%253Ctext%2520x%253D%2527256%2527%2520y%253D%2527340%2527%2520font-family%253D%2527Arial%252C%2520Helvetica%252C%2520sans-serif%2527%2520font-size%253D%252756%2527%2520font-weight%253D%2527700%2527%2520text-anchor%253D%2527middle%2527%2520fill%253D%2527%25231e40af%2527%253EBERTONE%253C%252Ftext%253E%253Crect%2520x%253D%252780%2527%2520y%253D%2527380%2527%2520width%253D%2527352%2527%2520height%253D%252710%2527%2520rx%253D%25275%2527%2520fill%253D%2527%25230ea5e9%2527%252F%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%22%7D%2C%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D%2527http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2527%2520viewBox%253D%25270%25200%2520512%2520512%2527%253E%253Cdefs%253E%253ClinearGradient%2520id%253D%2527grad%2527%2520x1%253D%25270%2525%2527%2520y1%253D%25270%2525%2527%2520x2%253D%2527100%2525%2527%2520y2%253D%2527100%2525%2527%253E%253Cstop%2520offset%253D%25270%2525%2527%2520style%253D%2527stop-color%253A%25231e40af%253Bstop-opacity%253A1%2527%2520%252F%253E%253Cstop%2520offset%253D%2527100%2525%2527%2520style%253D%2527stop-color%253A%25231e3a8a%253Bstop-opacity%253A1%2527%2520%252F%253E%253C%252FlinearGradient%253E%253C%252Fdefs%253E%253Crect%2520width%253D%2527512%2527%2520height%253D%2527512%2527%2520rx%253D%252796%2527%2520fill%253D%2527url%2528%2523grad%2529%2527%252F%253E%253Ctext%2520x%253D%2527256%2527%2520y%253D%2527200%2527%2520font-family%253D%2527Arial%252C%2520Helvetica%252C%2520sans-serif%2527%2520font-size%253D%2527120%2527%2520font-weight%253D%2527900%2527%2520text-anchor%253D%2527middle%2527%2520fill%253D%2527white%2527%253EB%253C%252Ftext%253E%253Ctext%2520x%253D%2527256%2527%2520y%253D%2527340%2527%2520font-family%253D%2527Arial%252C%2520Helvetica%252C%2520sans-serif%2527%2520font-size%253D%252756%2527%2520font-weight%253D%2527700%2527%2520text-anchor%253D%2527middle%2527%2520fill%253D%2527%25231e40af%2527%253EBERTONE%253C%252Ftext%253E%253Crect%2520x%253D%252780%2527%2520y%253D%2527380%2527%2520width%253D%2527352%2527%2520height%253D%252710%2527%2520rx%253D%25275%2527%2520fill%253D%2527%25230ea5e9%2527%252F%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22maskable%22%7D%5D%7D">
+
+    <!-- Tailwind CSS (warning de CDN suprimido - no afecta el funcionamiento) -->
+    <script>!function(){const w=console.warn;console.warn=function(...a){if(a[0]&&String(a[0]).includes('cdn.tailwindcss.com'))return;w.apply(console,a)};}();</script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Html5-QrCode Library (QR Scanner) -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <!-- Tesseract.js OCR - lee texto de etiquetas en el dispositivo -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-app-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-auth-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-firestore-compat.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/firebase@10.12.5/firebase-storage-compat.min.js"></script>
+    <!-- Fallback CDN por si gstatic no carga en alguna red -->
+    <script>
+    window.__firebaseLoadCheck = function() {
+        return typeof firebase !== 'undefined' && firebase.app && firebase.auth && firebase.firestore && firebase.storage;
+    };
+    </script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    
+    <style>
+        @media print {
+            body { background: white; color: black; }
+            .no-print { display: none !important; }
+            .print-card { border: 1px solid #ccc; box-shadow: none; margin: 0; padding: 10px; }
+            .page-break { page-break-before: always; }
+        }
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        /* Custom scrollbar for gallery */
+        .gallery-scrollbar::-webkit-scrollbar {
+            height: 6px;
+        }
+        .gallery-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen pb-12">
+
+    <!-- MENÚ DE CONFIGURACIÓN DE MARCA (Editable en cualquier momento) -->
+    <div id="settings-panel" class="bg-slate-800 text-white p-4 hidden no-print transition-all duration-300">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-2 mb-4">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                    <i class="fas fa-cog"></i> Personalización de la Aplicación (Logos y Títulos)
+                </h3>
+                <button onclick="toggleSettings()" class="text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                    <label class="block text-xs text-slate-400 font-semibold mb-1">Nombre de la Empresa</label>
+                    <input type="text" id="cfg-empresa" oninput="actualizarMarca()" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 font-semibold mb-1">Subtítulo de la Empresa</label>
+                    <input type="text" id="cfg-subtitulo" oninput="actualizarMarca()" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 font-semibold mb-1">Título del Formulario</label>
+                    <input type="text" id="cfg-titulo-form" oninput="actualizarMarca()" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block text-xs text-slate-400 font-semibold mb-1">Subtítulo del Formulario</label>
+                    <input type="text" id="cfg-subtitulo-form" oninput="actualizarMarca()" class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-sm text-white focus:outline-none focus:border-blue-500">
+                </div>
+                <div class="sm:col-span-2 md:col-span-4 border border-slate-600 rounded-xl p-3 bg-slate-900/50">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-sm font-bold text-white flex items-center gap-2"><i class="fas fa-cloud text-blue-400"></i> Sincronización en la Nube (Firebase)</span>
+                        <button onclick="toggleGuiaFirebase()" type="button" class="text-blue-400 text-xs underline hover:text-blue-300">¿Cómo configurar?</button>
+                    </div>
+                    <div id="guia-firebase" class="hidden mb-3 bg-blue-950/60 rounded-lg p-3 text-xs text-slate-300 space-y-1">
+                        <!-- AVISO FILE:// -->
+                        <div id="alerta-file-protocol" class="hidden mb-3 bg-red-900 border border-red-400 rounded-lg p-3">
+                            <p class="text-red-200 font-bold mb-1">🚨 Abrís el archivo como file:// — la nube NO puede funcionar así.</p>
+                            <p class="text-red-100 mb-2">Firebase necesita una URL <strong>https://</strong>. Solución gratis en 5 min con GitHub Pages:</p>
+                            <ol class="text-red-100 space-y-1 list-decimal list-inside">
+                                <li>Entrá a <a href="https://github.com" target="_blank" class="text-blue-300 underline font-bold">github.com</a> → crear cuenta gratis</li>
+                                <li>Nuevo repositorio público → nombre: <strong>bertone-app</strong></li>
+                                <li>Subir este archivo renombrado como <strong>index.html</strong></li>
+                                <li>Settings → Pages → Branch: main → Save</li>
+                                <li>URL: <strong>https://tuusuario.github.io/bertone-app</strong> → compartir con todos 📱</li>
+                            </ol>
+                        </div>
+                        <p class="font-bold text-blue-300 mb-2">📋 Pasos para activar la nube (gratis):</p>
+                        <p>1. Ir a <a href="https://console.firebase.google.com" target="_blank" class="text-blue-400 underline">console.firebase.google.com</a></p>
+                        <p>2. Crear proyecto → Continuar → Deshabilitar Analytics → Crear</p>
+                        <p>3. En "Authentication" → Iniciar → pestaña "Sign-in method" → habilitar <strong>Anónimo</strong></p>
+                        <p>4. En "Firestore Database" → Crear base de datos → Modo prueba → Listo</p>
+                        <p>4b. En "Storage" → Comenzar → Modo prueba → Listo (para guardar fotos)</p>
+                        <p>5. En "Authentication" → Sign-in method → <strong>Anónimo → Habilitar</strong>.</p>
+                        <div class="mt-3 bg-yellow-900 border border-yellow-500 rounded-lg p-3">
+                            <p class="text-yellow-300 font-bold mb-1">⚠️ Si solo funciona en UN dispositivo:</p>
+                            <p class="text-yellow-200 text-xs mb-2">Las reglas en "modo prueba" vencen a los 30 días. Copiá estas reglas permanentes:</p>
+                            <p class="font-bold text-white text-xs mb-1">Firestore → Reglas:</p>
+                            <pre class="bg-slate-900 text-green-300 text-xs rounded p-2 mb-2 overflow-x-auto">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}</pre>
+                            <p class="font-bold text-white text-xs mb-1">Storage → Reglas:</p>
+                            <pre class="bg-slate-900 text-green-300 text-xs rounded p-2 overflow-x-auto">rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}</pre>
+                        </div>
+                        <p>5. Ir a ⚙️ Configuración del proyecto → "Tu app" → Registrar app web → Copiar config</p>
+                        <p>6. Pegar la config JSON aquí abajo y guardar</p>
+                        <p class="text-yellow-300 mt-1">💡 Para compartir con otros celulares: guardá la config y usá el botón "Compartir Config"</p>
+                    </div>
+                    <textarea id="cfg-db-config" rows="3" placeholder='Pegar aqui la configuracion JSON de Firebase:
+{"apiKey":"AIza...","authDomain":"mi-proyecto.firebaseapp.com","projectId":"mi-proyecto",...}' class="w-full bg-slate-700 border border-slate-600 rounded px-2.5 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-blue-500 placeholder-slate-500"></textarea>
+                    <div class="flex gap-2 mt-2">
+                        <button type="button" onclick="compartirConfigCloud()" class="bg-blue-700 hover:bg-blue-600 text-xs text-white font-bold px-3 py-1.5 rounded flex items-center gap-1.5 transition">
+                            <i class="fas fa-share-alt"></i> Compartir Config
+                        </button>
+                        <span class="text-[10px] text-slate-400 self-center">Genera un QR para que otros celulares se conecten a la misma base</span>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4 pt-4 border-t border-slate-700 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <label class="block text-xs text-slate-400 font-semibold mb-1">Subir Logotipo Personalizado (Reemplaza el texto corporativo)</label>
+                    <div class="flex items-center gap-2">
+                        <input type="file" id="cfg-logo-file" accept="image/*" onchange="cargarLogoPersonalizado(event)" class="text-xs text-slate-300 file:mr-4 file:py-1 file:px-2 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-500 cursor-pointer">
+                        <button id="btn-borrar-logo" onclick="borrarLogo()" class="hidden bg-red-600 hover:bg-red-500 text-xs text-white px-2 py-1 rounded">Quitar Logo</button>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="guardarConfiguracionMarca()" class="bg-blue-600 hover:bg-blue-500 text-xs font-bold px-4 py-2 rounded transition">
+                        Guardar Configuración
+                    </button>
+                    <button onclick="restaurarValoresPredeterminados()" class="bg-slate-600 hover:bg-slate-500 text-xs font-bold px-4 py-2 rounded transition">
+                        Restaurar Predeterminado
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Header / Navbar (No se imprime) -->
+    <header class="bg-blue-900 text-white shadow-md py-4 px-6 mb-6 no-print">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <!-- Contenedor del Logo Editable -->
+                <div id="brand-logo-container" class="bg-white p-1.5 rounded-lg flex items-center justify-center min-w-[50px] min-h-[44px]">
+                    <div id="brand-text-logo" class="text-blue-900 font-black text-xl tracking-wider px-1">
+                        BERTONE
+                    </div>
+                    <img id="brand-img-logo" src="" alt="Logo" class="hidden max-h-11 object-contain">
+                </div>
+                <div>
+                    <h1 id="brand-form-title" class="text-lg font-bold">SISTEMA DE CALIDAD</h1>
+                    <p id="brand-form-subtitle" class="text-xs text-blue-200">Checklist de Cumplimiento de Paneles</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-2 justify-center">
+                <!-- Botón de Instalación PWA para Celular -->
+                <button id="pwa-install-btn" class="hidden bg-amber-500 hover:bg-amber-400 text-slate-950 px-3 py-2 rounded-lg font-bold text-sm flex items-center gap-2 transition animate-bounce">
+                    <i class="fas fa-download"></i> Instalar en Celular
+                </button>
+                <button onclick="toggleSettings()" class="bg-blue-800 hover:bg-blue-700 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition" title="Editar marcas, textos y logos">
+                    <i class="fas fa-edit"></i> Editar App
+                </button>
+                <button onclick="resetearChecklistLocal()" class="bg-orange-700 hover:bg-orange-600 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition" title="Restablecer items del checklist">
+                    <i class="fas fa-list-check"></i> Restablecer Items
+                </button>
+                <button onclick="window.print()" class="bg-blue-700 hover:bg-blue-600 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition">
+                    <i class="fas fa-print"></i> Imprimir / PDF
+                </button>
+                <button onclick="exportarExcel()" class="bg-emerald-600 hover:bg-emerald-500 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition">
+                    <i class="fas fa-file-excel"></i> Exportar Todo a Excel
+                </button>
+                <label class="cursor-pointer bg-amber-600 hover:bg-amber-500 active:bg-amber-700 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition select-none" title="Consolidar datos de otros operadores">
+                    <i class="fas fa-file-import"></i> Importar / Combinar
+                    <input type="file" id="importar-csv-file" accept=".csv" class="hidden" onchange="importarCSV(event)">
+                </label>
+                <button onclick="toggleHistorial()" class="bg-slate-700 hover:bg-slate-600 px-3 py-2 rounded-lg font-semibold text-sm flex items-center gap-2 transition">
+                    <i class="fas fa-history"></i> <span id="btn-historial-txt">Historial ([0])</span>
+                </button>
+                <button onclick="abrirConfigNube()" id="cloud-status-badge" class="bg-slate-800 hover:bg-slate-700 px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-2 border border-blue-700 transition cursor-pointer" title="Configurar sincronización en la nube">
+                    <i class="fas fa-cloud"></i> <span id="cloud-badge-txt">☁️ Configurar Nube</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6">
+        
+        <!-- Alertas de estado (No se imprime) -->
+        <div id="alert-box" class="hidden mb-6 p-4 rounded-lg text-white font-semibold flex justify-between items-center no-print">
+            <span id="alert-msg"></span>
+            <button onclick="cerrarAlerta()" class="text-white hover:text-slate-200"><i class="fas fa-times"></i></button>
+        </div>
+
+        <!-- VISTA: HISTORIAL ACUMULATIVO -->
+        <section id="seccion-historial" class="hidden mb-8 bg-white p-6 rounded-xl shadow-md border border-slate-200 no-print">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fas fa-database text-blue-900"></i> Base de Datos Acumulativa
+                    </h2>
+                    <p class="text-xs text-slate-500 mt-1">Todos los registros guardados aquí se exportarán juntos en una única planilla de Excel.</p>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="exportarExcel()" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-2 rounded-lg font-bold transition">
+                        <i class="fas fa-download"></i> Descargar Todo el Excel
+                    </button>
+                    <button onclick="limpiarHistorialCompleto()" class="bg-red-50 hover:bg-red-100 text-red-600 text-xs px-3 py-2 rounded-lg font-medium border border-red-200 transition">
+                        Borrar Todo
+                    </button>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-100 text-slate-700 uppercase tracking-wider text-xs">
+                            <th class="p-3 border-b">Fecha</th>
+                            <th class="p-3 border-b">Código</th>
+                            <th class="p-3 border-b">Panel (Modelo)</th>
+                            <th class="p-3 border-b">Cucarda/Serie</th>
+                            <th class="p-3 border-b">Mesa</th>
+                            <th class="p-3 border-b">Operarios / Firma</th>
+                            <th class="p-3 border-b">Resultado</th>
+                            <th class="p-3 border-b">Adjuntos</th>
+                            <th class="p-3 border-b text-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-historial-body">
+                        <!-- Cargado dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- FORMULARIO PRINCIPAL -->
+        <form id="checklist-form" onsubmit="guardarRegistro(event)" class="bg-white rounded-xl shadow-md border border-slate-200 p-6 md:p-8 print-card">
+            
+            <!-- Encabezado de Impresión -->
+            <div class="hidden print:flex justify-between items-center border-b-2 border-slate-800 pb-4 mb-6">
+                <div class="flex items-center gap-3">
+                    <div id="print-logo-container" class="bg-white p-1 border border-slate-300 rounded flex items-center justify-center min-w-[50px] min-h-[44px]">
+                        <!-- Sincronizado por JS -->
+                    </div>
+                    <div>
+                        <h1 id="print-company-name" class="text-2xl font-black tracking-wider text-slate-900">BERTONE</h1>
+                        <p id="print-company-subtitle" class="text-xs font-bold text-slate-600">CONSTRUCCIONES METÁLICAS</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <h2 id="print-form-title" class="text-lg font-extrabold text-slate-800">SISTEMA DE CALIDAD</h2>
+                    <p id="print-form-subtitle" class="text-sm font-semibold text-slate-600">CHECK LIST DE CUMPLIMIENTO</p>
+                </div>
+            </div>
+
+            <!-- ENCABEZADO DE DATOS CON ESCÁNER QR -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-2 border-b border-slate-200">
+                <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500">Datos de Identificación del Panel</h3>
+                
+                <div class="flex gap-2 flex-wrap w-full sm:w-auto no-print">
+                    <!-- Botón Escaneo QR -->
+                    <button type="button" onclick="abrirScanner()" class="flex-1 sm:flex-none bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-sm">
+                        <i class="fas fa-qrcode text-sm"></i> Escanear QR
+                    </button>
+                    <!-- Botón Foto IA para leer cucarda -->
+                    <button type="button" onclick="abrirCamaraIA()" class="flex-1 sm:flex-none bg-violet-700 hover:bg-violet-600 active:bg-violet-800 text-white text-xs font-bold py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition shadow-lg">
+                        <i class="fas fa-brain text-sm"></i> Foto IA Cucarda
+                    </button>
+                </div>
+
+                <!-- SELECTOR DE TIPO CON DROPDOWN -->
+                <div class="mt-4">
+                    <div class="relative inline-block w-full sm:w-auto">
+                        <button type="button" id="btn-tipo-selector" onclick="abrirDropdownTipo()" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 px-6 rounded-lg flex items-center justify-between gap-2 transition shadow-lg">
+                            <span id="tipo-actual-texto">📦 Paneles</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
+                        <div id="dropdown-tipos" class="hidden absolute top-full left-0 mt-1 w-full sm:w-56 bg-white border border-slate-300 rounded-lg shadow-xl z-50">
+                            <button type="button" onclick="cambiarTipo('Paneles')" class="w-full text-left px-4 py-3 hover:bg-blue-50 border-b border-slate-200 font-bold text-slate-800">📦 Paneles</button>
+                            <button type="button" onclick="cambiarTipo('Conductos')" class="w-full text-left px-4 py-3 hover:bg-blue-50 border-b border-slate-200 font-bold text-slate-800">🔩 Conductos</button>
+                            <button type="button" onclick="cambiarTipo('Tubos')" class="w-full text-left px-4 py-3 hover:bg-blue-50 border-b border-slate-200 font-bold text-slate-800">🛠️ Tubos</button>
+                            <button type="button" onclick="cambiarTipo('Armaduras')" class="w-full text-left px-4 py-3 hover:bg-blue-50 font-bold text-slate-800">🏗️ Armaduras</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- DATOS DE CABECERA -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Fecha</label>
+                    <input type="date" id="fecha" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Código (Etiqueta)</label>
+                    <input type="text" id="codigo" required placeholder="Ej. 08-007-08544" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Nombre Panel (Letras Grandes)</label>
+                    <input type="text" id="nombre_panel" required placeholder="Ej. PPV018B" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 font-bold text-blue-900 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">N° Serie / Cucarda</label>
+                    <input type="text" id="cucarda_serie" required placeholder="Ej. 2600001" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Mesa</label>
+                    <input type="text" id="mesa" required placeholder="Ej. Mesa 02" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Operarios</label>
+                    <input type="text" id="operarios" required placeholder="Ej. J. Pérez, M. Gómez" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+            </div>
+
+            <!-- TABLA DE CONTROLES -->
+            <div class="mb-8">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 pb-2 border-b-2 border-slate-200">
+                    <h3 class="text-lg font-bold text-slate-800">Ítems de Control de Calidad</h3>
+                    <button type="button" onclick="toggleItemManager()" class="no-print bg-slate-700 hover:bg-slate-600 text-white text-xs font-bold py-2 px-4 rounded-lg flex items-center gap-2 transition">
+                        <i class="fas fa-list-check"></i> Modificar Ítems
+                    </button>
+                </div>
+
+                <div id="item-manager" class="hidden no-print mb-5 border border-blue-100 rounded-xl bg-blue-50/60 p-4">
+                    <div class="grid grid-cols-1 md:grid-cols-[180px_1fr_auto] gap-3 items-end">
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Categoría</label>
+                            <input type="text" id="new-item-category" list="category-list" placeholder="Ej. Armadura" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                            <datalist id="category-list"></datalist>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase text-slate-500 mb-1">Descripción del ítem</label>
+                            <input type="text" id="new-item-desc" placeholder="Nuevo control de calidad..." class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <button type="button" onclick="agregarItemManual()" class="bg-blue-900 hover:bg-blue-800 text-white text-xs font-bold py-2.5 px-4 rounded-lg">
+                            <i class="fas fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-slate-500 mt-2">Para quitar un ítem, usá el icono de basura que aparece al lado de cada control.</p>
+                </div>
+                
+                <div class="space-y-6" id="items-container">
+                    <!-- Las categorías e ítems se inyectan dinámicamente aquí -->
+                </div>
+            </div>
+
+            <!-- OBSERVACIONES GENERALES Y REGISTRO FOTOGRÁFICO -->
+            <div class="mb-8 border border-slate-200 rounded-xl p-4 sm:p-6 bg-slate-50/50">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                    <label class="block text-sm font-bold text-slate-700 uppercase">Observaciones Generales e Imágenes</label>
+                    
+                    <!-- Botones de foto: Cámara en vivo y Galería -->
+                    <div class="flex gap-2 no-print">
+                        <button type="button" onclick="abrirCamara()" class="bg-blue-900 text-white text-xs font-bold py-2 px-3 rounded-lg flex items-center gap-2 transition active:bg-blue-700">
+                            <i class="fas fa-camera"></i> Cámara
+                        </button>
+                        <label class="cursor-pointer bg-slate-600 text-white text-xs font-bold py-2 px-3 rounded-lg flex items-center gap-2 transition select-none active:bg-slate-400">
+                            <i class="fas fa-images"></i> Galería
+                            <input type="file" id="input-fotos-galeria" accept="image/*" multiple class="hidden" onchange="procesarFotosAdjuntas(event)">
+                        </label>
+                    </div>
+                </div>
+                
+                <textarea id="observaciones" rows="3" placeholder="Escriba aquí aclaraciones, desvíos detectados o acciones correctivas tomadas..." class="w-full bg-white border border-slate-300 rounded-lg p-3 text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition mb-4"></textarea>
+                
+                <!-- Galería de fotos adjuntas -->
+                <div id="gallery-wrapper" class="hidden">
+                    <p class="text-xs font-bold text-slate-500 uppercase mb-2">Imágenes Adjuntas a esta Planilla:</p>
+                    <div id="fotos-preview-container" class="flex gap-4 overflow-x-auto pb-3 gallery-scrollbar">
+                        <!-- Thumbnails dinámicos -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- DATOS RESPONSABLE Y GUARDADO -->
+            <div class="mb-8 border border-slate-300 rounded-xl p-6 bg-slate-50">
+                <label class="block text-xs font-bold uppercase text-slate-500 mb-3">Responsable</label>
+                <div class="mb-4">
+                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Nombre y Apellido del Responsable (Obligatorio)</label>
+                    <input type="text" id="nombre_firmante" required placeholder="Escriba su Nombre y Apellido completo" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                </div>
+                <p class="text-xs text-slate-500 mb-4">Al guardar, los datos del panel, respuestas y fotos quedarán consolidados en la base de datos.</p>
+                <div class="flex flex-col sm:flex-row gap-2 no-print">
+                    <button type="submit" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-6 rounded-lg text-sm tracking-wide shadow transition flex items-center justify-center gap-2">
+                        <i class="fas fa-save"></i> Guardar Planilla
+                    </button>
+                    <button type="button" onclick="resetearFormulario()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-3 px-4 rounded-lg text-sm transition">
+                        Limpiar Todo
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECCIÓN IMPRIMIBLE PARA FOTOS -->
+            <div id="print-photos-section" class="hidden print:block page-break mt-6">
+                <h3 class="text-sm font-bold uppercase border-b-2 border-slate-800 pb-1 mb-4">Registro Fotográfico del Panel</h3>
+                <div id="print-photos-grid" class="grid grid-cols-2 gap-4">
+                    <!-- Se inyectan imágenes aquí en impresión -->
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <!-- MODAL DE ESCANEO QR -->
+    <div id="qr-modal" class="fixed inset-0 bg-slate-900/80 z-50 flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2">
+                    <i class="fas fa-qrcode text-blue-900"></i> Escanear Código QR
+                </h3>
+                <button type="button" onclick="cerrarScanner()" class="text-slate-400 hover:text-slate-600 text-lg"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="bg-blue-50 border border-blue-100 rounded-lg p-3 text-xs text-slate-600">
+                <p class="font-bold text-blue-900 mb-1">Formatos de QR soportados:</p>
+                <ul class="list-disc list-inside space-y-1">
+                    <li><strong>Texto Separado por barras:</strong> <code class="bg-blue-100 px-1 rounded font-mono">CÓDIGO | NOMBRE PANEL | SERIE</code></li>
+                    <li><strong>JSON estructurado:</strong> <code class="bg-blue-100 px-1 rounded font-mono">{"codigo":"...", "nombre":"...", "serie":"..."}</code></li>
+                </ul>
+            </div>
+
+            <!-- Contenedor del scanner de cámara -->
+            <div class="relative rounded-lg overflow-hidden border border-slate-300 bg-black aspect-video max-w-full mx-auto w-full">
+                <div id="reader" class="w-full h-full"></div>
+            </div>
+
+            <!-- Botón fallback: label nativo, funciona sin JS .click() en iOS/Android -->
+            <div class="text-center">
+                <p class="text-xs text-slate-500 mb-2">Problemas con la camara activa?</p>
+                <label class="cursor-pointer text-xs text-blue-700 font-bold underline inline-flex items-center gap-1">
+                    <i class="fas fa-image"></i> Subir foto del QR desde el celular
+                    <input type="file" id="qr-file-fallback" accept="image/*" capture="environment" class="hidden" onchange="cerrarScanner(); escanearDesdeArchivo(event)">
+                </label>
+            </div>
+
+            <div class="flex flex-col gap-2">
+                <button type="button" onclick="cerrarScanner()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2.5 rounded-lg text-sm transition">
+                    Cerrar Cámara
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- MODAL CÁMARA IA - LECTURA CUCARDA -->
+    <div id="ia-camera-modal" class="fixed inset-0 bg-black z-[72] flex flex-col hidden no-print">
+        <!-- Header -->
+        <div class="absolute top-0 left-0 right-0 flex justify-between items-center px-4 py-3 bg-gradient-to-b from-black/80 to-transparent z-10">
+            <button onclick="cerrarCamaraIA()" class="text-white bg-black/50 backdrop-blur rounded-xl px-4 py-2 text-sm font-bold flex items-center gap-2 active:bg-black/80">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <div class="text-center">
+                <span class="text-white font-bold text-sm drop-shadow block">🧠 IA Lee la Cucarda</span>
+                <span class="text-white/70 text-xs">Enfocá bien la etiqueta</span>
+            </div>
+            <button onclick="cambiarCamaraIA()" class="text-white bg-black/50 backdrop-blur rounded-xl p-2.5 active:bg-black/80">
+                <i class="fas fa-sync-alt text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Video + overlay guía -->
+        <div class="relative w-full h-full">
+            <video id="ia-camera-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
+            <!-- Marco guía -->
+            <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="border-2 border-white/80 rounded-2xl w-[85%] max-w-sm aspect-[3/2] shadow-[0_0_0_9999px_rgba(0,0,0,0.45)]">
+                    <div class="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-violet-400 rounded-tl-lg -translate-x-0.5 -translate-y-0.5"></div>
+                    <div class="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-violet-400 rounded-tr-lg translate-x-0.5 -translate-y-0.5"></div>
+                    <div class="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-violet-400 rounded-bl-lg -translate-x-0.5 translate-y-0.5"></div>
+                    <div class="absolute bottom-0 right-0 w-6 h-6 border-b-4 border-r-4 border-violet-400 rounded-br-lg translate-x-0.5 translate-y-0.5"></div>
+                </div>
+            </div>
+            <!-- Estado IA procesando -->
+            <div id="ia-procesando" class="hidden absolute inset-0 bg-black/75 flex flex-col items-center justify-center gap-4 z-20">
+                <div class="w-16 h-16 border-4 border-violet-500 border-t-transparent rounded-full animate-spin"></div>
+                <p class="text-white font-bold text-lg">Analizando cucarda...</p>
+                <p class="text-violet-300 text-sm">La IA está leyendo la etiqueta</p>
+            </div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="absolute bottom-0 left-0 right-0 pb-10 pt-6 bg-gradient-to-t from-black/80 to-transparent flex justify-center items-center gap-8">
+            <div class="w-14"></div>
+            <!-- Disparador -->
+            <button onclick="capturarFotoIA()" id="btn-capturar-ia"
+                class="w-20 h-20 rounded-full bg-violet-500 border-4 border-violet-300 shadow-2xl flex items-center justify-center active:scale-90 transition-transform focus:outline-none">
+                <i class="fas fa-brain text-white text-2xl"></i>
+            </button>
+            <!-- Galería alternativa -->
+            <label class="cursor-pointer w-14 h-14 bg-black/50 backdrop-blur rounded-full text-white flex items-center justify-center active:bg-black/80">
+                <i class="fas fa-images text-xl"></i>
+                <input type="file" accept="image/*" class="hidden" onchange="procesarFotoIADesdeGaleria(event)">
+            </label>
+        </div>
+    </div>
+
+    <!-- MODAL CÁMARA EN VIVO -->
+    <div id="camera-modal" class="fixed inset-0 bg-black z-[70] flex flex-col hidden no-print">
+        <!-- Barra superior -->
+        <div class="absolute top-0 left-0 right-0 flex justify-between items-center px-4 py-3 bg-gradient-to-b from-black/70 to-transparent z-10">
+            <button onclick="cerrarCamara()" class="text-white bg-black/50 backdrop-blur rounded-xl px-4 py-2 text-sm font-bold flex items-center gap-2 active:bg-black/80">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+            <span class="text-white font-bold text-sm drop-shadow">📸 Tomar Foto</span>
+            <button onclick="cambiarCamara()" id="btn-flip-cam" class="text-white bg-black/50 backdrop-blur rounded-xl p-2.5 active:bg-black/80" title="Cambiar cámara">
+                <i class="fas fa-sync-alt text-lg"></i>
+            </button>
+        </div>
+
+        <!-- Video feed -->
+        <video id="camera-video" class="w-full h-full object-cover" autoplay playsinline muted></video>
+
+        <!-- Barra inferior -->
+        <div class="absolute bottom-0 left-0 right-0 pb-10 pt-6 bg-gradient-to-t from-black/80 to-transparent flex justify-center items-center gap-8">
+            <!-- Contador de fotos tomadas -->
+            <div class="w-14 h-14 flex items-center justify-center">
+                <span id="foto-count-badge" class="hidden bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-full"></span>
+            </div>
+            <!-- Botón disparador -->
+            <button onclick="capturarFoto()" id="btn-capturar"
+                class="w-20 h-20 rounded-full bg-white border-4 border-slate-300 shadow-2xl flex items-center justify-center active:scale-90 transition-transform focus:outline-none">
+                <div class="w-15 h-15 rounded-full bg-white border-2 border-slate-200 w-14 h-14"></div>
+            </button>
+            <!-- Botón cerrar con fotos -->
+            <button onclick="cerrarCamara()" class="w-14 h-14 bg-emerald-600 rounded-full text-white flex items-center justify-center active:bg-emerald-700 shadow-lg">
+                <i class="fas fa-check text-xl"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL CONFIG NUBE -->
+    <div id="cloud-modal" class="fixed inset-0 bg-slate-900/90 z-[65] flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 flex flex-col gap-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="font-bold text-slate-800 flex items-center gap-2 text-lg">
+                    <i class="fas fa-cloud text-blue-600"></i> Sincronización en la Nube
+                </h3>
+                <button onclick="cerrarConfigNube()" class="text-slate-400 hover:text-slate-600 text-xl"><i class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Estado actual -->
+            <div id="cloud-modal-status" class="rounded-xl p-4 bg-slate-50 border border-slate-200 text-sm text-slate-600 flex items-center gap-3">
+                <i class="fas fa-database text-slate-400 text-xl"></i>
+                <div>
+                    <p class="font-bold text-slate-700">Modo: Solo Local</p>
+                    <p class="text-xs mt-0.5">Los datos se guardan solo en este dispositivo.</p>
+                </div>
+            </div>
+
+            <!-- Pasos -->
+            <div class="bg-blue-50 border border-blue-100 rounded-xl p-4 text-xs text-slate-600 space-y-2">
+                <p class="font-bold text-blue-800 text-sm mb-2">🚀 Activar nube (Firebase gratis)</p>
+                <div class="space-y-2">
+                    <p><span class="bg-blue-600 text-white font-bold rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-1">1</span>
+                        Ir a <a href="https://console.firebase.google.com" target="_blank" class="text-blue-600 font-bold underline">console.firebase.google.com</a> → Crear proyecto</p>
+                    <p><span class="bg-blue-600 text-white font-bold rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-1">2</span>
+                        <strong>Authentication</strong> → Iniciar sesión → Sign-in method → activar <strong>Anónimo</strong></p>
+                    <p><span class="bg-blue-600 text-white font-bold rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-1">3</span>
+                        <strong>Firestore Database</strong> → Crear base de datos → Modo prueba</p>
+                    <p><span class="bg-blue-600 text-white font-bold rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-1">4</span>
+                        ⚙️ Configuración → Registrar app web → copiar el objeto <code class="bg-blue-100 px-1 rounded">firebaseConfig</code></p>
+                    <p><span class="bg-blue-600 text-white font-bold rounded-full w-5 h-5 inline-flex items-center justify-center text-[10px] mr-1">5</span>
+                        Pegar aquí abajo y tocar <strong>Conectar</strong></p>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-1">Config JSON de Firebase</label>
+                <textarea id="cloud-modal-config" rows="5"
+                    placeholder='{"apiKey":"AIza...","authDomain":"mi-app.firebaseapp.com","projectId":"mi-app","storageBucket":"mi-app.appspot.com","messagingSenderId":"123456","appId":"1:123..."}'
+                    oninput="limpiarJsonFirebase(this)" onpaste="setTimeout(()=>limpiarJsonFirebase(this),50)"
+                    class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-xs font-mono text-slate-800 focus:ring-2 focus:ring-blue-500 outline-none resize-none"></textarea>
+                <p class="text-[10px] text-slate-400 mt-1">💡 Podés pegar el bloque completo de Firebase, se limpia automáticamente.</p>
+            </div>
+
+            <!-- QR de compartir -->
+            <div id="cloud-qr-section" class="hidden border border-slate-200 rounded-xl p-4 text-center bg-slate-50">
+                <p class="text-xs font-bold text-slate-600 mb-3">📱 Escaneá este QR con otro celular para conectarlo a la misma base de datos:</p>
+                <img id="cloud-qr-img" src="" alt="QR Config" class="mx-auto rounded-lg border border-slate-200 max-w-[200px]">
+                <p class="text-[10px] text-slate-400 mt-2">El QR contiene la configuración de Firebase. Guardá la imagen para compartirla.</p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-2">
+                <button onclick="conectarNubeDesdeModal()" class="flex-1 bg-blue-900 hover:bg-blue-800 text-white font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition">
+                    <i class="fas fa-plug"></i> Conectar a la Nube
+                </button>
+                <button onclick="generarQRConfig()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3 px-4 rounded-xl text-sm flex items-center justify-center gap-2 transition">
+                    <i class="fas fa-qrcode"></i> Generar QR
+                </button>
+                <button onclick="desconectarNube()" class="bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 px-3 rounded-xl text-sm flex items-center justify-center gap-2 transition border border-red-200">
+                    <i class="fas fa-unlink"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Div oculto para escaneo QR desde archivo (no depende del modal) -->
+    <div id="reader-file" style="display:none;width:1px;height:1px;overflow:hidden;position:absolute;top:-9999px;left:-9999px;"></div>
+
+    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO -->
+    <div id="confirm-modal" class="fixed inset-0 bg-slate-900/80 z-[60] flex items-center justify-center p-4 hidden no-print">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 flex flex-col gap-4">
+            <div class="flex items-center gap-3 border-b pb-3 text-amber-600">
+                <i class="fas fa-exclamation-triangle text-2xl"></i>
+                <h3 class="font-bold text-slate-800 text-lg" id="confirm-title">¿Estás seguro?</h3>
+            </div>
+            <p class="text-sm text-slate-600" id="confirm-message">Esta acción no se puede deshacer.</p>
+            <div class="flex gap-2 justify-end mt-2">
+                <button id="confirm-btn-cancel" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold py-2 px-4 rounded-lg text-sm transition">
+                    Cancelar
+                </button>
+                <button id="confirm-btn-ok" class="bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded-lg text-sm transition">
+                    Confirmar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // VERSION DEL CHECKLIST - cambiar este numero fuerza reset del localStorage
+        const CHECKLIST_VERSION = "2.0";
+
+        // CONFIGURACIÓN DE MARCA POR DEFECTO
+        let brandSettings = {
+            empresa: "BERTONE",
+            subtitulo: "CONSTRUCCIONES METÁLICAS",
+            titulo_form: "SISTEMA DE CALIDAD",
+            subtitulo_form: "CHECK LIST DE CUMPLIMIENTO",
+            logo_url: "",
+            db_config: ""
+        };
+
+        // DATOS DEL CHECKLIST
+        let checklistData = [
+            {
+                categoria: "Armadura",
+                items: [
+                    { id: "01", desc: "Cucarda y etiqueta disponible y corresponde?" },
+                    { id: "02", desc: "Hierros, estribos correctos y distancia correspondiente?" },
+                    { id: "03", desc: "Escalerillas correspondientes bien soldadas y vinculadas?" },
+                    { id: "04", desc: "Distancia de armazon a perimetrales and aberturas?" },
+                    { id: "05", desc: "Armazon con cruces correctos entre vigas y columnas?" },
+                    { id: "06", desc: "Ganchos de izaje accesibles, alineados y correctos de acuerdo a plano?" },
+                    { id: "07", desc: "Plano en A3 disponible?" }
+                ]
+            },
+            {
+                categoria: "Controles en Mesa",
+                items: [
+                    { id: "08", desc: "Cucarda y etiqueta disponible y corresponde?" },
+                    { id: "09", desc: "Limpieza mesa" },
+                    { id: "10", desc: "Control dimensional molde perimetral y escuadra." },
+                    { id: "11", desc: "Separación entre molde perimetral y mesa" },
+                    { id: "12", desc: "Armadura libre contaminación con desmoldante" },
+                    { id: "13", desc: "Colocación de separadores" },
+                    { id: "14", desc: "Control de herrajes (diám. y long. De hierros, espesor de planchuela)" },
+                    { id: "15", desc: "Posición de herrajes y Fijación" },
+                    { id: "17", desc: "Estado, Posición, ventilaciones de Abertura y paralelismo" },
+                    { id: "18", desc: "Instalaciones eléctricas, es la descripta y esta ubicada en lugar" },
+                    { id: "19", desc: "Instalaciones sanitarias, es la descripta y esta ubicada en lugar" },
+                    { id: "20", desc: "Protección de terminales" },
+                    { id: "21", desc: "Protección ganchos de izaje escalerillas" }
+                ]
+            },
+            {
+                categoria: "Hormigón Armado",
+                items: [
+                    { id: "22", desc: "Terminación correcta de cara: enrasada y terminación (Llaneado, corte manguero o flatachado)" }
+                ]
+            }
+        ];
+
+        let database = [];
+        let tipoActual = "Paneles";
+        const TIPOS = ["Paneles", "Conductos", "Tubos", "Armaduras"];
+        let checklistPorTipo = {
+            "Paneles": null,
+            "Conductos": null,
+            "Tubos": null,
+            "Armaduras": null
+        };
+        
+        let fotosTemporales = []; // Array de Base64 de las imágenes adjuntas actualmente
+        let html5QrCode = null; // Instancia global de escáner QR
+        let dbFirebase = null;
+        let storageFirebase = null; // Firebase Storage para subir fotos
+        let unsubscribeRegistros = null;
+        let unsubscribeConfig = null;
+        let esCloudValido = false;
+
+        // Service Worker para funcionamiento Offline / PWA
+        // Técnica para archivo HTML único: registra el SW apuntando al propio HTML,
+        // que responde con el código del SW cuando lo solicita el navegador.
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = [
+                    "const CACHE='bertone-v1';",
+                    "self.addEventListener('install',e=>self.skipWaiting());",
+                    "self.addEventListener('activate',e=>e.waitUntil(clients.claim()));",
+                    "self.addEventListener('fetch',e=>e.respondWith(fetch(e.request).catch(()=>caches.match(e.request))));"
+                ].join('');
+
+                // Crear un Blob con tipo correcto y registrar vía URL temporal
+                // Solo funciona cuando la página se sirve por HTTP/HTTPS (no file://)
+                if (location.protocol === 'http:' || location.protocol === 'https:') {
+                    const blob = new Blob([swCode], { type: 'text/javascript' });
+                    const swUrl = URL.createObjectURL(blob);
+                    navigator.serviceWorker.register(swUrl, { scope: './' })
+                        .then(() => URL.revokeObjectURL(swUrl))
+                        .catch(() => URL.revokeObjectURL(swUrl)); // silencioso si falla
+                }
+                // En file:// el SW no es posible, pero el resto de la app funciona normal
+            });
+        }
+
+        // Manejo del evento de instalación PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) {
+                installBtn.classList.remove('hidden');
+                installBtn.addEventListener('click', () => {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then((choiceResult) => {
+                        if (choiceResult.outcome === 'accepted') {
+                            console.log('El usuario aceptó la instalación');
+                        }
+                        installBtn.classList.add('hidden');
+                        deferredPrompt = null;
+                    });
+                });
+            }
+        });
+
+        // Inicialización básica
+        window.onload = function() {
+            // Detectar si se abre como file:// - Firebase no funciona en ese caso
+            if (window.location.protocol === 'file:') {
+                setTimeout(() => {
+                    mostrarAlerta(
+                        "⚠️ Abrís el archivo localmente (file://). La nube NO va a funcionar así. " +
+                        "Para usar en todos los dispositivos: subí el archivo a GitHub Pages (gratis) y compartí esa URL. " +
+                        "Abrí el modal ☁️ para ver instrucciones.",
+                        "warning"
+                    );
+                }, 1500);
+            }
+            cargarConfiguracionMarca();
+            cargarChecklistPersonalizado();
+            setFechaHoy();
+            renderChecklist();
+            cargarBaseDatos();
+            inicializarFirebaseCloud();
+        };
+
+        function setFechaHoy() {
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('fecha').value = hoy;
+        }
+
+        function cargarChecklistPersonalizado() {
+            // Si la version guardada no coincide, ignorar localStorage y usar defaults
+            const versionGuardada = localStorage.getItem('bertone_checklist_version');
+            if (versionGuardada !== CHECKLIST_VERSION) {
+                localStorage.removeItem('bertone_checklist_items');
+                localStorage.setItem('bertone_checklist_version', CHECKLIST_VERSION);
+                console.log('Checklist actualizado a version ' + CHECKLIST_VERSION + ', usando defaults.');
+                return;
+            }
+            const guardado = localStorage.getItem('bertone_checklist_items');
+            if (!guardado) return;
+            try {
+                const datos = JSON.parse(guardado);
+                const totalItemsDefault = checklistData.reduce((acc, cat) => acc + cat.items.length, 0);
+                const totalItemsGuardados = Array.isArray(datos) ? datos.reduce((acc, cat) => acc + (cat.items ? cat.items.length : 0), 0) : 0;
+                if (Array.isArray(datos) && datos.length > 0 && totalItemsGuardados >= totalItemsDefault) {
+                    checklistData = datos;
+                } else {
+                    console.warn('Checklist local incompleto (' + totalItemsGuardados + ' vs ' + totalItemsDefault + '), usando defaults.');
+                    localStorage.removeItem('bertone_checklist_items');
+                }
+            } catch (error) {
+                console.warn('No se pudo cargar el checklist personalizado.', error);
+                localStorage.removeItem('bertone_checklist_items');
+            }
+        }
+
+        function guardarChecklistPersonalizado() {
+            localStorage.setItem('bertone_checklist_items', JSON.stringify(checklistData));
+            if (esCloudValido && dbFirebase) {
+                dbFirebase.collection("bertone_config").doc("checklist").set({ items: checklistData, updated_at: Date.now() }, { merge: true }).catch(console.error);
+            }
+        }
+
+        function setCloudBadge(texto, tipo = "local") {
+            const badge = document.getElementById('cloud-status-badge');
+            if (!badge) return;
+            const estilos = {
+                local: "bg-slate-800 hover:bg-slate-700 border border-blue-700 text-white transition cursor-pointer",
+                ok:    "bg-emerald-600 hover:bg-emerald-500 text-white transition cursor-pointer",
+                error: "bg-rose-600 hover:bg-rose-500 text-white transition cursor-pointer",
+                wait:  "bg-amber-500 hover:bg-amber-400 text-slate-950 transition cursor-pointer"
+            };
+            badge.className = `${estilos[tipo] || estilos.local} px-3 py-2 rounded-lg font-bold text-xs flex items-center gap-2`;
+            badge.innerHTML = texto;
+        }
+
+        async function inicializarFirebaseCloud() {
+            if (unsubscribeRegistros) unsubscribeRegistros();
+            if (unsubscribeConfig) unsubscribeConfig();
+            unsubscribeRegistros = null;
+            unsubscribeConfig = null;
+            dbFirebase = null;
+            storageFirebase = null;
+            esCloudValido = false;
+
+            const rawConfig = (brandSettings.db_config || '').trim();
+            if (!rawConfig) {
+                setCloudBadge('<i class="fas fa-cloud"></i> ☁️ Configurar Nube', "local");
+                return;
+            }
+
+            try {
+                // Esperar hasta 15 segundos a que Firebase SDK cargue (incluye storage)
+                if (!window.firebase || !window.firebase.storage) {
+                    setCloudBadge('<i class="fas fa-spinner animate-spin"></i> Cargando SDK...', "wait");
+                    await new Promise((resolve, reject) => {
+                        let intentos = 0;
+                        const check = setInterval(() => {
+                            intentos++;
+                            if (window.firebase && window.firebase.firestore && window.firebase.storage) {
+                                clearInterval(check);
+                                resolve();
+                            } else if (intentos > 75) {
+                                clearInterval(check);
+                                reject(new Error("No se pudo cargar Firebase. Verificá tu conexión a internet e intentá de nuevo."));
+                            }
+                        }, 200);
+                    });
+                }
+
+                // ── Limpiar JSON: el usuario a veces pega "const firebaseConfig = {...};"
+                let jsonStr = rawConfig;
+                const matchObj = rawConfig.match(/\{[\s\S]*\}/);
+                if (matchObj) jsonStr = matchObj[0];
+                // Reemplazar comillas tipográficas
+                jsonStr = jsonStr.replace(/[“”‘’]/g, '"');
+                
+                let config;
+                try {
+                    config = JSON.parse(jsonStr);
+                } catch(e) {
+                    try {
+                        config = JSON.parse(jsObjectAJson(jsonStr));
+                    } catch(e2) {
+                        throw new Error("El JSON de configuración no es válido. Copialó de nuevo desde Firebase Console.");
+                    }
+                }
+
+                if (!config.apiKey || !config.projectId) {
+                    throw new Error("Faltan campos en el JSON. Aseguráte de copiar la config completa con apiKey y projectId.");
+                }
+
+                // Asegurar storageBucket si no está explícito en el JSON
+                if (!config.storageBucket) {
+                    config.storageBucket = config.projectId + ".appspot.com";
+                }
+
+                setCloudBadge('<i class="fas fa-spinner animate-spin"></i> Conectando...', "wait");
+
+                // Reutilizar app si ya existe, o crear nueva con nombre fijo
+                const APP_NAME = "BertoneApp";
+                let app;
+                try {
+                    app = firebase.app(APP_NAME);
+                    // Si el projectId cambió, eliminar y recrear
+                    if (app.options.projectId !== config.projectId) {
+                        await app.delete();
+                        app = firebase.initializeApp(config, APP_NAME);
+                    }
+                } catch(e) {
+                    app = firebase.initializeApp(config, APP_NAME);
+                }
+
+                // Login anónimo con timeout
+                const authPromise = app.auth().signInAnonymously();
+                const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error("Tiempo de espera agotado. Verificá que Authentication > Anónimo esté habilitado en Firebase.")), 12000));
+                await Promise.race([authPromise, timeout]);
+
+                dbFirebase = app.firestore();
+                // Storage requiere plan Blaze (pago) - solo inicializar si está disponible
+                try {
+                    storageFirebase = app.storage();
+                } catch(e) {
+                    storageFirebase = null;
+                    console.info("Storage no disponible en este plan:", e.message);
+                }
+                esCloudValido = true;
+                setCloudBadge('<i class="fas fa-cloud"></i> ✅ Nube Activa', "ok");
+                actualizarEstadoModalNube();
+                mostrarAlerta("✅ ¡Conectado a la nube! Los datos se sincronizan en todos los dispositivos.", "success");
+
+                // Escuchar registros en tiempo real
+                unsubscribeRegistros = dbFirebase.collection("bertone_registros").orderBy("id_registro", "desc").onSnapshot(snapshot => {
+                    database = snapshot.docs.map(doc => ({ id_cloud: doc.id, ...doc.data() }));
+                    localStorage.setItem('bertone_quality_records', JSON.stringify(database));
+                    actualizarTablaHistorial();
+                }, err => {
+                    console.error("Firestore snapshot error:", err.code, err.message);
+                    if (err.code === 'permission-denied') {
+                        setCloudBadge('<i class="fas fa-lock"></i> Sin permisos', "error");
+                        mostrarAlerta("⚠️ Sin permisos. Revisá las reglas de Firestore en Firebase Console.", "error");
+                    } else if (err.code === 'unavailable') {
+                        setCloudBadge('<i class="fas fa-wifi"></i> Sin conexión', "wait");
+                        // Reintentar en 10 segundos
+                        setTimeout(() => { if (!esCloudValido) inicializarFirebaseCloud(); }, 10000);
+                    }
+                });
+
+                // Escuchar checklist en tiempo real
+                unsubscribeConfig = dbFirebase.collection("bertone_config").doc("checklist").onSnapshot(doc => {
+                    if (!doc.exists) return;
+                    const items = doc.data().items;
+                    if (Array.isArray(items) && items.length > 0) {
+                        checklistData = items;
+                        localStorage.setItem('bertone_checklist_items', JSON.stringify(checklistData));
+                        renderChecklist();
+                    }
+                }, err => console.error("Config sync error:", err));
+
+                // CORREGIDO: Solo sincronizar checklist si la nube no tiene datos aun (no sobreescribir la nube con datos locales)
+                const checklistDoc = await dbFirebase.collection("bertone_config").doc("checklist").get();
+                if (!checklistDoc.exists) {
+                    await dbFirebase.collection("bertone_config").doc("checklist").set({ items: checklistData, updated_at: Date.now() }, { merge: true });
+                }
+
+            } catch (error) {
+                console.error("Firebase error completo:", error.code, error.message, error);
+                setCloudBadge('<i class="fas fa-triangle-exclamation"></i> Error de conexión', "error");
+                const code = error.code || '';
+                let msg = error.message || "Error desconocido";
+
+                if (code === 'auth/operation-not-allowed' || msg.includes('operation-not-allowed')) {
+                    msg = "⚠️ SOLUCIÓN: Firebase Console → Authentication → Sign-in method → Anónimo → HABILITAR.";
+                } else if (code === 'auth/network-request-failed' || msg.includes('network')) {
+                    const esFileProtocol = window.location.protocol === 'file:';
+                    if (esFileProtocol) {
+                        msg = "⚠️ Abrís el archivo directo desde el celular (file://). Firebase no funciona así. SOLUCIÓN: subí el archivo a GitHub Pages o Google Drive y abrilo desde una URL https://";
+                    } else {
+                        msg = "⚠️ Sin internet. Verificá WiFi o datos móviles del dispositivo.";
+                    }
+                } else if (code === 'auth/too-many-requests') {
+                    msg = "⚠️ Demasiados intentos. Esperá unos minutos y volvé a intentar.";
+                } else if (msg.includes('permission') || msg.includes('Permission') || code.includes('permission')) {
+                    msg = "⚠️ SOLUCIÓN: Firebase Console → Firestore Database → Reglas → Cambiar a modo prueba.";
+                } else if (msg.includes('quota') || msg.includes('Quota')) {
+                    msg = "⚠️ Límite de Firebase alcanzado. Plan gratuito superado.";
+                } else if (msg.includes('app/duplicate')) {
+                    msg = "⚠️ Error interno (app duplicada). Recargá la página.";
+                } else if (msg.includes('No se pudo cargar Firebase')) {
+                    msg = "⚠️ No cargaron los scripts de Firebase. Verificá la conexión a internet.";
+                } else if (msg.includes('agotado') || msg.includes('timeout')) {
+                    msg = "⚠️ Tiempo agotado. Verificá que Authentication Anónimo esté habilitado en Firebase Console.";
+                }
+
+                // Mostrar código técnico para facilitar diagnóstico
+                const codigoTecnico = code ? ` [${code}]` : '';
+                mostrarAlerta("❌ No se pudo conectar: " + msg + codigoTecnico, "error");
+            }
+        }
+
+        // Guardar fotos en Firestore como base64 (SIN necesidad de Storage)
+        async function subirFotosAStorage(fotosBase64, idRegistro) {
+            if (!fotosBase64 || fotosBase64.length === 0) return fotosBase64;
+            
+            // Plan SPARK (gratis): guardar fotos como base64 en Firestore
+            // Las fotos ya están en base64, solo retornarlas
+            console.log(`✅ Guardando ${fotosBase64.length} fotos en Firestore como base64`);
+            return fotosBase64;
+        }
+        // --- MANEJO DE CAJAS DE CONFIRMACIÓN PERSONALIZADAS ---
+        function mostrarConfirmacion(titulo, mensaje, esPeligroso = true) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirm-modal');
+                const titleEl = document.getElementById('confirm-title');
+                const msgEl = document.getElementById('confirm-message');
+                const btnOk = document.getElementById('confirm-btn-ok');
+                const btnCancel = document.getElementById('confirm-btn-cancel');
+
+                titleEl.innerText = titulo;
+                msgEl.innerText = mensaje;
+
+                if (esPeligroso) {
+                    btnOk.className = "bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded-lg text-sm transition";
+                } else {
+                    btnOk.className = "bg-blue-900 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded-lg text-sm transition";
+                }
+
+                modal.classList.remove('hidden');
+
+                const nuevoBtnOk = btnOk.cloneNode(true);
+                const nuevoBtnCancel = btnCancel.cloneNode(true);
+                btnOk.parentNode.replaceChild(nuevoBtnOk, btnOk);
+                btnCancel.parentNode.replaceChild(nuevoBtnCancel, btnCancel);
+
+                nuevoBtnOk.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    resolve(true);
+                });
+
+                nuevoBtnCancel.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                    resolve(false);
+                });
+            });
+        }
+
+        // --- SISTEMA DE ESCANEO DE CÓDIGO QR INTELIGENTE ---
+        function abrirScanner() {
+            if (!window.Html5Qrcode) {
+                mostrarAlerta("No se pudo cargar la librería QR. Revise la conexión a internet.", "error");
+                return;
+            }
+            // Verificar si el navegador soporta el acceso directo de cámara activa en vivo
+            const soportaCamaraEnVivo = window.isSecureContext && navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+
+            if (soportaCamaraEnVivo) {
+                // Entorno Seguro: Abre el escaneo de video fluido tradicional
+                const modal = document.getElementById('qr-modal');
+                modal.classList.remove('hidden');
+                document.getElementById('reader').innerHTML = "";
+
+                // Asegurarse de que no quede instancia anterior
+                if (html5QrCode) {
+                    try { html5QrCode.stop().catch(() => {}); } catch(e) {}
+                    html5QrCode = null;
+                }
+
+                html5QrCode = new Html5Qrcode("reader");
+                
+                const config = { 
+                    fps: 15, 
+                    qrbox: (width, height) => {
+                        const minDim = Math.min(width, height);
+                        const boxSize = Math.floor(minDim * 0.7);
+                        return { width: boxSize, height: boxSize };
+                    }
+                };
+
+                html5QrCode.start(
+                    { facingMode: "environment" },
+                    config,
+                    onQrCodeSuccess,
+                    onQrCodeError
+                ).catch(err => {
+                    console.warn("Fallo al arrancar escaneo en vivo:", err);
+                    // Puede ser denegación de permisos o contexto inseguro
+                    cerrarScanner();
+                    if (err && (String(err).includes('Permission') || String(err).includes('NotAllowed') || String(err).includes('permission'))) {
+                        mostrarAlerta("Permiso de cámara denegado. Usá el botón 'Subir foto del QR' como alternativa.", "warning");
+                    }
+                    ejecutarCargaManualArchivoQR();
+                });
+            } else {
+                // Entorno Local/Inseguro (file:// o content:// en móvil): Lanzamos directamente la cámara nativa del teléfono
+                ejecutarCargaManualArchivoQR();
+            }
+        }
+
+        function ejecutarCargaManualArchivoQR() {
+            // En mobile, no llamamos .click() aqui (bloqueado en callbacks async iOS/Android)
+            // En cambio abrimos el modal con el label nativo visible para que el usuario lo toque
+            document.getElementById('qr-modal').classList.remove('hidden');
+            mostrarAlerta("Toca el boton \"Subir foto del QR\" del panel para usar la camara.", "info");
+        }
+
+        function cerrarScanner() {
+            document.getElementById('qr-modal').classList.add('hidden');
+            if (html5QrCode) {
+                const instancia = html5QrCode;
+                html5QrCode = null;
+                instancia.stop()
+                    .catch(() => {})
+                    .finally(() => {
+                        try { instancia.clear(); } catch(e) {}
+                    });
+            }
+        }
+
+        // Procesar QR leído por la cámara en directo
+        function onQrCodeSuccess(decodedText, decodedResult) {
+            completarCamposDesdeQR(decodedText);
+            cerrarScanner();
+        }
+
+        function onQrCodeError(errorMessage) {
+            // Pasivo
+        }
+
+        // ESCANEAR QR DESDE ARCHIVO O FOTO (MÉTODO FALLBACK 100% COMPATIBLE)
+        function escanearDesdeArchivo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Usamos el div oculto dedicado, no el #reader del modal (que puede estar hidden)
+            const readerDiv = document.getElementById('reader-file');
+            readerDiv.innerHTML = "";
+            const html5QrCodeLocal = new Html5Qrcode("reader-file");
+            mostrarAlerta("Procesando código QR capturado...", "info");
+            
+            html5QrCodeLocal.scanFile(file, true)
+                .then(decodedText => {
+                    completarCamposDesdeQR(decodedText);
+                    mostrarAlerta("¡Código QR leído con éxito!", "success");
+                })
+                .catch(err => {
+                    console.error("Error al escanear archivo de imagen: ", err);
+                    mostrarAlerta("No se detectó ningún código QR legible en la foto. Intente de nuevo encuadrando bien de cerca la etiqueta.", "error");
+                })
+                .finally(() => {
+                    try { html5QrCodeLocal.clear(); } catch(e) {}
+                    readerDiv.innerHTML = "";
+                });
+
+            event.target.value = ""; // Limpiar para permitir re-escaneo
+        }
+
+        // LÓGICA DE DETECCIÓN E INYECCIÓN DE DATOS CONFIGURADA SEGÚN CUCARDA BERTONE
+        function completarCamposDesdeQR(decodedText) {
+            try {
+                let data = null;
+                let cod = "";
+                let nom = "";
+                let ser = "";
+                const extraerDatosBertone = (texto) => {
+                    const limpio = String(texto || "").replace(/\s+/g, " ").trim();
+                    const codigo = limpio.match(/\b\d{2}-\d{3}-\d{5}\b/)?.[0] || "";
+                    const panel = limpio.match(/\b[A-Z]{2,5}\d{2,4}[A-Z]?\b/i)?.[0]?.toUpperCase() || "";
+                    const candidatosSerie = limpio.match(/\b\d{6,9}\b/g) || [];
+                    const serie = candidatosSerie.find(n => n !== codigo.replace(/\D/g, "")) || "";
+                    return { codigo, panel, serie };
+                };
+                
+                // 1. Intentar como JSON estructurado
+                try {
+                    data = JSON.parse(decodedText);
+                } catch (e) {
+                    data = null;
+                }
+
+                if (data && typeof data === 'object') {
+                    cod = data.codigo || data.code || data.Código || data.CODIGO || "";
+                    ser = data.serie || data.n_serie || data.n_serie_cucarda || data.cucarda_serie || data.SERIE || data.N_Serie || "";
+                    nom = data.nombre_panel || data.nombre || data.panel || data.modelo || data.model || data.PPV || data.NOMBRE_PANEL || "";
+                    
+                    if (!nom && (data.descripcion || data.description)) {
+                        nom = data.descripcion || data.description;
+                    }
+                } else {
+                    const detectado = extraerDatosBertone(decodedText);
+                    cod = detectado.codigo;
+                    nom = detectado.panel;
+                    ser = detectado.serie;
+
+                    // 2. Intentar parsear como texto separado por barras, comas, o saltos de línea
+                    let parts = [];
+                    if (decodedText.includes('|')) {
+                        parts = decodedText.split('|');
+                    } else if (decodedText.includes(';')) {
+                        parts = decodedText.split(';');
+                    } else if (decodedText.includes(',')) {
+                        parts = decodedText.split(',');
+                    } else if (decodedText.includes('\n')) {
+                        parts = decodedText.split('\n');
+                    }
+
+                    // Limpieza de espacios
+                    parts = parts.map(p => p.trim());
+
+                    if (parts.length >= 2) {
+                        // Intentar identificar inteligentemente por formato típico de Bertone
+                        // Código: ej. 08-007-08544 (contiene guiones y números)
+                        let codigoDetectado = parts.find(p => /^\d{2}-\d{3}-\d{5}$/.test(p)) || parts.find(p => p.includes('-'));
+                        // Serie: ej. 2600001 (número de unos 7 dígitos)
+                        let serieDetectada = parts.find(p => /^\d{7}$/.test(p));
+                        // Nombre: ej. PPV018B (letras y números al final, letras grandes)
+                        let nombreDetectado = parts.find(p => /^[A-Z]{3}\d{3}[A-Z]$/.test(p)) || parts.find(p => p !== codigoDetectado && p !== serieDetectada);
+
+                        cod = cod || codigoDetectado || parts[0] || "";
+                        ser = ser || serieDetectada || (parts[2] || parts[1] || "");
+                        nom = nom || nombreDetectado || (parts[1] || "");
+                    } else {
+                        // Si es texto plano completo
+                        let rawText = decodedText.trim();
+                        // Si tiene formato de código de panel clásico Bertone (ej: "PPV018B") en medio
+                        let matchModel = rawText.match(/[A-Z]{3}\d{3}[A-Z]/);
+                        if (matchModel) {
+                            nom = nom || matchModel[0];
+                        }
+                        cod = cod || rawText;
+                    }
+                }
+
+                // Inyección de los valores extraídos
+                document.getElementById('codigo').value = cod || document.getElementById('codigo').value;
+                document.getElementById('nombre_panel').value = nom || document.getElementById('nombre_panel').value;
+                document.getElementById('cucarda_serie').value = ser || document.getElementById('cucarda_serie').value;
+
+                mostrarAlerta("Campos rellenados: Panel '" + (nom || "Sin Nombre") + "' detectado.", "success");
+            } catch (err) {
+                console.error("Error decodificando QR: ", err);
+                mostrarAlerta("Error al interpretar los datos del código QR.", "error");
+            }
+        }
+
+
+        // --- MANEJO DE CONFIGURACIÓN DE MARCA ---
+        function toggleSettings() {
+            const panel = document.getElementById('settings-panel');
+            panel.classList.toggle('hidden');
+        }
+
+        // Fuerza el reset del checklist desde defaults (borra cache local)
+        function resetearChecklistLocal() {
+            localStorage.removeItem('bertone_checklist_items');
+            localStorage.removeItem('bertone_checklist_version');
+            // Recargar defaults hardcodeados
+            checklistData = [
+                {
+                    categoria: "Armadura",
+                    items: [
+                        { id: "01", desc: "Cucarda y etiqueta disponible y corresponde?" },
+                        { id: "02", desc: "Hierros, estribos correctos y distancia correspondiente?" },
+                        { id: "03", desc: "Escalerillas correspondientes bien soldadas y vinculadas?" },
+                        { id: "04", desc: "Distancia de armazon a perimetrales and aberturas?" },
+                        { id: "05", desc: "Armazon con cruces correctos entre vigas y columnas?" },
+                        { id: "06", desc: "Ganchos de izaje accesibles, alineados y correctos de acuerdo a plano?" },
+                        { id: "07", desc: "Plano en A3 disponible?" }
+                    ]
+                },
+                {
+                    categoria: "Controles en Mesa",
+                    items: [
+                        { id: "08", desc: "Cucarda y etiqueta disponible y corresponde?" },
+                        { id: "09", desc: "Limpieza mesa" },
+                        { id: "10", desc: "Control dimensional molde perimetral y escuadra." },
+                        { id: "11", desc: "Separación entre molde perimetral y mesa" },
+                        { id: "12", desc: "Armadura libre contaminación con desmoldante" },
+                        { id: "13", desc: "Colocación de separadores" },
+                        { id: "14", desc: "Control de herrajes (diám. y long. De hierros, espesor de planchuela)" },
+                        { id: "15", desc: "Posición de herrajes y Fijación" },
+                        { id: "17", desc: "Estado, Posición, ventilaciones de Abertura y paralelismo" },
+                        { id: "18", desc: "Instalaciones eléctricas, es la descripta y esta ubicada en lugar" },
+                        { id: "19", desc: "Instalaciones sanitarias, es la descripta y esta ubicada en lugar" },
+                        { id: "20", desc: "Protección de terminales" },
+                        { id: "21", desc: "Protección ganchos de izaje escalerillas" }
+                    ]
+                },
+                {
+                    categoria: "Hormigón Armado",
+                    items: [
+                        { id: "22", desc: "Terminación correcta de cara: enrasada y terminación (Llaneado, corte manguero o flatachado)" }
+                    ]
+                }
+            ];
+            renderChecklist();
+            mostrarAlerta("Items restablecidos correctamente.", "success");
+        }
+
+        function cargarConfiguracionMarca() {
+            const guardado = localStorage.getItem('bertone_brand_settings');
+            if (guardado) {
+                brandSettings = JSON.parse(guardado);
+            }
+            aplicarConfiguracionMarcaUI();
+        }
+
+        function aplicarConfiguracionMarcaUI() {
+            document.getElementById('cfg-empresa').value = brandSettings.empresa;
+            document.getElementById('cfg-subtitulo').value = brandSettings.subtitulo;
+            document.getElementById('cfg-titulo-form').value = brandSettings.titulo_form;
+            document.getElementById('cfg-subtitulo-form').value = brandSettings.subtitulo_form;
+            document.getElementById('cfg-db-config').value = brandSettings.db_config || "";
+
+            actualizarMarca();
+        }
+
+        function actualizarMarca() {
+            const empresa = document.getElementById('cfg-empresa').value || "BERTONE";
+            const subtitulo = document.getElementById('cfg-subtitulo').value || "CONSTRUCCIONES METÁLICAS";
+            const tituloForm = document.getElementById('cfg-titulo-form').value || "SISTEMA DE CALIDAD";
+            const subtituloForm = document.getElementById('cfg-subtitulo-form').value || "CHECK LIST DE CUMPLIMIENTO";
+
+            document.getElementById('brand-form-title').innerText = tituloForm;
+            document.getElementById('brand-form-subtitle').innerText = subtituloForm;
+
+            document.getElementById('print-company-name').innerText = empresa;
+            document.getElementById('print-company-subtitle').innerText = subtitulo;
+            document.getElementById('print-form-title').innerText = tituloForm;
+            document.getElementById('print-form-subtitle').innerText = subtituloForm;
+
+            const textLogo = document.getElementById('brand-text-logo');
+            const imgLogo = document.getElementById('brand-img-logo');
+            const printLogoContainer = document.getElementById('print-logo-container');
+
+            if (brandSettings.logo_url) {
+                textLogo.classList.add('hidden');
+                imgLogo.src = brandSettings.logo_url;
+                imgLogo.classList.remove('hidden');
+                document.getElementById('btn-borrar-logo').classList.remove('hidden');
+
+                printLogoContainer.innerHTML = `<img src="${brandSettings.logo_url}" class="max-h-12 object-contain mx-auto">`;
+            } else {
+                textLogo.innerText = empresa;
+                textLogo.classList.remove('hidden');
+                imgLogo.classList.add('hidden');
+                document.getElementById('btn-borrar-logo').classList.add('hidden');
+
+                printLogoContainer.innerHTML = `<span class="text-slate-900 font-black text-sm tracking-wider">${empresa}</span>`;
+            }
+        }
+
+        function cargarLogoPersonalizado(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                brandSettings.logo_url = e.target.result;
+                actualizarMarca();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function borrarLogo() {
+            brandSettings.logo_url = "";
+            document.getElementById('cfg-logo-file').value = "";
+            actualizarMarca();
+        }
+
+        // Guardar configuración de marca
+        function guardarConfiguracionMarca() {
+            brandSettings.empresa = document.getElementById('cfg-empresa').value;
+            brandSettings.subtitulo = document.getElementById('cfg-subtitulo').value;
+            brandSettings.titulo_form = document.getElementById('cfg-titulo-form').value;
+            brandSettings.subtitulo_form = document.getElementById('cfg-subtitulo-form').value;
+            brandSettings.db_config = document.getElementById('cfg-db-config').value.trim();
+
+            localStorage.setItem('bertone_brand_settings', JSON.stringify(brandSettings));
+            mostrarAlerta("¡Configuración de marca guardada con éxito!", "success");
+            toggleSettings();
+            inicializarFirebaseCloud();
+        }
+
+        async function restaurarValoresPredeterminados() {
+            const confirmado = await mostrarConfirmacion(
+                "Restaurar Marca original", 
+                "¿Deseas restaurar la marca original y el logotipo de BERTONE?", 
+                false
+            );
+
+            if (confirmado) {
+                brandSettings = {
+                    empresa: "BERTONE",
+                    subtitulo: "CONSTRUCCIONES METÁLICAS",
+                    titulo_form: "SISTEMA DE CALIDAD",
+                    subtitulo_form: "CHECK LIST DE CUMPLIMIENTO",
+                    logo_url: "",
+                    db_config: ""
+                };
+                localStorage.setItem('bertone_brand_settings', JSON.stringify(brandSettings));
+                aplicarConfiguracionMarcaUI();
+                mostrarAlerta("Valores restablecidos.", "info");
+                toggleSettings();
+            }
+        }
+
+
+        // --- ADJUNTAR IMÁGENES / CÁMARA EN OBSERVACIONES ---
+        function procesarFotosAdjuntas(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    comprimirImagen(e.target.result, 800, 0.7, function(base64Comprimido) {
+                        fotosTemporales.push(base64Comprimido);
+                        renderizarPrevisualizacionFotos();
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
+            event.target.value = "";
+        }
+
+        function comprimirImagen(base64Original, maxDim, calidad, callback) {
+            const img = new Image();
+            img.onload = function() {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxDim) {
+                        height *= maxDim / width;
+                        width = maxDim;
+                    }
+                } else {
+                    if (height > maxDim) {
+                        width *= maxDim / height;
+                        height = maxDim;
+                    }
+                }
+
+                const canvasTmp = document.createElement('canvas');
+                canvasTmp.width = width;
+                canvasTmp.height = height;
+                const ctxTmp = canvasTmp.getContext('2d');
+                ctxTmp.drawImage(img, 0, 0, width, height);
+
+                const base64Comprimido = canvasTmp.toDataURL('image/jpeg', calidad);
+                callback(base64Comprimido);
+            };
+            img.src = base64Original;
+        }
+
+        function renderizarPrevisualizacionFotos() {
+            const container = document.getElementById('fotos-preview-container');
+            const wrapper = document.getElementById('gallery-wrapper');
+            const printGrid = document.getElementById('print-photos-grid');
+            
+            container.innerHTML = "";
+            printGrid.innerHTML = "";
+
+            if (fotosTemporales.length === 0) {
+                wrapper.classList.add('hidden');
+                document.getElementById('print-photos-section').classList.add('print:hidden');
+                return;
+            }
+
+            wrapper.classList.remove('hidden');
+            document.getElementById('print-photos-section').classList.remove('print:hidden');
+
+            fotosTemporales.forEach((foto, index) => {
+                const card = document.createElement('div');
+                card.className = "relative flex-shrink-0 w-24 h-24 rounded-lg overflow-hidden border border-slate-300 shadow bg-slate-100 group cursor-pointer hover:shadow-lg transition";
+                card.innerHTML = `
+                    <img src="${foto}" class="w-full h-full object-cover cursor-pointer" onclick="abrirVisorFoto(${index})" title="Click para ampliar">
+                    <button type="button" onclick="eliminarFoto(${index})" class="absolute top-1 right-1 bg-red-600 hover:bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-[10px] shadow transition">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(card);
+
+                const printCard = document.createElement('div');
+                printCard.className = "border border-slate-300 rounded p-1 bg-white flex flex-col items-center justify-center";
+                printCard.innerHTML = `
+                    <img src="${foto}" class="max-h-48 object-contain">
+                    <p class="text-[9px] text-slate-500 mt-1">Foto Adjunta #${index + 1}</p>
+                `;
+                printGrid.appendChild(printCard);
+            });
+        }
+
+        function eliminarFoto(index) {
+            fotosTemporales.splice(index, 1);
+            renderizarPrevisualizacionFotos();
+        }
+
+        // ─── VISOR DE FOTOS CON PINCH-ZOOM ───
+        let visorFotoIndex = 0;
+        let visorEscala = 1;
+
+        function abrirVisorFoto(index) {
+            visorFotoIndex = index;
+            visorEscala = 1;
+            const modal = document.getElementById('visor-foto-modal');
+            const img = document.getElementById('visor-foto-img');
+            img.src = fotosTemporales[visorFotoIndex];
+            img.style.transform = 'scale(1)';
+            document.getElementById('visor-foto-contador').textContent = `${visorFotoIndex + 1} / ${fotosTemporales.length}`;
+            modal.classList.remove('hidden');
+        }
+
+        function cerrarVisorFoto() {
+            document.getElementById('visor-foto-modal').classList.add('hidden');
+            visorEscala = 1;
+        }
+
+        function visorFotoAnterior() {
+            visorFotoIndex = (visorFotoIndex - 1 + fotosTemporales.length) % fotosTemporales.length;
+            visorEscala = 1;
+            const img = document.getElementById('visor-foto-img');
+            img.src = fotosTemporales[visorFotoIndex];
+            img.style.transform = 'scale(1)';
+            document.getElementById('visor-foto-contador').textContent = `${visorFotoIndex + 1} / ${fotosTemporales.length}`;
+        }
+
+        function visorFotoSiguiente() {
+            visorFotoIndex = (visorFotoIndex + 1) % fotosTemporales.length;
+            visorEscala = 1;
+            const img = document.getElementById('visor-foto-img');
+            img.src = fotosTemporales[visorFotoIndex];
+            img.style.transform = 'scale(1)';
+            document.getElementById('visor-foto-contador').textContent = `${visorFotoIndex + 1} / ${fotosTemporales.length}`;
+        }
+
+
+        // --- CARGAR / GUARDAR BASE DE DATOS (ACUMULATIVA) ---
+        function cargarBaseDatos() {
+            const guardado = localStorage.getItem('bertone_quality_records');
+            if (guardado) {
+                database = JSON.parse(guardado);
+            }
+            actualizarTablaHistorial();
+        }
+
+        async function guardarRegistro(e) {
+            e.preventDefault();
+
+            const elFirmante = document.getElementById('nombre_firmante');
+            const nombreFirmante = elFirmante ? elFirmante.value.trim() : "";
+
+            const registro = {
+                id_registro: Date.now(),
+                fecha: document.getElementById('fecha').value,
+                codigo: document.getElementById('codigo').value,
+                nombre_panel: document.getElementById('nombre_panel').value,
+                cucarda_serie: document.getElementById('cucarda_serie').value,
+                mesa: document.getElementById('mesa').value,
+                operarios: document.getElementById('operarios').value,
+                observaciones: document.getElementById('observaciones').value,
+                nombre_firmante: nombreFirmante,
+                fotos: [...fotosTemporales],
+                items: {},
+                resultado_global: "Aprobado"
+            };
+
+            let tieneIncorrectos = false;
+            try {
+                checklistData.forEach(cat => {
+                    cat.items.forEach(item => {
+                        const selector = document.querySelector(`input[name="item_${item.id}"]:checked`);
+                        const valor = selector ? selector.value : "No evaluado";
+                        const comentComentario = document.querySelector(`input[name="comentario_${item.id}"]`);
+                        const comentario = comentComentario ? comentComentario.value : "";
+                        
+                        registro.items[item.id] = {
+                            estado: valor,
+                            comentario: comentario
+                        };
+
+                        if (valor === "Incorrecto") {
+                            tieneIncorrectos = true;
+                        }
+                    });
+                });
+            } catch(itemErr) {
+                console.warn("Error leyendo items del checklist:", itemErr);
+            }
+
+            registro.resultado_global = tieneIncorrectos ? "Rechazado" : "Aprobado";
+
+            registro.firma = null; // Firma digital desactivada
+
+            database.push(registro);
+            localStorage.setItem('bertone_quality_records', JSON.stringify(database));
+
+            // ✅ ACTUALIZAR UI INMEDIATAMENTE
+            actualizarTablaHistorial();
+            mostrarAlerta("✅ ¡Planilla guardada!", "success");
+            
+            resetearFormulario();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // 🌐 FIREBASE EN BACKGROUND (sin bloquear)
+            if (esCloudValido && dbFirebase) {
+                (async () => {
+                    try {
+                        console.log("📤 Guardando registro en Firebase...");
+                        
+                        // Comprimir fotos para que caber en Firestore (límite 1MB por doc)
+                        let fotosComprimidas = [];
+                        if (registro.fotos && registro.fotos.length > 0) {
+                            console.log(`📸 Comprimiendo ${registro.fotos.length} fotos...`);
+                            for (const foto of registro.fotos) {
+                                if (foto && foto.startsWith('data:image')) {
+                                    // Comprimir cada foto a tamaño menor
+                                    const comprimida = await new Promise((resolve) => {
+                                        comprimirImagen(foto, 600, 0.6, (base64Comprimido) => {
+                                            resolve(base64Comprimido);
+                                        });
+                                    });
+                                    fotosComprimidas.push(comprimida);
+                                } else {
+                                    fotosComprimidas.push(foto);
+                                }
+                            }
+                            console.log("✅ Fotos comprimidas");
+                        }
+                        
+                        const registroNube = { ...registro, fotos: fotosComprimidas };
+                        await dbFirebase.collection("bertone_registros").doc(String(registro.id_registro)).set(registroNube);
+                        console.log("✅ ¡Sincronizado con nube!");
+                        mostrarAlerta("☁️ Guardado en nube también", "info");
+                    } catch (error) {
+                        console.error("❌ No se pudo guardar en nube:", error);
+                        mostrarAlerta(`Guardado local. Nube: ${error.message}`, "warning");
+                    }
+                })();
+            }
+        }
+
+        function actualizarTablaHistorial() {
+            const body = document.getElementById('tabla-historial-body');
+            body.innerHTML = "";
+
+            document.getElementById('btn-historial-txt').innerText = `Historial ([${database.length}])`;
+
+            if (database.length === 0) {
+                body.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="p-4 text-center text-slate-400 italic">No hay registros acumulados todavía.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            [...database].reverse().forEach(reg => {
+                const colorRes = reg.resultado_global === "Aprobado" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800";
+                const cantFotos = reg.fotos ? reg.fotos.length : 0;
+                
+                body.innerHTML += `
+                    <tr class="hover:bg-slate-50 border-b border-slate-100">
+                        <td class="p-3 font-semibold text-slate-700">${reg.fecha}</td>
+                        <td class="p-3 font-mono text-slate-600">${reg.codigo}</td>
+                        <td class="p-3 text-slate-700 font-bold">${reg.nombre_panel}</td>
+                        <td class="p-3 text-slate-600">${reg.cucarda_serie}</td>
+                        <td class="p-3 text-slate-600">${reg.mesa}</td>
+                        <td class="p-3 text-slate-500">
+                            <span class="font-bold text-slate-700 block text-xs">${reg.nombre_firmante}</span>
+                            <span class="text-[10px] text-slate-400">Ops: ${reg.operarios}</span>
+                        </td>
+                        <td class="p-3"><span class="px-2 py-1 rounded-full text-xs font-bold ${colorRes}">${reg.resultado_global}</span></td>
+                        <td class="p-3 text-slate-500 text-xs">
+                            ${cantFotos > 0 ? `<span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full font-bold flex items-center justify-center gap-1 w-max"><i class="fas fa-camera"></i> ${cantFotos}</span>` : 'Sin fotos'}
+                        </td>
+                        <td class="p-3 text-center">
+                            <div class="flex items-center justify-center gap-1">
+                                <button onclick="cargarRegistroEnFormulario(${reg.id_registro})" class="text-blue-600 hover:text-blue-800 p-1 mx-1" title="Cargar/Imprimir esta planilla"><i class="fas fa-edit"></i></button>
+                                <button onclick="eliminarRegistro(${reg.id_registro})" class="text-rose-600 hover:text-rose-800 p-1 mx-1" title="Eliminar"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function cargarRegistroEnFormulario(id) {
+            const reg = database.find(r => r.id_registro === id);
+            if (!reg) return;
+
+            document.getElementById('fecha').value = reg.fecha;
+            document.getElementById('codigo').value = reg.codigo;
+            document.getElementById('nombre_panel').value = reg.nombre_panel;
+            document.getElementById('cucarda_serie').value = reg.cucarda_serie;
+            document.getElementById('mesa').value = reg.mesa;
+            document.getElementById('operarios').value = reg.operarios;
+            document.getElementById('observaciones').value = reg.observaciones || "";
+            document.getElementById('nombre_firmante').value = reg.nombre_firmante || "";
+
+            fotosTemporales = reg.fotos ? [...reg.fotos] : [];
+            renderizarPrevisualizacionFotos();
+
+            checklistData.forEach(cat => {
+                cat.items.forEach(item => {
+                    const itemData = reg.items[item.id];
+                    if (itemData) {
+                        const radio = document.querySelector(`input[name="item_${item.id}"][value="${itemData.estado}"]`);
+                        if (radio) radio.checked = true;
+                        document.querySelector(`input[name="comentario_${item.id}"]`).value = itemData.comentario || "";
+                    }
+                });
+            });
+
+            // Firma digital desactivada
+
+            mostrarAlerta("Planilla cargada con éxito. Listo para revisar, reimprimir o editar.", "info");
+            window.scrollTo({ top: 400, behavior: 'smooth' });
+        }
+
+        async function eliminarRegistro(id) {
+            const confirmado = await mostrarConfirmacion(
+                "Eliminar planilla", 
+                "¿Estás seguro de que querés eliminar esta planilla de este dispositivo?", 
+                true
+            );
+
+            if (confirmado) {
+                // CORREGIDO: borrar también en Firestore
+                if (esCloudValido && dbFirebase) {
+                    try {
+                        await dbFirebase.collection("bertone_registros").doc(String(id)).delete();
+                    } catch(err) {
+                        console.warn("No se pudo borrar en nube:", err);
+                    }
+                }
+                database = database.filter(r => r.id_registro !== id);
+                localStorage.setItem('bertone_quality_records', JSON.stringify(database));
+                actualizarTablaHistorial();
+                mostrarAlerta("Registro eliminado.", "info");
+            }
+        }
+
+        async function limpiarHistorialCompleto() {
+            const confirmado = await mostrarConfirmacion(
+                "BORRAR TODO EL HISTORIAL", 
+                "¡ATENCIÓN! Esto borrará permanentemente todas las planillas guardadas localmente en este dispositivo. Esta acción es definitiva.", 
+                true
+            );
+
+            if (confirmado) {
+                // CORREGIDO: borrar también en Firestore
+                if (esCloudValido && dbFirebase) {
+                    try {
+                        const snapshot = await dbFirebase.collection("bertone_registros").get();
+                        const batch = dbFirebase.batch();
+                        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+                        await batch.commit();
+                    } catch(err) {
+                        console.warn("No se pudo borrar historial en nube:", err);
+                    }
+                }
+                localStorage.removeItem('bertone_quality_records');
+                database = [];
+                actualizarTablaHistorial();
+                mostrarAlerta("Historial completamente borrado.", "info");
+            }
+        }
+
+        function resetearFormulario() {
+            document.getElementById('checklist-form').reset();
+            setFechaHoy();
+            fotosTemporales = [];
+            renderizarPrevisualizacionFotos();
+            mostrarAlerta("Formulario reiniciado.", "info");
+        }
+
+
+        // --- EXPORTACIÓN DE EXCEL ACUMULATIVO ---
+        function exportarExcel() {
+            if (database.length === 0) {
+                mostrarAlerta("No hay registros guardados para exportar.", "warning");
+                return;
+            }
+
+            const fechaHoy = new Date().toISOString().slice(0, 10);
+
+            // ─── GENERAR Y DESCARGAR HTML CON FOTOS ───
+            let htmlFotos = `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fotos Bertone ${fechaHoy}</title>
+<style>
+  body{font-family:Arial,sans-serif;background:#f1f5f9;padding:20px}
+  h1{text-align:center;color:#1e3a8a;margin-bottom:4px}
+  .sub{text-align:center;color:#64748b;font-size:13px;margin-bottom:24px}
+  .reg{background:#fff;border-radius:10px;padding:20px;margin:20px 0;box-shadow:0 2px 8px rgba(0,0,0,.1)}
+  .reg-header{border-bottom:2px solid #1e3a8a;padding-bottom:8px;margin-bottom:12px}
+  .reg-title{color:#1e3a8a;font-weight:bold;font-size:16px}
+  .info{font-size:13px;color:#555;margin:3px 0}
+  .fotos{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;margin-top:14px}
+  .foto-card{border:1px solid #ddd;border-radius:8px;overflow:hidden}
+  .foto-card img{width:100%;height:160px;object-fit:cover}
+  .sin-fotos{color:#aaa;font-size:13px}
+  footer{text-align:center;margin-top:40px;color:#888;font-size:12px;border-top:1px solid #ddd;padding-top:15px}
+</style>
+</head>
+<body>
+<h1>📷 Registro Fotográfico — Bertone</h1>
+<p class="sub">Generado: ${new Date().toLocaleString()} | ${database.length} registros</p>`;
+
+            database.forEach((reg, i) => {
+                htmlFotos += `
+<div class="reg">
+  <div class="reg-header">
+    <div class="reg-title">${reg.nombre_panel || 'Sin nombre'}</div>
+  </div>
+  <div class="info"><strong>Fecha:</strong> ${reg.fecha}</div>
+  <div class="info"><strong>Código:</strong> ${reg.codigo || '-'} | <strong>Serie:</strong> ${reg.cucarda_serie || '-'}</div>
+  <div class="info"><strong>Mesa:</strong> ${reg.mesa || '-'} | <strong>Operarios:</strong> ${reg.operarios || '-'}</div>
+  <div class="info"><strong>Resultado:</strong> ${reg.resultado_global || '-'}</div>`;
+
+                if (reg.fotos && reg.fotos.length > 0) {
+                    htmlFotos += `<div class="fotos">`;
+                    reg.fotos.forEach((foto, fi) => {
+                        htmlFotos += `<div class="foto-card"><img src="${foto}" alt="Foto"></div>`;
+                    });
+                    htmlFotos += `</div>`;
+                } else {
+                    htmlFotos += `<p class="sin-fotos">📭 Sin fotos adjuntas</p>`;
+                }
+                htmlFotos += `</div>`;
+            });
+
+            htmlFotos += `
+<footer>
+  <p><strong>Creado por Barcos Martín</strong> — Sistema de Control de Calidad Bertone</p>
+</footer>
+</body></html>`;
+
+            // Descargar HTML
+            const blobH = new Blob([htmlFotos], {type:'text/html'});
+            const urlH = URL.createObjectURL(blobH);
+            const aH = document.createElement('a');
+            aH.href = urlH;
+            aH.download = `fotos_bertone_${fechaHoy}.html`;
+            aH.click();
+            URL.revokeObjectURL(urlH);
+
+            // ─── DESCARGAR EXCEL (original, sin cambios) ───
+            let headers = [
+                "ID Registro", "Fecha", "Código", "Nombre Panel", "Cucarda Serie", 
+                "Mesa", "Operarios", "Nombre del Firmante", "Observaciones Generales", 
+                "Resultado Global", "Cantidad de Fotos"
+            ];
+            
+            checklistData.forEach(cat => {
+                cat.items.forEach(item => {
+                    headers.push(`${item.id} Estado`, `${item.id} Comentario`);
+                });
+            });
+
+            const rows = [headers];
+            database.forEach(reg => {
+                let row = [
+                    reg.id_registro,
+                    reg.fecha,
+                    reg.codigo,
+                    reg.nombre_panel,
+                    reg.cucarda_serie,
+                    reg.mesa,
+                    reg.operarios,
+                    reg.nombre_firmante || "",
+                    (reg.observaciones || "").replace(/\n/g, " "),
+                    reg.resultado_global,
+                    reg.fotos ? reg.fotos.length : 0
+                ];
+
+                checklistData.forEach(cat => {
+                    cat.items.forEach(item => {
+                        const itemData = reg.items[item.id] || { estado: "No evaluado", comentario: "" };
+                        row.push(itemData.estado, (itemData.comentario || "").replace(/\n/g, " "));
+                    });
+                });
+
+                rows.push(row);
+            });
+
+            if (window.XLSX) {
+                const wb = XLSX.utils.book_new();
+                const ws = XLSX.utils.aoa_to_sheet(rows);
+                XLSX.utils.book_append_sheet(wb, ws, "Checklist");
+                XLSX.writeFile(wb, "checklist_calidad_acumulado_BERTONE.xlsx");
+                mostrarAlerta("✅ Descargados: HTML con fotos + Excel", "success");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+            rows.forEach(row => {
+                csvContent += row.map(val => `"${String(val ?? "").replace(/"/g, '""')}"`).join(";") + "\n";
+            });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `checklist_calidad_acumulado_BERTONE.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            mostrarAlerta("✅ Descargados: HTML con fotos + CSV", "success");
+        }
+
+
+        // --- IMPORTACIÓN DE ARCHIVOS PARA CONSOLIDACIÓN / COMBINACIÓN ---
+        function importarCSV(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const text = e.target.result;
+                procesarDatosImportados(text);
+            };
+            reader.readAsText(file);
+            event.target.value = "";
+        }
+
+        async function procesarDatosImportados(text) {
+            try {
+                const lineas = text.split("\n");
+                if (lineas.length < 2) throw new Error("Archivo vacío o incorrecto");
+
+                const headers = lineas[0].replace("\uFEFF", "").replace(/"/g, "").split(";");
+                let nuevosRegistros = 0;
+
+                for (let i = 1; i < lineas.length; i++) {
+                    if (!lineas[i].trim()) continue;
+
+                    const row = lineas[i].replace(/"/g, "").split(";");
+                    if (row.length < 10) continue;
+
+                    const id_registro = parseInt(row[0]) || Date.now() + i;
+
+                    if (database.some(r => r.id_registro === id_registro)) continue;
+
+                    const registro = {
+                        id_registro: id_registro,
+                        fecha: row[1],
+                        codigo: row[2],
+                        nombre_panel: row[3],
+                        cucarda_serie: row[4],
+                        mesa: row[5],
+                        operarios: row[6],
+                        nombre_firmante: row[7],
+                        observaciones: row[8],
+                        resultado_global: row[9],
+                        fotos: [],
+                        items: {}
+                    };
+
+                    let colIdx = 11;
+                    checklistData.forEach(cat => {
+                        cat.items.forEach(item => {
+                            if (colIdx < headers.length) {
+                                registro.items[item.id] = {
+                                    estado: row[colIdx] || "No evaluado",
+                                    comentario: row[colIdx + 1] || ""
+                                };
+                            }
+                            colIdx += 2;
+                        });
+                    });
+
+                    database.push(registro);
+                    nuevosRegistros++;
+                }
+
+                if (nuevosRegistros > 0) {
+                    localStorage.setItem('bertone_quality_records', JSON.stringify(database));
+                    actualizarTablaHistorial();
+                    // CORREGIDO: sincronizar registros importados a Firestore
+                    if (esCloudValido && dbFirebase) {
+                        const registrosNuevos = database.slice(-nuevosRegistros);
+                        for (const reg of registrosNuevos) {
+                            try {
+                                await dbFirebase.collection("bertone_registros").doc(String(reg.id_registro)).set(reg);
+                            } catch(err) {
+                                console.warn("No se pudo sincronizar registro importado:", err);
+                            }
+                        }
+                    }
+                    mostrarAlerta(`¡Combinación exitosa! Se añadieron ${nuevosRegistros} nuevas planillas a tu base de datos acumulada.`, "success");
+                } else {
+                    mostrarAlerta("No se detectaron nuevas planillas para importar o ya estaban todas en tu historial.", "info");
+                }
+
+            } catch (err) {
+                mostrarAlerta("Error al procesar el archivo. Asegúrese de que sea un reporte exportado previamente.", "error");
+                console.error(err);
+            }
+        }
+
+
+        // --- RENDERIZACIÓN DE CONTROLES DEL CHECKLIST ---
+        function toggleItemManager() {
+            document.getElementById('item-manager').classList.toggle('hidden');
+        }
+
+        function actualizarListaCategorias() {
+            const datalist = document.getElementById('category-list');
+            if (!datalist) return;
+            datalist.innerHTML = checklistData.map(cat => `<option value="${cat.categoria}"></option>`).join("");
+        }
+
+        function agregarItemManual() {
+            const categoria = document.getElementById('new-item-category').value.trim() || "Controles adicionales";
+            const desc = document.getElementById('new-item-desc').value.trim();
+            if (!desc) {
+                mostrarAlerta("Escriba la descripción del nuevo ítem.", "warning");
+                return;
+            }
+            let cat = checklistData.find(c => c.categoria.toLowerCase() === categoria.toLowerCase());
+            if (!cat) {
+                cat = { categoria, items: [] };
+                checklistData.push(cat);
+            }
+            const nums = checklistData.flatMap(c => c.items.map(i => parseInt(i.id, 10))).filter(n => !Number.isNaN(n));
+            const id = String((nums.length ? Math.max(...nums) : 0) + 1).padStart(2, "0");
+            cat.items.push({ id, desc });
+            document.getElementById('new-item-desc').value = "";
+            guardarChecklistPersonalizado();
+            renderChecklist();
+            mostrarAlerta("Ítem agregado.", "success");
+        }
+
+        async function quitarItemManual(itemId) {
+            const confirmado = await mostrarConfirmacion("Quitar ítem", "El ítem se quitará del checklist para los próximos controles.", true);
+            if (!confirmado) return;
+            checklistData.forEach(cat => {
+                cat.items = cat.items.filter(item => item.id !== itemId);
+            });
+            checklistData = checklistData.filter(cat => cat.items.length > 0);
+            guardarChecklistPersonalizado();
+            renderChecklist();
+            mostrarAlerta("Ítem quitado.", "info");
+        }
+
+        function renderChecklist() {
+            const container = document.getElementById('items-container');
+            container.innerHTML = "";
+            actualizarListaCategorias();
+
+            checklistData.forEach((cat, catIdx) => {
+                let catHTML = `
+                    <div class="bg-slate-100 p-3 rounded-lg font-bold text-slate-700 text-sm uppercase tracking-wider mb-3">
+                        ${cat.categoria}
+                    </div>
+                    <div class="space-y-4 mb-6">
+                `;
+
+                cat.items.forEach(item => {
+                    catHTML += `
+                        <div class="bg-white border border-slate-200 rounded-lg p-4 shadow-sm flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 hover:border-blue-300 transition">
+                            <div class="flex-1">
+                                <span class="inline-block bg-blue-100 text-blue-800 font-mono text-xs font-bold px-2 py-0.5 rounded-full mr-2">
+                                    ${item.id}
+                                </span>
+                                <span class="text-sm font-semibold text-slate-700">${item.desc}</span>
+                                <button type="button" onclick="quitarItemManual('${item.id}')" class="no-print ml-2 text-rose-500 hover:text-rose-700 text-xs" title="Quitar ítem">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="flex flex-wrap items-center gap-2 w-full lg:w-auto">
+                                <label class="flex-1 sm:flex-initial flex items-center justify-center gap-1 cursor-pointer bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-600 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300 option-btn">
+                                    <input type="radio" name="item_${item.id}" value="Correcto" required class="accent-emerald-600">
+                                    <span>Correcto</span>
+                                </label>
+                                
+                                <label class="flex-1 sm:flex-initial flex items-center justify-center gap-1 cursor-pointer bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-600 hover:bg-rose-50 hover:text-rose-700 hover:border-rose-300 option-btn">
+                                    <input type="radio" name="item_${item.id}" value="Incorrecto" class="accent-rose-600">
+                                    <span>Incorrecto</span>
+                                </label>
+
+                                <label class="flex-1 sm:flex-initial flex items-center justify-center gap-1 cursor-pointer bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs font-bold text-slate-600 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-300 option-btn">
+                                    <input type="radio" name="item_${item.id}" value="Mejorable" class="accent-amber-600">
+                                    <span>Mejorable</span>
+                                </label>
+                                
+                                <input type="text" name="comentario_${item.id}" placeholder="Comentario opcional..." class="w-full sm:w-[200px] text-xs bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 outline-none focus:border-blue-500 transition">
+                            </div>
+                        </div>
+                    `;
+                });
+
+                catHTML += `</div>`;
+                container.innerHTML += catHTML;
+            });
+        }
+
+
+        // --- FIRMA (desactivada) ---
+        let canvas = null, ctx = null;
+        let drawing = false;
+        function initSignaturePad() {}
+        function limpiarFirma() {}
+        function startDraw(e) {}
+        function stopDraw() {}
+        function draw(e) {}
+        function isCanvasBlank(c) { return true; }
+
+                // --- HELPERS GENERALES ---
+        function toggleHistorial() {
+            const sec = document.getElementById('seccion-historial');
+            const btn = document.getElementById('btn-historial-txt');
+            if (sec.classList.contains('hidden')) {
+                sec.classList.remove('hidden');
+                btn.innerHTML = `Ocultar Historial (${database.length})`;
+            } else {
+                sec.classList.add('hidden');
+                btn.innerHTML = `Historial ([${database.length}])`;
+            }
+        }
+
+        function mostrarAlerta(msg, tipo) {
+            const box = document.getElementById('alert-box');
+            const text = document.getElementById('alert-msg');
+            box.className = "mb-6 p-4 rounded-lg text-white font-semibold flex justify-between items-center no-print";
+            
+            if (tipo === "success") box.classList.add("bg-emerald-600");
+            else if (tipo === "warning") box.classList.add("bg-amber-600");
+            else if (tipo === "info") box.classList.add("bg-blue-600");
+            else box.classList.add("bg-rose-600");
+
+            text.innerText = msg;
+            box.classList.remove('hidden');
+
+            setTimeout(() => {
+                box.classList.add('hidden');
+            }, 6000);
+        }
+
+        function cerrarAlerta() {
+            document.getElementById('alert-box').classList.add('hidden');
+        }
+
+
+        // ═══════════════════════════════════════════════════
+        //  MÓDULO CÁMARA IA - LEE CUCARDA CON VISIÓN ARTIFICIAL
+        // ═══════════════════════════════════════════════════
+        let iaCameraStream = null;
+        let iaFrontal = false;
+
+        async function abrirCamaraIA() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                // Sin cámara en vivo → pedir imagen desde galería
+                document.querySelector('#ia-camera-modal label input[type=file]').click();
+                return;
+            }
+            document.getElementById('ia-camera-modal').classList.remove('hidden');
+            await iniciarStreamCamaraIA();
+        }
+
+        async function iniciarStreamCamaraIA() {
+            try {
+                if (iaCameraStream) {
+                    iaCameraStream.getTracks().forEach(t => t.stop());
+                    iaCameraStream = null;
+                }
+                iaCameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: iaFrontal ? 'user' : { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+                    audio: false
+                });
+                const video = document.getElementById('ia-camera-video');
+                video.srcObject = iaCameraStream;
+                await video.play().catch(() => {});
+            } catch(err) {
+                cerrarCamaraIA();
+                mostrarAlerta("No se pudo acceder a la cámara: " + (err.message || err), "error");
+            }
+        }
+
+        function cerrarCamaraIA() {
+            if (iaCameraStream) {
+                iaCameraStream.getTracks().forEach(t => t.stop());
+                iaCameraStream = null;
+            }
+            document.getElementById('ia-camera-modal').classList.add('hidden');
+            document.getElementById('ia-procesando').classList.add('hidden');
+        }
+
+        function cambiarCamaraIA() {
+            iaFrontal = !iaFrontal;
+            iniciarStreamCamaraIA();
+        }
+
+        function capturarFotoIA() {
+            const video = document.getElementById('ia-camera-video');
+            if (!video.videoWidth) {
+                mostrarAlerta("La cámara aún no está lista.", "warning");
+                return;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width  = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            // Flash
+            const flash = document.createElement('div');
+            flash.style.cssText = 'position:fixed;inset:0;background:white;z-index:9999;opacity:0.8;pointer-events:none;';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 150);
+
+            // Comprimir y enviar a la IA
+            const base64 = canvas.toDataURL('image/jpeg', 0.88);
+            enviarFotoAIA(base64);
+        }
+
+        function procesarFotoIADesdeGaleria(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById('ia-camera-modal').classList.remove('hidden');
+                enviarFotoAIA(e.target.result);
+            };
+            reader.readAsDataURL(file);
+            event.target.value = '';
+        }
+
+        // ═══════════════════════════════════════════════════
+        //  LECTOR IA CUCARDA - usa Tesseract.js (OCR local, sin internet extra)
+        // ═══════════════════════════════════════════════════
+        let tesseractWorker = null;
+
+        async function obtenerWorkerOCR() {
+            if (tesseractWorker) return tesseractWorker;
+            actualizarSpinnerIA("Cargando motor OCR...");
+            tesseractWorker = await Tesseract.createWorker('spa+eng', 1, {
+                logger: m => {
+                    if (m.status === 'recognizing text') {
+                        const pct = Math.round((m.progress || 0) * 100);
+                        actualizarSpinnerIA("Analizando imagen... " + pct + "%");
+                    }
+                }
+            });
+            return tesseractWorker;
+        }
+
+        function actualizarSpinnerIA(texto) {
+            const p = document.querySelector('#ia-procesando p.text-violet-300');
+            if (p) p.textContent = texto;
+        }
+
+        async function enviarFotoAIA(base64DataUrl) {
+            const spinner = document.getElementById('ia-procesando');
+            spinner.classList.remove('hidden');
+            spinner.style.display = 'flex';
+            document.getElementById('btn-capturar-ia').disabled = true;
+
+            try {
+                actualizarSpinnerIA("Analizando etiqueta...");
+
+                // Extraer el base64 puro (sin el prefijo data:image/...;base64,)
+                const base64Pure = base64DataUrl.split(',')[1];
+                const mimeType = base64DataUrl.split(';')[0].split(':')[1] || 'image/jpeg';
+
+                // Usar Claude API para leer la cucarda con precisión
+                const response = await fetch("https://api.anthropic.com/v1/messages", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 300,
+                        messages: [{
+                            role: "user",
+                            content: [
+                                {
+                                    type: "image",
+                                    source: { type: "base64", media_type: mimeType, data: base64Pure }
+                                },
+                                {
+                                    type: "text",
+                                    text: `Esta es una cucarda/etiqueta de Premoldeados Bertone. Extraé estos campos y respondé SOLO con JSON válido, sin texto extra:
+{
+  "codigo": "el código en formato DD-DDD-DDDDD, ej: 08-007-08546",
+  "cucarda_serie": "el número de serie, ej: 2600003",
+  "nombre_panel": "el nombre/código del panel en letras grandes, ej: L102A o PPV018B o Panel interior",
+  "descripcion": "el texto de Descripción si aparece"
+}
+Si un campo no se ve claramente, dejalo como cadena vacía "".`
+                                }
+                            ]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error("Error API: " + response.status);
+                }
+
+                const data = await response.json();
+                const texto = data.content?.[0]?.text || '';
+
+                // Parsear JSON de la respuesta
+                let campos = { codigo: '', cucarda_serie: '', nombre_panel: '', descripcion: '' };
+                try {
+                    const clean = texto.replace(/```json|```/g, '').trim();
+                    campos = { ...campos, ...JSON.parse(clean) };
+                } catch(parseErr) {
+                    // Si no es JSON válido, intentar extracción con regex como fallback
+                    console.warn("No se pudo parsear JSON, usando regex fallback:", texto);
+                    campos = extraerCamposDeCucarda(texto);
+                }
+
+                cerrarCamaraIA();
+                let camposLlenos = 0;
+
+                const mappings = [
+                    { key: 'codigo',        id: 'codigo' },
+                    { key: 'nombre_panel',  id: 'nombre_panel' },
+                    { key: 'cucarda_serie', id: 'cucarda_serie' },
+                    { key: 'mesa',          id: 'mesa' },
+                    { key: 'operarios',     id: 'operarios' }
+                ];
+
+                for (const { key, id } of mappings) {
+                    const el = document.getElementById(id);
+                    if (el && campos[key] && campos[key].toString().trim()) {
+                        el.value = campos[key].toString().trim();
+                        el.dispatchEvent(new Event('input', { bubbles: true }));
+                        camposLlenos++;
+                    }
+                }
+
+                if (camposLlenos > 0) {
+                    mostrarAlerta("✅ Se reconocieron " + camposLlenos + " campo" + (camposLlenos > 1 ? "s" : "") + " de la cucarda. Verificá antes de guardar.", "success");
+                } else {
+                    console.warn("Campos vacíos. Respuesta IA:", texto);
+                    mostrarAlerta("⚠️ No se reconocieron campos. Acercá más la cámara y asegurate de que la etiqueta esté bien iluminada.", "warning");
+                }
+
+            } catch (err) {
+                cerrarCamaraIA();
+                console.error("Error IA cucarda:", err);
+                // Si falla la API, intentar con OCR local como fallback
+                actualizarSpinnerIA("Intentando OCR local...");
+                try {
+                    const imgEl = new Image();
+                    await new Promise((res, rej) => { imgEl.onload=res; imgEl.onerror=rej; imgEl.src=base64DataUrl; });
+                    const canvas = document.createElement('canvas');
+                    const escala = Math.min(4, 1600 / Math.max(imgEl.width, imgEl.height));
+                    canvas.width = Math.round(imgEl.width * escala);
+                    canvas.height = Math.round(imgEl.height * escala);
+                    const ctx = canvas.getContext('2d');
+                    ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(imgEl, 0, 0, canvas.width, canvas.height);
+                    ctx.filter = 'contrast(1.8) brightness(1.1) grayscale(1)';
+                    ctx.drawImage(canvas, 0, 0);
+                    const worker = await obtenerWorkerOCR();
+                    const resultado = await worker.recognize(canvas);
+                    const campos = extraerCamposDeCucarda(resultado.data.text || '');
+                    cerrarCamaraIA();
+                    let camposLlenos = 0;
+                    [['codigo','codigo'],['nombre_panel','nombre_panel'],['cucarda_serie','cucarda_serie']].forEach(([k,id]) => {
+                        const el = document.getElementById(id);
+                        if (el && campos[k]) { el.value = campos[k]; camposLlenos++; }
+                    });
+                    if (camposLlenos > 0) mostrarAlerta("✅ OCR local: " + camposLlenos + " campo(s) reconocidos.", "success");
+                    else mostrarAlerta("No se pudo leer la etiqueta. Completá los campos manualmente.", "warning");
+                } catch(ocrErr) {
+                    cerrarCamaraIA();
+                    mostrarAlerta("Error al procesar la imagen. Completá los campos manualmente.", "error");
+                }
+            } finally {
+                document.getElementById('btn-capturar-ia').disabled = false;
+                spinner.classList.add('hidden');
+                spinner.style.display = 'none';
+            }
+        }
+
+        function extraerCamposDeCucarda(texto) {
+            // Normalizar texto
+            const t = texto.replace(/\r/g, '\n').replace(/[ \t]+/g, ' ').trim();
+            const lineas = t.split('\n').map(l => l.trim()).filter(l => l.length > 1);
+            const campos = { codigo: '', nombre_panel: '', cucarda_serie: '', descripcion: '' };
+
+            // ── CÓDIGO: patrón fijo Bertone  XX-XXX-XXXXX  (ej: 08-007-08546)
+            // Acepta guión, barra, espacio como separador, y OCR que confunde - con _
+            const rCodigo = t.match(/\b(\d{2}[-_/ ]\d{3}[-_/ ]\d{5})\b/);
+            if (rCodigo) campos.codigo = rCodigo[1].replace(/[_/ ]/g, '-');
+
+            // ── N° SERIE: número de 7 dígitos (ej: 2600003, 2500123)
+            // Primero buscar con label explícito
+            const rSerieLabel = t.match(/n[°o]?\s*[.:]?\s*serie\s*[:.#]?\s*(\d{5,8})/i);
+            if (rSerieLabel) {
+                campos.cucarda_serie = rSerieLabel[1];
+            } else {
+                // Buscar número de 7 dígitos solo (formato Bertone: 26xxxxx o 25xxxxx)
+                const rSerie7 = t.match(/\b(2[0-9]{6})\b/);
+                if (rSerie7) campos.cucarda_serie = rSerie7[1];
+                // Fallback: cualquier número 5-8 dígitos en su propia línea
+                if (!campos.cucarda_serie) {
+                    for (const linea of lineas) {
+                        if (/^\d{5,8}$/.test(linea)) { campos.cucarda_serie = linea; break; }
+                    }
+                }
+            }
+
+            // ── NOMBRE PANEL (letras grandes): aparece al final de la cucarda
+            // Formato: L102A, V018D, PPV018B, SF2000, etc.
+            // Buscar el texto más grande — suele ser la última línea significativa
+            // o aparecer después de "Descripción:" o solo en línea propia
+            const rDescLabel = t.match(/descripci[oó]n\s*[:.]\s*(.+)/i);
+            if (rDescLabel) {
+                // Descripción puede ser "Panel interior", "LOSA L102A", etc.
+                const desc = rDescLabel[1].trim();
+                campos.descripcion = desc;
+                // Si la descripción termina en un código tipo L102A, usarlo como nombre
+                const mCodPanel = desc.match(/([A-Z]{1,4}\d{2,4}[A-Z]?)$/i);
+                if (mCodPanel) campos.nombre_panel = mCodPanel[1].toUpperCase();
+            }
+
+            // Si no encontramos nombre_panel desde descripción, buscar línea con código alfanumérico grande
+            // Patrones: L102A, V018D, PPV018B, SF2000, PI-001
+            if (!campos.nombre_panel) {
+                // Buscar línea que sea solo un código alfanumérico (nombre en letras grandes)
+                for (const linea of lineas) {
+                    if (/^[A-Z]{1,4}\d{2,4}[A-Z]?$/i.test(linea) && linea.length >= 3) {
+                        campos.nombre_panel = linea.toUpperCase();
+                        break;
+                    }
+                }
+            }
+
+            // Fallback nombre_panel: código alfanumérico en cualquier parte del texto
+            if (!campos.nombre_panel) {
+                const rAlfanum = t.match(/\b([A-Z]{1,4}\d{2,4}[A-Z]?)\b/i);
+                if (rAlfanum && rAlfanum[1].length >= 3) {
+                    campos.nombre_panel = rAlfanum[1].toUpperCase();
+                }
+            }
+
+            // Si descripcion tiene el nombre completo y nombre_panel es distinto, usar descripcion completa
+            if (campos.descripcion && !campos.nombre_panel) {
+                campos.nombre_panel = campos.descripcion;
+            }
+
+            console.log('OCR campos extraídos:', campos, '| Texto bruto:', t.substring(0, 200));
+            return campos;
+        }
+
+        // Comprime foto a miniatura pequeña (< 50KB) para guardar en Firestore sin Storage
+        async function comprimirFotoParaFirestore(base64) {
+            if (!base64 || base64.startsWith('http')) return base64;
+            try {
+                const img = new Image();
+                await new Promise((res, rej) => { img.onload=res; img.onerror=rej; img.src=base64; });
+                const canvas = document.createElement('canvas');
+                const MAX = 400; // máximo 400px en cualquier lado
+                const ratio = Math.min(MAX/img.width, MAX/img.height, 1);
+                canvas.width = Math.round(img.width * ratio);
+                canvas.height = Math.round(img.height * ratio);
+                canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+                return canvas.toDataURL('image/jpeg', 0.5); // calidad 50%
+            } catch(e) {
+                return ''; // si falla, no guardar foto
+            }
+        }
+
+        // ═══════════════════════════════════════════════════
+        //  MÓDULO CÁMARA EN VIVO
+        // ═══════════════════════════════════════════════════
+        let cameraStream = null;
+        let camaraFrontal = false;
+        let fotosEnSesionCamara = 0;
+
+        async function abrirCamara() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                // Fallback: abrir galería con capture
+                mostrarAlerta("Tu navegador no soporta cámara en vivo. Usá Galería.", "warning");
+                document.getElementById('input-fotos-galeria').click();
+                return;
+            }
+            fotosEnSesionCamara = fotosTemporales.length;
+            document.getElementById('camera-modal').classList.remove('hidden');
+            await iniciarStreamCamara();
+        }
+
+        async function iniciarStreamCamara() {
+            try {
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(t => t.stop());
+                    cameraStream = null;
+                }
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: camaraFrontal ? 'user' : { ideal: 'environment' },
+                        width:  { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    },
+                    audio: false
+                });
+                const video = document.getElementById('camera-video');
+                video.srcObject = cameraStream;
+                await video.play().catch(() => {});
+                actualizarContadorCamara();
+            } catch(err) {
+                cerrarCamara();
+                if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                    mostrarAlerta("Permiso de cámara denegado. Habilitá el acceso en la configuración del celular.", "error");
+                } else {
+                    mostrarAlerta("No se pudo abrir la cámara: " + (err.message || err), "error");
+                }
+            }
+        }
+
+        function cerrarCamara() {
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(t => t.stop());
+                cameraStream = null;
+            }
+            document.getElementById('camera-modal').classList.add('hidden');
+            fotosEnSesionCamara = 0;
+        }
+
+        function cambiarCamara() {
+            camaraFrontal = !camaraFrontal;
+            iniciarStreamCamara();
+        }
+
+        function capturarFoto() {
+            const video = document.getElementById('camera-video');
+            if (!video.videoWidth || !video.srcObject) {
+                mostrarAlerta("La cámara aún no está lista. Esperá un instante.", "warning");
+                return;
+            }
+            const canvas = document.createElement('canvas');
+            canvas.width  = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+
+            // Flash visual
+            const flash = document.createElement('div');
+            flash.style.cssText = 'position:fixed;inset:0;background:white;z-index:9999;opacity:0.8;pointer-events:none;';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 150);
+
+            comprimirImagen(canvas.toDataURL('image/jpeg', 0.92), 1280, 0.82, function(compressed) {
+                fotosTemporales.push(compressed);
+                renderizarPrevisualizacionFotos();
+                actualizarContadorCamara();
+            });
+        }
+
+        function actualizarContadorCamara() {
+            const badge = document.getElementById('foto-count-badge');
+            const total = fotosTemporales.length;
+            if (total > 0) {
+                badge.classList.remove('hidden');
+                badge.textContent = total + (total === 1 ? ' foto' : ' fotos');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+
+        // ═══════════════════════════════════════════════════
+        //  MÓDULO NUBE - MODAL DE CONFIGURACIÓN
+        // ═══════════════════════════════════════════════════
+        function limpiarJsonFirebase(el) {
+            let v = el.value;
+            // Extraer solo el bloque { ... }
+            const m = v.match(/\{[\s\S]*\}/);
+            if (m) v = m[0];
+            // Quitar comillas tipográficas
+            v = v.replace(/[“”‘’]/g, '"');
+            el.value = v;
+        }
+
+        function jsObjectAJson(str) {
+            var i = str.indexOf('{');
+            var j = str.lastIndexOf('}');
+            if (i < 0 || j < 0) return str;
+            try {
+                // Use Function to evaluate JS object literal safely
+                return JSON.stringify(Function('return (' + str.substring(i, j+1) + ')')());
+            } catch(e) {
+                return str.substring(i, j+1);
+            }
+        }
+
+        function abrirConfigNube() {
+            const modal = document.getElementById('cloud-modal');
+            // Sincronizar valor actual
+            document.getElementById('cloud-modal-config').value = brandSettings.db_config || '';
+            actualizarEstadoModalNube();
+            modal.classList.remove('hidden');
+        }
+
+        function cerrarConfigNube() {
+            document.getElementById('cloud-modal').classList.add('hidden');
+        }
+
+        function actualizarEstadoModalNube() {
+            // Mostrar aviso file:// si corresponde
+            const alertaFile = document.getElementById('alerta-file-protocol');
+            if (alertaFile) {
+                if (window.location.protocol === 'file:') {
+                    alertaFile.classList.remove('hidden');
+                } else {
+                    alertaFile.classList.add('hidden');
+                }
+            }
+            const statusDiv = document.getElementById('cloud-modal-status');
+            if (esCloudValido) {
+                statusDiv.className = 'rounded-xl p-4 bg-emerald-50 border border-emerald-200 text-sm text-emerald-700 flex items-center gap-3';
+                statusDiv.innerHTML = '<i class="fas fa-check-circle text-emerald-500 text-xl"></i><div><p class="font-bold text-emerald-700">✅ Conectado a la Nube</p><p class="text-xs mt-0.5">Todos los dispositivos con esta config se sincronizan en tiempo real.</p></div>';
+            } else {
+                statusDiv.className = 'rounded-xl p-4 bg-slate-50 border border-slate-200 text-sm text-slate-600 flex items-center gap-3';
+                statusDiv.innerHTML = '<i class="fas fa-database text-slate-400 text-xl"></i><div><p class="font-bold text-slate-700">Modo: Solo Local</p><p class="text-xs mt-0.5">Los datos se guardan solo en este dispositivo.</p></div>';
+            }
+        }
+
+        async function conectarNubeDesdeModal() {
+            const textarea = document.getElementById('cloud-modal-config');
+            limpiarJsonFirebase(textarea);
+            const raw = textarea.value.trim();
+            if (!raw) {
+                mostrarAlerta("Pegá primero la configuración JSON de Firebase.", "warning");
+                return;
+            }
+            // Extraer JSON limpio
+            const match = raw.match(/\{[\s\S]*\}/);
+            const jsonStr = match ? match[0] : raw;
+            // Intentar parsear directo, si falla convertir de JS a JSON
+            let config;
+            let jsonLimpio = jsonStr;
+            try {
+                config = JSON.parse(jsonLimpio);
+            } catch(e) {
+                // Puede ser formato JS (sin comillas en claves) — convertir
+                try {
+                    jsonLimpio = jsObjectAJson(jsonStr);
+                    config = JSON.parse(jsonLimpio);
+                } catch(e2) {
+                    mostrarAlerta("No se pudo leer el JSON. Copiá el bloque completo desde Firebase → Configuración → formato Config. Error: " + e2.message, "error");
+                    return;
+                }
+            }
+            if (!config.apiKey || !config.projectId) {
+                mostrarAlerta("Faltan campos. El JSON debe tener al menos apiKey y projectId.", "error");
+                return;
+            }
+            // Guardar siempre el JSON limpio
+            brandSettings.db_config = jsonStr;
+            document.getElementById('cfg-db-config').value = jsonStr;
+            localStorage.setItem('bertone_brand_settings', JSON.stringify(brandSettings));
+            cerrarConfigNube();
+            mostrarAlerta("Conectando a la nube...", "info");
+            await inicializarFirebaseCloud();
+        }
+
+        async function desconectarNube() {
+            brandSettings.db_config = '';
+            document.getElementById('cfg-db-config').value = '';
+            document.getElementById('cloud-modal-config').value = '';
+            localStorage.setItem('bertone_brand_settings', JSON.stringify(brandSettings));
+            if (unsubscribeRegistros) unsubscribeRegistros();
+            if (unsubscribeConfig) unsubscribeConfig();
+            dbFirebase = null;
+            storageFirebase = null;
+            esCloudValido = false;
+            setCloudBadge('<i class="fas fa-cloud"></i> <span id="cloud-badge-txt">☁️ Configurar Nube</span>', "local");
+            actualizarEstadoModalNube();
+            mostrarAlerta("Desconectado de la nube. La app sigue en modo local.", "info");
+        }
+
+        function generarQRConfig() {
+            const config = document.getElementById('cloud-modal-config').value.trim();
+            if (!config) {
+                mostrarAlerta("Primero ingresá la configuración de Firebase.", "warning");
+                return;
+            }
+            try {
+                JSON.parse(config);
+            } catch(e) {
+                mostrarAlerta("El JSON no es válido.", "error");
+                return;
+            }
+            const encoded = encodeURIComponent(config);
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=220x220&ecc=M&data=${encoded}`;
+            document.getElementById('cloud-qr-img').src = qrUrl;
+            document.getElementById('cloud-qr-section').classList.remove('hidden');
+        }
+
+        function compartirConfigCloud() {
+            const config = document.getElementById('cfg-db-config').value.trim();
+            if (!config) {
+                abrirConfigNube();
+                return;
+            }
+            abrirConfigNube();
+            document.getElementById('cloud-modal-config').value = config;
+            generarQRConfig();
+        }
+
+        function toggleGuiaFirebase() {
+            document.getElementById('guia-firebase').classList.toggle('hidden');
+        }
+
+    
+        // ─── CARGAR FOTOS EN PDF AL IMPRIMIR ───
+        window.addEventListener('beforeprint', () => {
+            const grid = document.getElementById('print-photos-grid');
+            if (!grid || fotosTemporales.length === 0) return;
+            
+            grid.innerHTML = '';
+            fotosTemporales.forEach(foto => {
+                const img = document.createElement('img');
+                img.src = foto;
+                img.style.maxHeight = '200px';
+                img.style.objectFit = 'contain';
+                img.style.border = '1px solid #ccc';
+                img.style.borderRadius = '4px';
+                img.style.width = '100%';
+                grid.appendChild(img);
+            });
+            
+            const section = document.getElementById('print-photos-section');
+            if (section) section.style.display = 'block';
+        });
+        
+        window.addEventListener('afterprint', () => {
+            const section = document.getElementById('print-photos-section');
+            if (section) section.style.display = 'none';
+        });
+        
+        // ─── PINCH-ZOOM PARA VISOR DE FOTOS ───
+        document.addEventListener('DOMContentLoaded', () => {
+            const img = document.getElementById('visor-foto-img');
+            if (!img) return;
+            
+            let touchDist = 0;
+            
+            img.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 2) {
+                    touchDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                }
+            }, { passive: true });
+            
+            img.addEventListener('touchmove', (e) => {
+                if (e.touches.length === 2) {
+                    const newDist = Math.hypot(
+                        e.touches[0].clientX - e.touches[1].clientX,
+                        e.touches[0].clientY - e.touches[1].clientY
+                    );
+                    visorEscala = Math.max(1, Math.min(4, visorEscala + (newDist - touchDist) * 0.008));
+                    img.style.transform = `scale(${visorEscala})`;
+                    touchDist = newDist;
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            img.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                visorEscala = Math.max(1, Math.min(4, visorEscala + (e.deltaY > 0 ? -0.15 : 0.15)));
+                img.style.transform = `scale(${visorEscala})`;
+            }, { passive: false });
+        });
+
+        
+
+        // ═══════════════════════════════════════════════════════════════
+        // DROPDOWN Y TIPOS DE CHECKLIST
+        // ═══════════════════════════════════════════════════════════════
+        
+        function abrirDropdownTipo() {
+            const dropdown = document.getElementById('dropdown-tipos');
+            if (dropdown) dropdown.classList.toggle('hidden');
+        }
+
+        function cambiarTipo(tipo) {
+            tipoActual = tipo;
+            
+            // Guardar checklist actual
+            const itemsActuales = document.querySelectorAll('input[type="checkbox"][name^="item_"]');
+            if (!checklistPorTipo[tipo]) {
+                // Primera vez que selecciona este tipo, hacer copia del checklist actual
+                checklistPorTipo[tipo] = Array.from(itemsActuales).map(inp => ({
+                    id: inp.name,
+                    checked: inp.checked
+                }));
+            }
+            
+            // Actualizar botón
+            const iconos = { 'Paneles': '📦', 'Conductos': '🔩', 'Tubos': '🛠️', 'Armaduras': '🏗️' };
+            document.getElementById('tipo-actual-texto').textContent = `${iconos[tipo]} ${tipo}`;
+            
+            // Cerrar dropdown
+            document.getElementById('dropdown-tipos').classList.add('hidden');
+            
+            // Restaurar checkboxes del tipo
+            setTimeout(() => {
+                const items = document.querySelectorAll('input[type="checkbox"][name^="item_"]');
+                if (checklistPorTipo[tipo]) {
+                    checklistPorTipo[tipo].forEach(item => {
+                        const input = document.querySelector(`input[name="${item.id}"]`);
+                        if (input) input.checked = item.checked;
+                    });
+                }
+            }, 100);
+            
+            console.log('Tipo:', tipo);
+        }
+
+        // Guardar estado de checkboxes cuando cambian
+        document.addEventListener('change', function(e) {
+            if (e.target.type === 'checkbox' && e.target.name.startsWith('item_')) {
+                if (!checklistPorTipo[tipoActual]) {
+                    checklistPorTipo[tipoActual] = [];
+                }
+                
+                const item = checklistPorTipo[tipoActual].find(it => it.id === e.target.name);
+                if (item) {
+                    item.checked = e.target.checked;
+                } else {
+                    checklistPorTipo[tipoActual].push({
+                        id: e.target.name,
+                        checked: e.target.checked
+                    });
+                }
+            }
+        });
+
+        // Cerrar dropdown al hacer click afuera
+        document.addEventListener('click', (e) => {
+            const dropdown = document.getElementById('dropdown-tipos');
+            const btn = document.getElementById('btn-tipo-selector');
+            if (dropdown && btn && !dropdown.contains(e.target) && !btn.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        });
+
+    </script>
+    <!-- VISOR DE FOTOS CON PINCH-ZOOM -->
+    <div id="visor-foto-modal" class="hidden fixed inset-0 z-[999] flex flex-col bg-black bg-opacity-95">
+        <!-- Header -->
+        <div class="flex items-center justify-between px-4 py-3 bg-black bg-opacity-80">
+            <span id="visor-foto-contador" class="text-white font-bold text-sm"></span>
+            <button onclick="cerrarVisorFoto()" class="text-white text-3xl leading-none hover:text-gray-300">✕</button>
+        </div>
+        <!-- Imagen -->
+        <div class="flex-1 flex items-center justify-center overflow-hidden">
+            <img id="visor-foto-img" src="" alt="Foto"
+                style="max-width:90vw;max-height:85vh;object-fit:contain;transform:scale(1);transition:transform 0.1s;user-select:none;touch-action:none">
+        </div>
+        <!-- Controles -->
+        <div class="flex items-center justify-center gap-4 px-4 py-3 bg-black bg-opacity-80">
+            <button onclick="visorFotoAnterior()" class="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2 rounded-lg font-bold">← Anterior</button>
+            <button onclick="cerrarVisorFoto()" class="bg-slate-600 hover:bg-slate-500 text-white px-5 py-2 rounded-lg font-bold">Cerrar</button>
+            <button onclick="visorFotoSiguiente()" class="bg-slate-700 hover:bg-slate-600 text-white px-5 py-2 rounded-lg font-bold">Siguiente →</button>
+        </div>
+    </div>
+
+
+
+    <!-- FOOTER -->
+    <footer class="text-center py-4 border-t border-slate-200 mt-8 no-print">
+        <p class="text-sm text-slate-600"><strong>Creado por Barcos Martín</strong> — Sistema de Control de Calidad Bertone</p>
+    </footer>
+
+</body>
+</html>
